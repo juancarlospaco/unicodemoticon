@@ -2,7 +2,7 @@ unicodemoticon
 ==============
 
 - Trayicon with Unicode Emoticons using Python3 Qt5
-- 200 lines of Python 3 + Qt 5, single-file, No Dependencies.
+- Python 3 + Qt 5, single-file, No Dependencies.
 
 
 ![screenshot](https://raw.githubusercontent.com/juancarlospaco/unicodemoticon/master/temp.jpg)
