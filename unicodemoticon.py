@@ -9,9 +9,9 @@ __version__ = ' 0.0.1 '
 __license__ = ' GPLv3 LGPLv3 '
 __author__ = ' Juan Carlos '
 __email__ = ' juancarlospaco@gmail.com '
-__url__ = 'https://github.com/juancarlospaco/unicodemoticons'
+__url__ = 'https://github.com/juancarlospaco/unicodemoticon'
 __source__ = ('https://raw.githubusercontent.com/juancarlospaco/'
-              'unicodemoticons/master/unicodemoticons.py')
+              'unicodemoticon/master/unicodemoticon.py')
 
 
 # imports
@@ -37,7 +37,7 @@ QWidget:disabled { color: #404040 }"""
 AUTOSTART_DESKTOP_FILE = """
 [Desktop Entry]
 Comment=Trayicon with Unicode Emoticons.
-Exec=sleep 9 && chrt --idle 0 /usr/bin/unicodemoticon
+Exec=chrt --idle 0 /usr/bin/unicodemoticon
 GenericName=Trayicon with Unicode Emoticons.
 Icon=system-run
 Name=UnicodEmoticon
@@ -386,22 +386,11 @@ class MainWindow(QSystemTrayIcon):
         helpMenu.addSeparator()
         helpMenu.addAction("Report Bugs", lambda:
                            open_new_tab(__url__ + '/issues?state=open'))
-        helpMenu.addAction("Check Updates", lambda: self.check_for_updates())
         traymenu.addSeparator()
         traymenu.addAction("Quit", lambda: self.close())
         self.setContextMenu(traymenu)
         self.show()
         self.add_autostart()
-
-    def check_for_updates(self):
-        """Method to check for updates from Git repo versus this version."""
-        this_version = str(open(__file__).read())
-        last_version = str(request.urlopen(__source__).read().decode("utf8"))
-        if this_version != last_version:
-            m = "Theres new Version available!<br>Download update from the web"
-        else:
-            m = "No new updates!<br>You have the lastest version of" + __doc__
-        return QMessageBox.information(self, __doc__.title(), "<b>" + m)
 
     def add_autostart(self):
         """Add to autostart of the Desktop."""
@@ -428,7 +417,7 @@ def main():
     """Main Loop."""
     try:
         nice(19)
-        sleep(19)
+        sleep(9)
     except Exception as error:
         print(error)
     app = QApplication(sys.argv)
