@@ -506,7 +506,7 @@ class MainWindow(QSystemTrayIcon):
         desktop_file = path.join(path.expanduser("~"),
                                  ".config/autostart/unicodemoticon.desktop")
         if (path.isdir(path.join(path.expanduser("~"), ".config/autostart"))
-            and not path.isfile(desktop_file)):
+                and not path.isfile(desktop_file)):
             with open(desktop_file, "w") as desktop_file_to_write:
                 desktop_file_to_write.write(AUTOSTART_DESKTOP_FILE)
 
