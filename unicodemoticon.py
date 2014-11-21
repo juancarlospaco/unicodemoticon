@@ -486,7 +486,7 @@ class MainWindow(QSystemTrayIcon):
         helpMenu = traymenu.addMenu("Help...")
         helpMenu.addAction("About Python 3",
                            lambda: open_new_tab('https://www.python.org'))
-        helpMenu.addAction("About" + __doc__, lambda: open_new_tab(__url__))
+        helpMenu.addAction("About " + __doc__, lambda: open_new_tab(__url__))
         helpMenu.addSeparator()
         if not sys.platform.startswith("win"):
             helpMenu.addAction("View Source Code", lambda: call(
