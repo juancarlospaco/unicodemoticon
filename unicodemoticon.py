@@ -22,6 +22,7 @@ from time import sleep
 from subprocess import call
 from webbrowser import open_new_tab
 from urllib import request
+from ctypes import cdll, byref, create_string_buffer
 
 from PyQt5.QtGui import QIcon, QFont
 from PyQt5.QtWidgets import QApplication, QMessageBox, QSystemTrayIcon, QMenu
@@ -652,7 +653,11 @@ class MainWindow(QSystemTrayIcon):
 def main():
     """Main Loop."""
     try:
-        nice(19)
+        nice(19)  # smooth cpu priority
+        libc = cdll.LoadLibrary('libc.so.6')  # set process name
+        buff = create_string_buffer(len(__doc__.strip()) + 1)
+        buff.value = bytes(__doc__.lower().replace(" ", "").encode("utf-8"))
+        libc.prctl(15, byref(buff), 0, 0, 0)
         sleep(9)
     except Exception as error:
         print(error)
