@@ -69,7 +69,6 @@ class MainWindow(QSystemTrayIcon):
         self.setToolTip(__doc__.strip().capitalize())
         traymenu = QMenu("Emoticons")
         self.setIcon(QIcon("edit-paste"))
-        self.font = QFont()
         traymenu.addAction("Emoticons").setDisabled(True)
         traymenu.setStyleSheet(QSS_STYLE.strip())
         traymenu.addSeparator()
