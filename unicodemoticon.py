@@ -5,7 +5,8 @@
 
 # metadata
 """UnicodEmoticons."""
-__version__ = ' 0.0.1 '
+__package__ = "unicodemoticons"
+__version__ = '0.0.1'
 __license__ = ' GPLv3 LGPLv3 '
 __author__ = ' Juan Carlos '
 __email__ = ' juancarlospaco@gmail.com '
@@ -17,12 +18,14 @@ __source__ = ('https://raw.githubusercontent.com/juancarlospaco/'
 # imports
 import sys
 from getopt import getopt
-from os import nice, path
-from time import sleep
+from os import path
+import os
 from subprocess import call
 from webbrowser import open_new_tab
 from urllib import request
 from ctypes import cdll, byref, create_string_buffer
+import logging as log
+from tempfile import gettempdir
 
 from PyQt5.QtGui import QIcon, QFont
 from PyQt5.QtWidgets import QApplication, QMessageBox, QSystemTrayIcon, QMenu
@@ -96,7 +99,8 @@ class MainWindow(QSystemTrayIcon):
         for item in (menu0, menu1, menu2, menu3, menu4, menu5, menu6, menu7,
                      menu8, menu9, menu10, menu11, menu12, menu13, menu14,
                      menu15, menu16, menu17, menu18, menu19, menu20):
-            item.setStyleSheet("font-size:25px;padding:0;margin:0")
+            item.setStyleSheet(
+                "font-size:25px;padding:0;margin:0;font-family:Oxygen")
         # sex
         menu0.addAction("all", lambda:
                         QApplication.clipboard().setText("☿⚢⚣⚤⚥♀⚧♂"))
@@ -635,12 +639,13 @@ class MainWindow(QSystemTrayIcon):
                                  ".config/autostart/unicodemoticon.desktop")
         if (path.isdir(path.join(path.expanduser("~"), ".config/autostart"))
                 and not path.isfile(desktop_file)):
+            log.info("Writing AutoStart file: " + desktop_file)
             with open(desktop_file, "w") as desktop_file_to_write:
                 desktop_file_to_write.write(AUTOSTART_DESKTOP_FILE)
 
     def close(self):
         """Overload close method."""
-        exit(1)
+        return sys.exit(1)
 
     def __hash__(self):
         """Return a valid answer."""
@@ -652,19 +657,23 @@ class MainWindow(QSystemTrayIcon):
 
 def main():
     """Main Loop."""
+    APPNAME = str(__package__ or __doc__)[:99].lower().strip().replace(" ", "")
+    log.basicConfig(  # Logs to temp .log File and system Standard Error.
+        filename=path.join(gettempdir(), APPNAME + ".log"), level=-1,
+        format="%(levelname)s:%(asctime)s %(message)s %(pathname)s:%(lineno)d")
+    log.getLogger().addHandler(log.StreamHandler(sys.stderr))
     try:
-        nice(19)  # smooth cpu priority
+        os.nice(19)  # smooth cpu priority
         libc = cdll.LoadLibrary('libc.so.6')  # set process name
-        buff = create_string_buffer(len(__doc__.strip()) + 1)
-        buff.value = bytes(__doc__.lower().replace(" ", "").encode("utf-8"))
+        buff = create_string_buffer(len(APPNAME) + 1)
+        buff.value = bytes(APPNAME.encode("utf-8"))
         libc.prctl(15, byref(buff), 0, 0, 0)
-        sleep(9)
-    except Exception as error:
-        print(error)
+    except Exception as reason:
+        log.warning(reason)
     app = QApplication(sys.argv)
-    app.setApplicationName(__doc__.strip().lower())
-    app.setOrganizationName(__doc__.strip().lower())
-    app.setOrganizationDomain(__doc__.strip())
+    app.setApplicationName(APPNAME)
+    app.setOrganizationName(APPNAME)
+    app.setOrganizationDomain(APPNAME)
     app.setWindowIcon(QIcon.fromTheme("edit-paste"))
     web = MainWindow()
     try:
@@ -673,12 +682,12 @@ def main():
         pass
     for o, v in opts:
         if o in ('-h', '--help'):
-            print(''' Usage:
+            print(APPNAME + ''' Usage:
                   -h, --help        Show help informations and exit.
                   -v, --version     Show version information and exit.''')
             return sys.exit(1)
         elif o in ('-v', '--version'):
-            print(__version__)
+            log.info(__version__)
             return sys.exit(1)
     sys.exit(app.exec_())
 
