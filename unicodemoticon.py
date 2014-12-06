@@ -66,7 +66,7 @@ class MainWindow(QSystemTrayIcon):
         """Tray icon main widget."""
         super(MainWindow, self).__init__()
         self.setIcon(QIcon.fromTheme("edit-paste"))
-        self.setToolTip(__doc__.strip().capitalize())
+        self.setToolTip(__doc__ + "\nPick 1 Emoticon, use CTRL+V to Paste it!")
         traymenu = QMenu("Emoticons")
         self.setIcon(QIcon("edit-paste"))
         traymenu.addAction("Emoticons").setDisabled(True)
@@ -659,9 +659,7 @@ class MainWindow(QSystemTrayIcon):
 def main():
     """Main Loop."""
     APPNAME = str(__package__ or __doc__)[:99].lower().strip().replace(" ", "")
-    log.basicConfig(  # Logs to temp .log File and system Standard Error.
-        filename=path.join(gettempdir(), APPNAME + ".log"), level=-1,
-        format="%(levelname)s:%(asctime)s %(message)s %(pathname)s:%(lineno)d")
+    log.basicConfig(level=-1, format="%(levelname)s:%(asctime)s %(message)s")
     log.getLogger().addHandler(log.StreamHandler(sys.stderr))
     try:
         os.nice(19)  # smooth cpu priority
@@ -676,7 +674,8 @@ def main():
     app.setOrganizationName(APPNAME)
     app.setOrganizationDomain(APPNAME)
     app.setWindowIcon(QIcon.fromTheme("edit-paste"))
-    web = MainWindow()
+    win = MainWindow()
+    win.show()
     try:
         opts, args = getopt(sys.argv[1:], 'hv', ('version', 'help'))
     except:
@@ -686,10 +685,10 @@ def main():
             print(APPNAME + ''' Usage:
                   -h, --help        Show help informations and exit.
                   -v, --version     Show version information and exit.''')
-            return sys.exit(1)
+            return sys.exit(0)
         elif o in ('-v', '--version'):
             log.info(__version__)
-            return sys.exit(1)
+            return sys.exit(0)
     sys.exit(app.exec_())
 
 
