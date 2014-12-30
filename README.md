@@ -17,7 +17,7 @@ wget -O - https://raw.githubusercontent.com/juancarlospaco/unicodemoticon/master
 # Install permanently on the system:
 
 ```
-sudo apt-get install python3-pyqt5  # OR  sudo yum install python3-qt5  OR  sudo pacman -S python-pyqt5
+sudo apt-get install python3-pyqt5 ttf-ancient-fonts  # OR  sudo yum install python3-qt5  OR  sudo pacman -S python-pyqt5
 sudo wget -O /usr/bin/unicodemoticon https://raw.githubusercontent.com/juancarlospaco/unicodemoticon/master/unicodemoticon.py
 sudo chmod +x /usr/bin/unicodemoticon
 unicodemoticon
@@ -28,7 +28,7 @@ unicodemoticon
 
 - [Python 3.x](https://www.python.org "Python Homepage")
 - [PyQt 5.x](http://www.riverbankcomputing.co.uk/software/pyqt/download5 "PyQt5 Homepage")
-
+- [Oxygen](https://www.google.com/fonts/specimen/Oxygen) and [Ubuntu](https://www.google.com/fonts/specimen/Ubuntu) Fonts.
 
 Donate, Charityware :
 ---------------------
