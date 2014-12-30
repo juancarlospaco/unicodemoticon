@@ -25,6 +25,7 @@ from webbrowser import open_new_tab
 from urllib import request
 from ctypes import cdll, byref, create_string_buffer
 import logging as log
+from copy import copy
 from tempfile import gettempdir
 
 from PyQt5.QtGui import QIcon, QFont
@@ -646,7 +647,7 @@ class MainWindow(QSystemTrayIcon):
 
     def close(self):
         """Overload close method."""
-        return sys.exit(1)
+        return sys.exit(0)
 
     def __hash__(self):
         """Return a valid answer."""
@@ -659,6 +660,38 @@ class MainWindow(QSystemTrayIcon):
 def main():
     """Main Loop."""
     APPNAME = str(__package__ or __doc__)[:99].lower().strip().replace(" ", "")
+    if not sys.platform.startswith("win") and sys.stderr.isatty():
+        def add_color_emit_ansi(fn):
+            """Add methods we need to the class."""
+            def new(*args):
+                """Method overload."""
+                if len(args) == 2:
+                    new_args = (args[0], copy(args[1]))
+                else:
+                    new_args = (args[0], copy(args[1]), args[2:])
+                if hasattr(args[0], 'baseFilename'):
+                    return fn(*args)
+                levelno = new_args[1].levelno
+                if levelno >= 50:
+                    color = '\x1b[31m'  # red
+                elif levelno >= 40:
+                    color = '\x1b[31m'  # red
+                elif levelno >= 30:
+                    color = '\x1b[33m'  # yellow
+                elif levelno >= 20:
+                    color = '\x1b[32m'  # green
+                elif levelno >= 10:
+                    color = '\x1b[35m'  # pink
+                else:
+                    color = '\x1b[0m'  # normal
+                try:
+                    new_args[1].msg = color + str(new_args[1].msg) + '\x1b[0m'
+                except Exception as reason:
+                    print(reason)  # Do not use log here.
+                return fn(*new_args)
+            return new
+        # all non-Windows platforms support ANSI Colors so we use them
+        log.StreamHandler.emit = add_color_emit_ansi(log.StreamHandler.emit)
     log.basicConfig(level=-1, format="%(levelname)s:%(asctime)s %(message)s")
     log.getLogger().addHandler(log.StreamHandler(sys.stderr))
     try:
