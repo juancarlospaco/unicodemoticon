@@ -29,6 +29,7 @@ from subprocess import call
 from tempfile import gettempdir
 from urllib import request
 from webbrowser import open_new_tab
+import signal
 
 from PyQt5.QtCore import QUrl
 from PyQt5.QtGui import QFont, QIcon
@@ -810,6 +811,7 @@ def main():
         libc.prctl(15, byref(buff), 0, 0, 0)
     except Exception as reason:
         log.warning(reason)
+    signal.signal(signal.SIGINT, signal.SIG_DFL)  # CTRL+C work to quit app
     app = QApplication(sys.argv)
     app.setApplicationName(APPNAME)
     app.setOrganizationName(APPNAME)
