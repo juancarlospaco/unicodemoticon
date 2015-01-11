@@ -75,13 +75,13 @@ class Downloader(QProgressDialog):
         super(Downloader, self).__init__(parent)
         self.setWindowTitle(__doc__)
         if not os.path.isfile(__file__) or not __source__:
-            self.close()
+            return
         if not os.access(__file__, os.W_OK):
             error_msg = ("Destination file permission denied (not Writable)! "
                          "Try again to Update but as root or administrator.")
             log.critical(error_msg)
             QMessageBox.warning(self, __doc__.title(), error_msg)
-            self.close()
+            return
         self._time, self._date = time.time(), datetime.now().isoformat()[:-7]
         self._url, self._dst = __source__, __file__
         log.debug("Downloading from {} to {}.".format(self._url, self._dst))
