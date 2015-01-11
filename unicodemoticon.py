@@ -16,20 +16,26 @@ __source__ = ('https://raw.githubusercontent.com/juancarlospaco/'
 
 
 # imports
+import logging as log
+import os
 import sys
+import time
+from copy import copy
+from ctypes import byref, cdll, create_string_buffer
+from datetime import datetime
 from getopt import getopt
 from os import path
-import os
 from subprocess import call
-from webbrowser import open_new_tab
-from urllib import request
-from ctypes import cdll, byref, create_string_buffer
-import logging as log
-from copy import copy
 from tempfile import gettempdir
+from urllib import request
+from webbrowser import open_new_tab
 
-from PyQt5.QtGui import QIcon, QFont
-from PyQt5.QtWidgets import QApplication, QMessageBox, QSystemTrayIcon, QMenu
+from PyQt5.QtCore import QUrl
+from PyQt5.QtGui import QFont, QIcon
+from PyQt5.QtNetwork import (QNetworkAccessManager, QNetworkProxyFactory,
+                             QNetworkRequest)
+from PyQt5.QtWidgets import (QApplication, QMenu, QMessageBox, QProgressDialog,
+                             QSystemTrayIcon)
 
 
 QSS_STYLE = """
@@ -54,6 +60,101 @@ X-DBUS-StartupType=none
 X-KDE-StartupNotify=false
 X-KDE-SubstituteUID=false
 """
+
+
+###############################################################################
+
+
+class Downloader(QProgressDialog):
+
+    """Downloader Dialog with complete informations and progress bar."""
+
+    def __init__(self, parent=None):
+        """Init class."""
+        super(Downloader, self).__init__(parent)
+        self.setWindowTitle(__doc__)
+        if not os.path.isfile(__file__) or not __source__:
+            self.close()
+        self._time, self._date = time.time(), datetime.now().isoformat()[:-7]
+        self._url, self._dst = __source__, __file__
+        log.debug("Downloading from {} to {}.".format(self._url, self._dst))
+        if not self._url.lower().startswith("https:"):
+            log.warning("Unsecure Download over plain text without SSL.")
+        self.template = """<h3>Downloading</h3><hr><table>
+        <tr><td><b>From:</b></td>      <td>{}</td>
+        <tr><td><b>To:  </b></td>      <td>{}</td> <tr>
+        <tr><td><b>Started:</b></td>   <td>{}</td>
+        <tr><td><b>Actual:</b></td>    <td>{}</td> <tr>
+        <tr><td><b>Elapsed:</b></td>   <td>{}</td>
+        <tr><td><b>Remaining:</b></td> <td>{}</td> <tr>
+        <tr><td><b>Received:</b></td>  <td>{} MegaBytes</td>
+        <tr><td><b>Total:</b></td>     <td>{} MegaBytes</td> <tr>
+        <tr><td><b>Speed:</b></td>     <td>{}</td>
+        <tr><td><b>Percent:</b></td>     <td>{}%</td></table><hr>"""
+        self.manager = QNetworkAccessManager(self)
+        self.manager.finished.connect(self.save_downloaded_data)
+        self.manager.sslErrors.connect(self.download_failed)
+        self.progreso = self.manager.get(QNetworkRequest(QUrl(self._url)))
+        self.progreso.downloadProgress.connect(self.update_download_progress)
+        self.show()
+        self.exec_()
+
+    def save_downloaded_data(self, data):
+        """Save all downloaded data to the disk and quit."""
+        log.debug("Download done. Update Done.")
+        with open(os.path.join(self._dst), "wb") as output_file:
+            output_file.write(data.readAll())
+        data.close()
+        QMessageBox.information(self, __doc__.title(),
+                                "<b>You got the latest version of this App!")
+        del self.manager, data
+        return self.close()
+
+    def download_failed(self, download_error):
+        """Handle a download error, probable SSL errors."""
+        log.error(download_error)
+        QMessageBox.error(self, __doc__.title(), str(download_error))
+
+    def seconds_time_to_human_string(self, time_on_seconds=0):
+        """Calculate time, with precision from seconds to days."""
+        minutes, seconds = divmod(int(time_on_seconds), 60)
+        hours, minutes = divmod(minutes, 60)
+        days, hours = divmod(hours, 24)
+        human_time_string = ""
+        if days:
+            human_time_string += "%02d Days " % days
+        if hours:
+            human_time_string += "%02d Hours " % hours
+        if minutes:
+            human_time_string += "%02d Minutes " % minutes
+        human_time_string += "%02d Seconds" % seconds
+        return human_time_string
+
+    def update_download_progress(self, bytesReceived, bytesTotal):
+        """Calculate statistics and update the UI with them."""
+        downloaded_MB = round(((bytesReceived / 1024) / 1024), 2)
+        total_data_MB = round(((bytesTotal / 1024) / 1024), 2)
+        downloaded_KB, total_data_KB = bytesReceived / 1024, bytesTotal / 1024
+        # Calculate download speed values, with precision from Kb/s to Gb/s
+        elapsed = time.clock()
+        if elapsed > 0:
+            speed = round((downloaded_KB / elapsed), 2)
+            if speed > 1024000:  # Gigabyte speeds
+                download_speed = "{} GigaByte/Second".format(speed // 1024000)
+            if speed > 1024:  # MegaByte speeds
+                download_speed = "{} MegaBytes/Second".format(speed // 1024)
+            else:  # KiloByte speeds
+                download_speed = "{} KiloBytes/Second".format(int(speed))
+        if speed > 0:
+            missing = abs((total_data_KB - downloaded_KB) // speed)
+        percentage = int(100.0 * bytesReceived // bytesTotal)
+        self.setLabelText(self.template.format(
+            self._url.lower()[:99], self._dst.lower()[:99],
+            self._date, datetime.now().isoformat()[:-7],
+            self.seconds_time_to_human_string(time.time() - self._time),
+            self.seconds_time_to_human_string(missing),
+            downloaded_MB, total_data_MB, download_speed, percentage))
+        self.setValue(percentage)
 
 
 ###############################################################################
@@ -629,6 +730,7 @@ class MainWindow(QSystemTrayIcon):
         helpMenu.addSeparator()
         helpMenu.addAction("Report Bugs", lambda:
                            open_new_tab(__url__ + '/issues?state=open'))
+        helpMenu.addAction("Check for updates", lambda: Downloader(self)))
         traymenu.addSeparator()
         traymenu.addAction("Quit", lambda: self.close())
         self.setContextMenu(traymenu)
