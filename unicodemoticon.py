@@ -79,7 +79,7 @@ class Downloader(QProgressDialog):
             error_msg = ("Destination file permission denied (not Writable)! "
                          "Try again to Update but as root or administrator.")
             log.critical(error_msg)
-            QMessageBox.error(self, __doc__.title(), error_msg)
+            QMessageBox.warning(self, __doc__.title(), error_msg)
             self.close()
         self._time, self._date = time.time(), datetime.now().isoformat()[:-7]
         self._url, self._dst = __source__, __file__
@@ -119,7 +119,7 @@ class Downloader(QProgressDialog):
     def download_failed(self, download_error):
         """Handle a download error, probable SSL errors."""
         log.error(download_error)
-        QMessageBox.error(self, __doc__.title(), str(download_error))
+        QMessageBox.warning(self, __doc__.title(), str(download_error))
 
     def seconds_time_to_human_string(self, time_on_seconds=0):
         """Calculate time, with precision from seconds to days."""
