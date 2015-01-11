@@ -730,7 +730,7 @@ class MainWindow(QSystemTrayIcon):
         helpMenu.addSeparator()
         helpMenu.addAction("Report Bugs", lambda:
                            open_new_tab(__url__ + '/issues?state=open'))
-        helpMenu.addAction("Check for updates", lambda: Downloader(self)))
+        helpMenu.addAction("Check for updates", lambda: Downloader(self))
         traymenu.addSeparator()
         traymenu.addAction("Quit", lambda: self.close())
         self.setContextMenu(traymenu)
