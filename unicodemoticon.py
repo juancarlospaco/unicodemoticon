@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-# PEP8:OK, LINT:OK, PY3:OK, PEP257:OK
 
 
 # metadata
 """UnicodEmoticons."""
 __package__ = "unicodemoticons"
 __version__ = '0.0.1'
-__license__ = ' GPLv3 LGPLv3 '
+__license__ = ' GPLv3+ LGPLv3+ '
 __author__ = ' Juan Carlos '
 __email__ = ' juancarlospaco@gmail.com '
 __url__ = 'https://github.com/juancarlospaco/unicodemoticon'
@@ -37,6 +36,11 @@ from PyQt5.QtNetwork import (QNetworkAccessManager, QNetworkProxyFactory,
                              QNetworkRequest)
 from PyQt5.QtWidgets import (QApplication, QMenu, QMessageBox, QProgressDialog,
                              QSystemTrayIcon)
+
+try:
+    import resource  # windows dont have resource
+except ImportError:
+    resource = None
 
 
 QSS_STYLE = """
@@ -751,16 +755,12 @@ class MainWindow(QSystemTrayIcon):
         if (path.isdir(path.join(path.expanduser("~"), ".config/autostart"))
                 and not path.isfile(desktop_file)):
             log.info("Writing AutoStart file: " + desktop_file)
-            with open(desktop_file, "w") as desktop_file_to_write:
-                desktop_file_to_write.write(AUTOSTART_DESKTOP_FILE)
+            with open(desktop_file, "w", encoding="utf-8") as desktop_file:
+                desktop_file.write(AUTOSTART_DESKTOP_FILE)
 
     def close(self):
         """Overload close method."""
         return sys.exit(0)
-
-    def __hash__(self):
-        """Return a valid answer."""
-        return 42
 
 
 ###############################################################################
@@ -782,7 +782,7 @@ def main():
                     return fn(*args)
                 levelno = new_args[1].levelno
                 if levelno >= 50:
-                    color = '\x1b[31m'  # red
+                    color = '\x1b[31;5;7m\n '  # blinking red with black
                 elif levelno >= 40:
                     color = '\x1b[31m'  # red
                 elif levelno >= 30:
@@ -794,7 +794,7 @@ def main():
                 else:
                     color = '\x1b[0m'  # normal
                 try:
-                    new_args[1].msg = color + str(new_args[1].msg) + '\x1b[0m'
+                    new_args[1].msg = color + str(new_args[1].msg) + ' \x1b[0m'
                 except Exception as reason:
                     print(reason)  # Do not use log here.
                 return fn(*new_args)
@@ -832,6 +832,9 @@ def main():
         elif o in ('-v', '--version'):
             log.info(__version__)
             return sys.exit(0)
+    log.info('Total Maximum RAM Memory used: ~{} MegaBytes.'.format(int(
+        resource.getrusage(resource.RUSAGE_SELF).ru_maxrss *
+        resource.getpagesize() / 1024 / 1024 if resource else 0)))
     sys.exit(app.exec_())
 
 
