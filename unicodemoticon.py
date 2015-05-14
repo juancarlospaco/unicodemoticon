@@ -5,7 +5,7 @@
 # metadata
 """UnicodEmoticons."""
 __package__ = "unicodemoticons"
-__version__ = '0.0.1'
+__version__ = '0.0.2'
 __license__ = ' GPLv3+ LGPLv3+ '
 __author__ = ' Juan Carlos '
 __email__ = ' juancarlospaco@gmail.com '
@@ -31,11 +31,11 @@ from webbrowser import open_new_tab
 import signal
 
 from PyQt5.QtCore import QUrl
-from PyQt5.QtGui import QFont, QIcon
+from PyQt5.QtGui import QFont, QIcon, QCursor
 from PyQt5.QtNetwork import (QNetworkAccessManager, QNetworkProxyFactory,
                              QNetworkRequest)
 from PyQt5.QtWidgets import (QApplication, QMenu, QMessageBox, QProgressDialog,
-                             QSystemTrayIcon)
+                             QSystemTrayIcon, QStyle)
 
 try:
     import resource  # windows dont have resource
@@ -175,40 +175,42 @@ class MainWindow(QSystemTrayIcon):
 
     """Main widget for UnicodEmoticons,not really a window since not needed."""
 
-    def __init__(self):
+    def __init__(self, icon, parent=None):
         """Tray icon main widget."""
-        super(MainWindow, self).__init__()
-        self.setIcon(QIcon.fromTheme("edit-paste"))
+        super(MainWindow, self).__init__(icon, parent)
+        log.info("Iniciando {}.".format(__doc__))
+        self.setIcon(icon)
         self.setToolTip(__doc__ + "\nPick 1 Emoticon, use CTRL+V to Paste it!")
-        traymenu = QMenu("Emoticons")
-        self.setIcon(QIcon("edit-paste"))
-        traymenu.addAction("Emoticons").setDisabled(True)
-        traymenu.setStyleSheet(QSS_STYLE.strip())
-        traymenu.addSeparator()
+        self.traymenu = QMenu("Emoticons")
+        self.traymenu.addAction("Emoticons").setDisabled(True)
+        self.traymenu.setIcon(icon)
+        self.traymenu.setStyleSheet(QSS_STYLE.strip())
+        self.traymenu.addSeparator()
+        self.activated.connect(self.click_trap)
         # NOTE: I try to do this with JSON and Dict, but the QActions Fail,
         #       pointing all actions to the lastest action assigned :(
         # menus
-        menu0 = traymenu.addMenu("Sex")
-        menu1 = traymenu.addMenu("Cats")
-        menu2 = traymenu.addMenu("Funny")
-        menu3 = traymenu.addMenu("Sad")
-        menu4 = traymenu.addMenu("Music")
-        menu5 = traymenu.addMenu("Arrows")
-        menu6 = traymenu.addMenu("Numbers")
-        menu7 = traymenu.addMenu("Letters")
-        menu8 = traymenu.addMenu("Stars")
-        menu9 = traymenu.addMenu("Hearts")
-        menu10 = traymenu.addMenu("Hands")
-        menu11 = traymenu.addMenu("Weather")
-        menu12 = traymenu.addMenu("Symbols")
-        menu13 = traymenu.addMenu("Tech")
-        menu14 = traymenu.addMenu("Geometry")
-        menu15 = traymenu.addMenu("Zodiac")
-        menu16 = traymenu.addMenu("Chess")
-        menu17 = traymenu.addMenu("Recycle")
-        menu18 = traymenu.addMenu("Religion")
-        menu19 = traymenu.addMenu("Animals face")
-        menu20 = traymenu.addMenu("Animals")
+        menu0 = self.traymenu.addMenu("Sex")
+        menu1 = self.traymenu.addMenu("Cats")
+        menu2 = self.traymenu.addMenu("Funny")
+        menu3 = self.traymenu.addMenu("Sad")
+        menu4 = self.traymenu.addMenu("Music")
+        menu5 = self.traymenu.addMenu("Arrows")
+        menu6 = self.traymenu.addMenu("Numbers")
+        menu7 = self.traymenu.addMenu("Letters")
+        menu8 = self.traymenu.addMenu("Stars")
+        menu9 = self.traymenu.addMenu("Hearts")
+        menu10 = self.traymenu.addMenu("Hands")
+        menu11 = self.traymenu.addMenu("Weather")
+        menu12 = self.traymenu.addMenu("Symbols")
+        menu13 = self.traymenu.addMenu("Tech")
+        menu14 = self.traymenu.addMenu("Geometry")
+        menu15 = self.traymenu.addMenu("Zodiac")
+        menu16 = self.traymenu.addMenu("Chess")
+        menu17 = self.traymenu.addMenu("Recycle")
+        menu18 = self.traymenu.addMenu("Religion")
+        menu19 = self.traymenu.addMenu("Animals face")
+        menu20 = self.traymenu.addMenu("Animals")
         for item in (menu0, menu1, menu2, menu3, menu4, menu5, menu6, menu7,
                      menu8, menu9, menu10, menu11, menu12, menu13, menu14,
                      menu15, menu16, menu17, menu18, menu19, menu20):
@@ -727,9 +729,9 @@ class MainWindow(QSystemTrayIcon):
         menu20.addAction("🐥", lambda: QApplication.clipboard().setText(" 🐥 "))
         menu20.addAction("🐦", lambda: QApplication.clipboard().setText(" 🐦 "))
         #
-        traymenu.addSeparator()
+        self.traymenu.addSeparator()
         # help
-        helpMenu = traymenu.addMenu("Help...")
+        helpMenu = self.traymenu.addMenu("Help...")
         helpMenu.addAction("About Python 3",
                            lambda: open_new_tab('https://www.python.org'))
         helpMenu.addAction("About " + __doc__, lambda: open_new_tab(__url__))
@@ -742,11 +744,16 @@ class MainWindow(QSystemTrayIcon):
         helpMenu.addAction("Report Bugs", lambda:
                            open_new_tab(__url__ + '/issues?state=open'))
         helpMenu.addAction("Check for updates", lambda: Downloader())
-        traymenu.addSeparator()
-        traymenu.addAction("Quit", lambda: self.close())
-        self.setContextMenu(traymenu)
+        self.traymenu.addSeparator()
+        self.traymenu.addAction("Quit", lambda: self.close())
+        self.setContextMenu(self.traymenu)
         self.show()
         self.add_autostart()
+
+    def click_trap(self, value):
+        """Trap the mouse tight click."""
+        if value == self.Trigger:  # left click
+            self.traymenu.exec_(QCursor.pos())
 
     def add_autostart(self):
         """Add to autostart of the Desktop."""
@@ -803,6 +810,7 @@ def main():
         log.StreamHandler.emit = add_color_emit_ansi(log.StreamHandler.emit)
     log.basicConfig(level=-1, format="%(levelname)s:%(asctime)s %(message)s")
     log.getLogger().addHandler(log.StreamHandler(sys.stderr))
+    log.info(__doc__)
     try:
         os.nice(19)  # smooth cpu priority
         libc = cdll.LoadLibrary('libc.so.6')  # set process name
@@ -816,22 +824,10 @@ def main():
     app.setApplicationName(APPNAME)
     app.setOrganizationName(APPNAME)
     app.setOrganizationDomain(APPNAME)
-    app.setWindowIcon(QIcon.fromTheme("edit-paste"))
-    win = MainWindow()
+    icon = QIcon(app.style().standardPixmap(QStyle.SP_FileIcon))
+    app.setWindowIcon(icon)
+    win = MainWindow(icon)
     win.show()
-    try:
-        opts, args = getopt(sys.argv[1:], 'hv', ('version', 'help'))
-    except:
-        pass
-    for o, v in opts:
-        if o in ('-h', '--help'):
-            print(APPNAME + ''' Usage:
-                  -h, --help        Show help informations and exit.
-                  -v, --version     Show version information and exit.''')
-            return sys.exit(0)
-        elif o in ('-v', '--version'):
-            log.info(__version__)
-            return sys.exit(0)
     log.info('Total Maximum RAM Memory used: ~{} MegaBytes.'.format(int(
         resource.getrusage(resource.RUSAGE_SELF).ru_maxrss *
         resource.getpagesize() / 1024 / 1024 if resource else 0)))
