@@ -17,6 +17,7 @@ __source__ = ('https://raw.githubusercontent.com/juancarlospaco/'
 # imports
 import logging as log
 import os
+import signal
 import sys
 import time
 from copy import copy
@@ -28,14 +29,13 @@ from subprocess import call
 from tempfile import gettempdir
 from urllib import request
 from webbrowser import open_new_tab
-import signal
 
 from PyQt5.QtCore import QUrl
-from PyQt5.QtGui import QFont, QIcon, QCursor
+from PyQt5.QtGui import QCursor, QFont, QIcon
 from PyQt5.QtNetwork import (QNetworkAccessManager, QNetworkProxyFactory,
                              QNetworkRequest)
 from PyQt5.QtWidgets import (QApplication, QMenu, QMessageBox, QProgressDialog,
-                             QSystemTrayIcon, QStyle)
+                             QStyle, QSystemTrayIcon)
 
 try:
     import resource  # windows dont have resource
@@ -570,6 +570,7 @@ class MainWindow(QSystemTrayIcon):
         menu12.addAction("📱", lambda: QApplication.clipboard().setText(" 📱 "))
         menu12.addAction("📡", lambda: QApplication.clipboard().setText(" 📡 "))
         menu12.addAction("📺", lambda: QApplication.clipboard().setText(" 📺 "))
+        menu12.addAction("⚽", lambda: QApplication.clipboard().setText(" ⚽ "))
         # tech
         menu13.addAction("all", lambda:
                          QApplication.clipboard().setText("☎✉✎⌛⌚✂ℹ"))
