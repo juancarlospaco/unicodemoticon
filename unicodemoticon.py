@@ -258,7 +258,8 @@ class MainWindow(QSystemTrayIcon):
         menu30 = self.traymenu.addMenu(list_of_labels[30].title())
         menu31 = self.traymenu.addMenu(list_of_labels[31].title())
         self.traymenu.addSeparator()
-        menuhtml = self.traymenu.addMenu("HTML5 Codes")
+        menuhtml0 = self.traymenu.addMenu("HTML5 Codes")
+        menuhtml1 = self.traymenu.addMenu("HTML5 Codes 2")
         for index, item in enumerate((
             menu0, menu1, menu2, menu3, menu4, menu5, menu6, menu7, menu8,
             menu9, menu10, menu11, menu12, menu13, menu14, menu15, menu16,
@@ -269,9 +270,16 @@ class MainWindow(QSystemTrayIcon):
             item.setFont(QFont('Oxygen', 25))
             self.build_submenu(UNICODEMOTICONS[list_of_labels[index]], item)
         # html entities
-        menuhtml.setStyleSheet("padding:0;margin:0;menu-scrollable:1;")
-        for html_char in tuple(sorted(entities.html5.items())):
-            action = menuhtml.addAction(html_char[1])
+        menuhtml0.setStyleSheet("padding:0;margin:0;menu-scrollable:1;")
+        menuhtml1.setStyleSheet("padding:0;margin:0;menu-scrollable:1;")
+        html_len = len(entities.html5.keys()) // 2
+        for html_char in tuple(sorted(entities.html5.items())[:html_len]):
+            action = menuhtml0.addAction(html_char[1])
+            action.triggered.connect(
+                lambda _, ch=html_char[0]: QApplication.clipboard().setText(
+                    "&{html_entity}".format(html_entity=ch)))
+        for html_char in tuple(sorted(entities.html5.items())[html_len:]):
+            action = menuhtml1.addAction(html_char[1])
             action.triggered.connect(
                 lambda _, ch=html_char[0]: QApplication.clipboard().setText(
                     "&{html_entity}".format(html_entity=ch)))
