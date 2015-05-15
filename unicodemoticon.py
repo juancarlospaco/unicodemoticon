@@ -29,7 +29,7 @@ from subprocess import call
 from tempfile import gettempdir
 from urllib import request
 from webbrowser import open_new_tab
-from html import entities, escape
+from html import entities
 
 from PyQt5.QtCore import QUrl
 from PyQt5.QtGui import QCursor, QFont, QIcon
@@ -66,6 +66,41 @@ X-DBUS-StartupType=none
 X-KDE-StartupNotify=false
 X-KDE-SubstituteUID=false
 """
+UNICODEMOTICONS = {
+    "sex": "♀♂⚢⚣⚤⚥⚧☿👭👬👫",
+    "cats": "😸😹😺😻😼😽😾😿🙀",
+    "funny": "😀😁😂😃😅😆😇😈😉😊😋😌😍😎😏😗😘😙😚😛😜😝☺☻👿👀",
+    "sad": "😐😒😓😔😕😖😤😞😟😠😡😢😣😥😦😧😨😩😪😫😭😮😯😰😱😲😳😴😵☹😷",
+    "music": "♫♪♭♩🎶🎨🎬🎤🎧🎼🎵🎹🎻🎺🎷🎸",
+    "arrows": "⇉⇇⇈⇊➺➽⇦⇨⇧⇩↔↕↖↗↘↙↯↰↱↲↳↴↵↶↷↺↻➭🔄⏪⏩⏫⏬",
+    "numbers": "①②③④⑤⑥⑦⑧⑨⑩➊➋➌➍➎➏➐➑➒➓½¾⒈⒉⒊⒋⒌⒍⒎⒏⒐⒑∞",
+    "letters": "ⓐⓑⓒⓓⓔⓕⓖⓗⓘⓙⓚⓛⓜⓝⓞⓟⓠⓡⓢⓣⓤⓥⓦⓨⓩ",
+    "simbols": "‼⁉…❓✔✗☑☒➖➗❌™®©Ω℮₤₧❎✅➿♿☠☯☮☘💲💯🚭🚮💤",
+    "stars": "✵✪✬✫✻✴☆✨✶✩★✾❄❀✿🃏⚝⚹⚜🌟🌠💫💥",
+    "hearts": "♥♡❤❦☙❣💌💘💞💖💓💗💟💝💑🌹💋💔💕",
+    "hands": "✌☜☞☝☟✋✊✍👊👌👏🙌👍👎",
+    "weather": "☀☁⚡☔☂❄☃☽☾🌞🌊🌋🌌🌁",
+    "clothes": "🎩👑👒👟👞👡👠👢👕👔👚👗🎽👖👘👙💼👜👝👛👓🎀🌂💄",
+    "plants": "💐🌸🌷🍀🌹🌻🌺🍁🍃🍂🌿🌾🍄🌵🌴🌲🌳🌰🌱🌼",
+    "tech": "☎✉✎⌛⏳⏰⌚✂ℹ☢☣☤✇✆",
+    "geometry": "■●▲▼▓▒░◑◐〇◈▣▨▧▩◎◊□◕☉",
+    "zodiac": "♈♉♊♋♌♍♎♏♐♑♒♓",
+    "chess": "♔♕♖♗♘♙♚♛♜♝♞♟",
+    "recycle": "♲♻♳♴♵♶♷♸♹♺♼♽♾",
+    "religion": "☦☧☨☩☪☫☬☭☯࿊࿕☥✟✠✡",
+    "animals faces": "🐭🐮🐵🐯🐰🐲🐳🐴🐶🐷🐸🐹🐺🐻🐼",
+    "animals": "🐞🐝🐜🐛🐀🐁🐂🐃🐄🐅🐆🐇🐈🐉🐊🐋🐌🐍🐎🐏🐐🐑",
+    "animals 2": "🐒🐓🐔🐕🐖🐗🐘🐪🐫🐩🐧🐨🐙🐬🐚🐟🐠🐡🐢🐣🐤🐥🐦",
+    "faces": "👲👳👮👷💂👶👦👧👨👩👴👵👱👼👸👹👺🙈🙉🙊💀👽👯",
+    "sports": "👾🎮🎴🀄🎲🎯🏈🏀⚽⚾🎾🎱🏉🎳⛳🚵🚴🏁🏇🏆🎿🏂🏊🏄⚾🎣",
+    "fruits": "🍎🍏🍊🍋🍒🍇🍉🍓🍑🍈🍌🍐🍍🍠🍆🍅🌽",
+    "food": "☕🍵🍶🍼🍺🍻🍸🍹🍷🍴🍕🍔🍟🍗🍖🍝🍛🍤🍱🍣🍥🍙🍜🍲🍢🍡🍳🍞🍩🍮🍦🍨🍧🎂🍰🍪🍫🍬🍭🍯",
+    "buildings": "🏠🏡🏫🏢🏣🏥🏪🏩🏨💒⛪🏬🏤🌇🌆🏯🏰⛺🏭🗼🗻🌄🌅🌃🗽🌉🎠🎡⛲🎢🚢",
+    "objects": "🎍🎎🎒🎓🎏🎃👻🎅🎄🎁🎋🎉🎊🎈🎌🌎💩⚙⚖⚔⚒",
+    "tech": "🎥📷📹📼💿📀💽💾💻📱☎📞📟📠📡📺📻🔊🔉🔇🔔🔕📢⏰🔓🔒🔑💡🔌🔍🔧🔨📲⚛",
+    "transport": "⛵🚤🚣⚓🚀✈💺🚁🚂🚊🚆🚈🚇🚋🚎🚌🚍🚙🚕🚖🚛🚚🚓🚔🚒🚑🚐🚲🚡🚟🚜",
+    "papers": "📧✉📩📨📫📪📬📭📮📝📃📑📊📋📆📁📂✂📌📎📏📐📗📓📔📒📚📖🔖📛🔬🔭📰"
+}
 
 
 ###############################################################################
@@ -188,238 +223,58 @@ class MainWindow(QSystemTrayIcon):
         self.traymenu.setStyleSheet(QSS_STYLE.strip())
         self.traymenu.addSeparator()
         self.activated.connect(self.click_trap)
-        # NOTE: I try to do this with JSON and Dict, but the QActions Fail,
-        #       pointing all actions to the lastest action assigned :(
         # menus
-        menu0 = self.traymenu.addMenu("Sex")
-        menu1 = self.traymenu.addMenu("Cats")
-        menu2 = self.traymenu.addMenu("Funny")
-        menu3 = self.traymenu.addMenu("Sad")
-        menu4 = self.traymenu.addMenu("Music")
-        menu5 = self.traymenu.addMenu("Arrows")
-        menu6 = self.traymenu.addMenu("Numbers")
-        menu7 = self.traymenu.addMenu("Letters")
-        menu8 = self.traymenu.addMenu("Stars")
-        menu9 = self.traymenu.addMenu("Hearts")
-        menu10 = self.traymenu.addMenu("Hands")
-        menu11 = self.traymenu.addMenu("Weather")
-        menu12 = self.traymenu.addMenu("Symbols")
-        menu13 = self.traymenu.addMenu("Tech")
-        menu14 = self.traymenu.addMenu("Geometry")
-        menu15 = self.traymenu.addMenu("Zodiac")
-        menu16 = self.traymenu.addMenu("Chess")
-        menu17 = self.traymenu.addMenu("Recycle")
-        menu18 = self.traymenu.addMenu("Religion")
-        menu19 = self.traymenu.addMenu("Animals faces")
-        menu20 = self.traymenu.addMenu("Animals")
-        menu21 = self.traymenu.addMenu("Animals 2")
-        menu22 = self.traymenu.addMenu("HTML5 Codes")
-        for item in (
+        list_of_labels = sorted(UNICODEMOTICONS.keys())
+        menu0 = self.traymenu.addMenu(list_of_labels[0].title())
+        menu1 = self.traymenu.addMenu(list_of_labels[1].title())
+        menu2 = self.traymenu.addMenu(list_of_labels[2].title())
+        menu3 = self.traymenu.addMenu(list_of_labels[3].title())
+        menu4 = self.traymenu.addMenu(list_of_labels[4].title())
+        menu5 = self.traymenu.addMenu(list_of_labels[5].title())
+        menu6 = self.traymenu.addMenu(list_of_labels[6].title())
+        menu7 = self.traymenu.addMenu(list_of_labels[7].title())
+        menu8 = self.traymenu.addMenu(list_of_labels[8].title())
+        menu9 = self.traymenu.addMenu(list_of_labels[9].title())
+        menu10 = self.traymenu.addMenu(list_of_labels[10].title())
+        menu11 = self.traymenu.addMenu(list_of_labels[11].title())
+        menu12 = self.traymenu.addMenu(list_of_labels[12].title())
+        menu13 = self.traymenu.addMenu(list_of_labels[13].title())
+        menu14 = self.traymenu.addMenu(list_of_labels[14].title())
+        menu15 = self.traymenu.addMenu(list_of_labels[15].title())
+        menu16 = self.traymenu.addMenu(list_of_labels[16].title())
+        menu17 = self.traymenu.addMenu(list_of_labels[17].title())
+        menu18 = self.traymenu.addMenu(list_of_labels[18].title())
+        menu19 = self.traymenu.addMenu(list_of_labels[19].title())
+        menu20 = self.traymenu.addMenu(list_of_labels[20].title())
+        menu21 = self.traymenu.addMenu(list_of_labels[21].title())
+        menu22 = self.traymenu.addMenu(list_of_labels[22].title())
+        menu23 = self.traymenu.addMenu(list_of_labels[23].title())
+        menu24 = self.traymenu.addMenu(list_of_labels[24].title())
+        menu25 = self.traymenu.addMenu(list_of_labels[25].title())
+        menu26 = self.traymenu.addMenu(list_of_labels[26].title())
+        menu27 = self.traymenu.addMenu(list_of_labels[27].title())
+        menu28 = self.traymenu.addMenu(list_of_labels[28].title())
+        menu29 = self.traymenu.addMenu(list_of_labels[29].title())
+        menu30 = self.traymenu.addMenu(list_of_labels[30].title())
+        menu31 = self.traymenu.addMenu(list_of_labels[31].title())
+        self.traymenu.addSeparator()
+        menuhtml = self.traymenu.addMenu("HTML5 Codes")
+        for index, item in enumerate((
             menu0, menu1, menu2, menu3, menu4, menu5, menu6, menu7, menu8,
             menu9, menu10, menu11, menu12, menu13, menu14, menu15, menu16,
-            menu17, menu18, menu19, menu20, menu21, menu22):
+            menu17, menu18, menu19, menu20, menu21, menu22, menu23, menu24,
+                menu25, menu26, menu27, menu28, menu29, menu30, menu31)):
             item.setStyleSheet(("font-size:25px;padding:0;margin:0;"
                                 "font-family:Oxygen;menu-scrollable:1;"))
             item.setFont(QFont('Oxygen', 25))
-        # sex
-        char_list = (" ♀ ", " ♂ ", " ⚢ ", " ⚣ ", " ⚤ ", " ⚥ ", " ⚧ ",
-                     " ☿ ", " 👭 ", " 👬 ", " 👫 ")
-        self.build_submenu(char_list, menu0)
-        # animals
-        char_list = (" 😸 ", " 😹 ", " 😺 ", " 😻 ", " 😼 ", " 😽 ", " 😾 ",
-                     " 😿 ", " 🙀 ")
-        self.build_submenu(char_list, menu1)
-        # funny
-        char_list = (" 😀 ", " 😁 ", " 😂 ", " 😃 ", " 😅 ", " 😆 ", " 😇 ",
-                     " 😈 ", " 😉 ", " 😊 ", " 😋 ", " 😌 ", " 😍 ", " 😎 ",
-                     " 😏 ", " 😗 ", " 😘 ", " 😙 ", " 😚 ", " 😛 ", " 😜 ",
-                     " 😝 ", " ☺ ", " ☻ ", "  ", " 👿 ", " 👸 ")
-        self.build_submenu(char_list, menu2)
-        # sad
-        char_list = (" 😐 ", " 😒 ", " 😓 ", " 😔 ", " 😕 ", " 😖 ",
-                     " 😞 ", " 😟 ", " 😠 ", " 😡 ", " 😢 ", " 😣 ", " 😥 ",
-                     " 😦 ", " 😧 ", " 😨 ", " 😩 ", " 😪 ", " 😫 ", " 😭 ",
-                     " 😮 ", " 😯 ", " 😰 ", " 😱 ", " 😲 ", " 😳 ", " 😴 ",
-                     " 😵 ", " ☹ ", " 😷 ")
-        self.build_submenu(char_list, menu3)
-        # music
-        char_list = (" ♫ ", " ♪ ", " ♭ ", " ♩ ", " 🎶 ")
-        self.build_submenu(char_list, menu4)
-        # arrows
-        char_list = (" ⇉ ", " ⇇ ", " ⇈ ", " ⇊ ", " ➺ ", " ➽ ", " ⇦ ", " ⇨ ",
-                     " ⇧ ", " ⇩ ", " ↔ ", " ↕ ", " ↖ ", " ↗ ", " ↘ ", " ↙ ",
-                     " ↯ ", " ↰ ", " ↱ ", " ↲ ", " ↳ ", " ↴ ", " ↵ ", " ↶ ",
-                     " ↷ ", " ↺ ", " ↻ ", " ➫ ", " ➭ ", " ➯ ")
-        self.build_submenu(char_list, menu5)
-        # numbers
-        char_list = (" ① ", " ② ", " ③ ", " ④ ", " ⑤ ", " ⑥ ", " ⑦ ",
-                     " ⑧ ", " ⑨ ", " ⑩ ", " ➊ ", " ➋ ", " ➌ ", " ➍ ",
-                     " ➎ ", " ➏ ", " ➐ ", " ➑ ", " ➒ ", " ➓ ", " ½ ", " ¾ ",
-                     " ⒈ ", " ⒉ ", " ⒊ ", " ⒋ ", " ⒌ ", " ⒍ ", " ⒎ ",
-                     " ⒏ ", " ⒐ ", " ⒑ ", " ∞ ")
-        self.build_submenu(char_list, menu6)
-        # letters
-        char_list = (" ⓐ ", " ⓑ ", " ⓒ ", " ⓓ ", " ⓔ ", " ⓕ ", " ⓖ ",
-                     " ⓗ ", " ⓘ ", " ⓙ ", " ⓚ ", " ⓛ ", " ⓜ ", " ⓝ ",
-                     " ⓞ ", " ⓟ ", " ⓠ ", " ⓡ ", " ⓢ ", " ⓣ ", " ⓤ ",
-                     " ⓥ ", " ⓦ ", " ⓨ ", " ⓩ ")
-        self.build_submenu(char_list, menu7)
-        # stars
-        char_list = (" ✵ ", " ✪ ", " ✬ ", " ✫ ", " ✻ ", " ✴ ", " ☆ ", " ✨ ",
-                     " ✶ ", " ✩ ", " ★ ", " ✾ ", " ❄ ", " ❀ ", " ✿ ", " 🃏 ",
-                     " ⚝ ", " ⚹ ", " ⚜ ", " 🌟 ", " 🌠 ", " 💫 ", " 💥 ")
-        self.build_submenu(char_list, menu8)
-        # hearts
-        char_list = (" ♥ ", " ♡ ", " ❤ ", " ❦ ", " ☙ ", " ❣ ", " 💌 ",
-                     " 💘 ", " 💞 ", " 💖 ", " 💓 ", " 💗 ", " 💟 ", " 💝 ",
-                     " 💑 ", " 🌹 ", " 💋 ", " 💔 ", " 💕 ")
-        self.build_submenu(char_list, menu9)
-        # hands
-        char_list = (" ✌ ", " ☜ ", " ☞ ", " ☝ ", " ☟ ", " ✋ ", " ✊ ", " ✍ ",
-                     " 👊 ", " 👌 ", " 👏 ", " 👀 ", " 🙌 ", " 👍 ", " 👎 ")
-        self.build_submenu(char_list, menu10)
-        # weather
-        menu11.addAction("all", lambda:
-                         QApplication.clipboard().setText("☀☁⚡☔❄☃☽☾"))
-        menu11.addAction("☀", lambda: QApplication.clipboard().setText(" ☀ "))
-        menu11.addAction("☁", lambda: QApplication.clipboard().setText(" ☁ "))
-        menu11.addAction("⚡", lambda: QApplication.clipboard().setText(" ⚡ "))
-        menu11.addAction("☔", lambda: QApplication.clipboard().setText(" ☔ "))
-        menu11.addAction("☂", lambda: QApplication.clipboard().setText(" ☂ "))
-
-        menu11.addAction("❄", lambda: QApplication.clipboard().setText(" ❄ "))
-        menu11.addAction("☃", lambda: QApplication.clipboard().setText(" ☃ "))
-        menu11.addAction("☽", lambda: QApplication.clipboard().setText(" ☽ "))
-        menu11.addAction("☾", lambda: QApplication.clipboard().setText(" ☾ "))
-        menu11.addAction("🌞", lambda: QApplication.clipboard().setText(" 🌞 "))
-        # symbols
-        menu12.addAction("‼", lambda: QApplication.clipboard().setText(" ‼ "))
-        menu12.addAction("⁉", lambda: QApplication.clipboard().setText(" ⁉ "))
-        menu12.addAction("…", lambda: QApplication.clipboard().setText(" … "))
-        menu12.addAction("❓", lambda: QApplication.clipboard().setText(" ❓ "))
-        menu12.addAction("✔", lambda: QApplication.clipboard().setText(" ✔ "))
-        menu12.addAction("✗", lambda: QApplication.clipboard().setText(" ✗ "))
-        menu12.addAction("☑", lambda: QApplication.clipboard().setText(" ☑ "))
-        menu12.addAction("☒", lambda: QApplication.clipboard().setText(" ☒ "))
-        menu12.addAction("➕", lambda: QApplication.clipboard().setText(" ➕ "))
-        menu12.addAction("➖", lambda: QApplication.clipboard().setText(" ➖ "))
-        menu12.addAction("➗", lambda: QApplication.clipboard().setText(" ➗ "))
-        menu12.addAction("❌", lambda: QApplication.clipboard().setText(" ❌ "))
-        menu12.addAction("™", lambda: QApplication.clipboard().setText(" ™ "))
-        menu12.addAction("®", lambda: QApplication.clipboard().setText(" ® "))
-        menu12.addAction("©", lambda: QApplication.clipboard().setText(" © "))
-        menu12.addAction("Ω", lambda: QApplication.clipboard().setText(" Ω "))
-        menu12.addAction("℮", lambda: QApplication.clipboard().setText(" ℮ "))
-        menu12.addAction("₤", lambda: QApplication.clipboard().setText(" ₤ "))
-        menu12.addAction("₧", lambda: QApplication.clipboard().setText(" ₧ "))
-        menu12.addAction("", lambda: QApplication.clipboard().setText("  "))
-        menu12.addAction("❎", lambda: QApplication.clipboard().setText(" ❎ "))
-        menu12.addAction("✅", lambda: QApplication.clipboard().setText(" ✅ "))
-        menu12.addAction("➿", lambda: QApplication.clipboard().setText(" ➿ "))
-        menu12.addAction("♿", lambda: QApplication.clipboard().setText(" ♿ "))
-        menu12.addAction("⚓ ", lambda: QApplication.clipboard().setText(" ⚓ "))
-        menu12.addAction("✈", lambda: QApplication.clipboard().setText(" ✈ "))
-        menu12.addAction("⚠", lambda: QApplication.clipboard().setText(" ⚠ "))
-        menu12.addAction("☕", lambda: QApplication.clipboard().setText(" ☕ "))
-        menu12.addAction("♛", lambda: QApplication.clipboard().setText(" ♛ "))
-        menu12.addAction("☠", lambda: QApplication.clipboard().setText(" ☠ "))
-        menu12.addAction("", lambda: QApplication.clipboard().setText("  "))
-        menu12.addAction("☮", lambda: QApplication.clipboard().setText(" ☮ "))
-        menu12.addAction("☯", lambda: QApplication.clipboard().setText(" ☯ "))
-        menu12.addAction("☘", lambda: QApplication.clipboard().setText(" ☘ "))
-        menu12.addAction("⚐", lambda: QApplication.clipboard().setText(" ⚐ "))
-        menu12.addAction("⚑", lambda: QApplication.clipboard().setText(" ⚑ "))
-        menu12.addAction("⚒", lambda: QApplication.clipboard().setText(" ⚒ "))
-        menu12.addAction("⚔", lambda: QApplication.clipboard().setText(" ⚔ "))
-        menu12.addAction("⚖", lambda: QApplication.clipboard().setText(" ⚖ "))
-        menu12.addAction("⚙", lambda: QApplication.clipboard().setText(" ⚙ "))
-        menu12.addAction("⚛", lambda: QApplication.clipboard().setText(" ⚛ "))
-        menu12.addAction("⚕", lambda: QApplication.clipboard().setText(" ⚕ "))
-        menu12.addAction("", lambda: QApplication.clipboard().setText("  "))
-        menu12.addAction("", lambda: QApplication.clipboard().setText("  "))
-        menu12.addAction("💩", lambda: QApplication.clipboard().setText(" 💩 "))
-        menu12.addAction("🍹", lambda: QApplication.clipboard().setText(" 🍹 "))
-        menu12.addAction("👙", lambda: QApplication.clipboard().setText(" 👙 "))
-        menu12.addAction("👡", lambda: QApplication.clipboard().setText(" 👡 "))
-        menu12.addAction("👕", lambda: QApplication.clipboard().setText(" 👕 "))
-        menu12.addAction("🌴", lambda: QApplication.clipboard().setText(" 🌴 "))
-        menu12.addAction("💪", lambda: QApplication.clipboard().setText(" 💪 "))
-        menu12.addAction("👯", lambda: QApplication.clipboard().setText(" 👯 "))
-        menu12.addAction("🍴", lambda: QApplication.clipboard().setText(" 🍴 "))
-        menu12.addAction("👪", lambda: QApplication.clipboard().setText(" 👪 "))
-        menu12.addAction("🎁", lambda: QApplication.clipboard().setText(" 🎁 "))
-        menu12.addAction("🍰", lambda: QApplication.clipboard().setText(" 🍰 "))
-        menu12.addAction("🎂", lambda: QApplication.clipboard().setText(" 🎂 "))
-        menu12.addAction("🎈", lambda: QApplication.clipboard().setText(" 🎈 "))
-        menu12.addAction("🔥", lambda: QApplication.clipboard().setText(" 🔥 "))
-        menu12.addAction("💣", lambda: QApplication.clipboard().setText(" 💣 "))
-        menu12.addAction("🔫", lambda: QApplication.clipboard().setText(" 🔫 "))
-        menu12.addAction("🍻", lambda: QApplication.clipboard().setText(" 🍻 "))
-        menu12.addAction("🍸", lambda: QApplication.clipboard().setText(" 🍸 "))
-        menu12.addAction("🍷", lambda: QApplication.clipboard().setText(" 🍷 "))
-        menu12.addAction("🌍", lambda: QApplication.clipboard().setText(" 🌍 "))
-        menu12.addAction("🌎", lambda: QApplication.clipboard().setText(" 🌎 "))
-        menu12.addAction("🌏", lambda: QApplication.clipboard().setText(" 🌏 "))
-        menu12.addAction("👽", lambda: QApplication.clipboard().setText(" 👽 "))
-        menu12.addAction("💀", lambda: QApplication.clipboard().setText(" 💀 "))
-        menu12.addAction("🍬", lambda: QApplication.clipboard().setText(" 🍬 "))
-        menu12.addAction("👾", lambda: QApplication.clipboard().setText(" 👾 "))
-        menu12.addAction("🚀", lambda: QApplication.clipboard().setText(" 🚀 "))
-        menu12.addAction("📹", lambda: QApplication.clipboard().setText(" 📹 "))
-        menu12.addAction("📷", lambda: QApplication.clipboard().setText(" 📷 "))
-        menu12.addAction("💻", lambda: QApplication.clipboard().setText(" 💻 "))
-        menu12.addAction("📱", lambda: QApplication.clipboard().setText(" 📱 "))
-        menu12.addAction("📡", lambda: QApplication.clipboard().setText(" 📡 "))
-        menu12.addAction("📺", lambda: QApplication.clipboard().setText(" 📺 "))
-        menu12.addAction("⚽", lambda: QApplication.clipboard().setText(" ⚽ "))
-        # tech
-        char_list = (" ☎ ", " ✉ ", " ✎ ", " ⌛ ", " ⏳ ", " ⏰ ", " ⌚ ",
-                     " ✂ ", " ℹ ", " ☢ ", " ☣ ", " ☤ ", " ✇ ", " ✆ ")
-        self.build_submenu(char_list, menu13)
-        # geometric
-        char_list = (" ■ ", " ● ", " ▲ ", " ▼ ", " ▓ ", " ▒ ", " ░ ", " ◑ ",
-                     " ◐ ", " 〇 ", " ◈ ", " ▣ ", " ▨ ", " ▧ ", " ▩ ",
-                     " ◎ ", " ◊ ", " □ ", " ◕ ", " ☉ ")
-        self.build_submenu(char_list, menu14)
-        # zodiac
-        char_list = (" ♈ ", " ♉ ", " ♊ ", " ♋ ", " ♌ ", " ♍ ", " ♎ ",
-                     " ♏ ", " ♐ ", " ♑ ", " ♒ ", " ♓ ")
-        self.build_submenu(char_list, menu15)
-        # chess
-        char_list = (" ♔ ", " ♕ ", " ♖ ", " ♗ ", " ♘ ", " ♙ ", " ♚ ",
-                     " ♛ ", " ♜ ", " ♝ ", " ♞ ", " ♟ ")
-        self.build_submenu(char_list, menu16)
-        # recycle
-        char_list = (" ♲ ", " ♻ ", " ♳ ", " ♴ ", " ♵ ", " ♶ ", " ♷ ",
-                     " ♸ ", " ♹ ", " ♺ ", " ♼ ", " ♽ ", " ♾ ")
-        self.build_submenu(char_list, menu17)
-        # religion
-        char_list = (" ☦ ", " ☧ ", " ☨ ", " ☩ ", " ☪ ", " ☫ ", " ☬ ", " ☭ ",
-                     " ☯ ", " ࿊ ", " ࿕ ", " ☥ ", " ✟ ", " ✠ ", " ✡ ")
-        self.build_submenu(char_list, menu18)
-        # animals face
-        char_list = (" 🐭 ", " 🐮 ", " 🐵 ", " 🐯 ", " 🐰 ", " 🐲 ", " 🐳 ",
-                     " 🐴 ", " 🐶 ", " 🐷 ", " 🐸 ", " 🐹 ", " 🐺 ", " 🐻 ",
-                     " 🐼 ")
-        self.build_submenu(char_list, menu19)
-        # animals
-        char_list = (" 🐞 ", " 🐝 ", " 🐜 ", " 🐛 ", " 🐀 ", " 🐁 ", " 🐂 ",
-                     " 🐃 ", " 🐄 ", " 🐅 ", " 🐆 ", " 🐇 ", " 🐈 ", " 🐉 ",
-                     " 🐊 ", " 🐋 ", " 🐌 ", " 🐍 ", " 🐎 ", " 🐏 ", " 🐐 ",
-                     " 🐑 ")
-        self.build_submenu(char_list, menu20)
-        char_list = (" 🐒 ", " 🐓 ", " 🐔 ", " 🐕 ", " 🐖 ", " 🐗 ", " 🐘 ",
-                     " 🐪 ", " 🐫 ", " 🐩 ", " 🐧 ", " 🐨 ", " 🐙 ", " 🐬 ",
-                     " 🐚 ", " 🐟 ", " 🐠 ", " 🐡 ", " 🐢 ", " 🐣 ", " 🐤 ",
-                     " 🐥 ", " 🐦 ")
-        self.build_submenu(char_list, menu21)
+            self.build_submenu(UNICODEMOTICONS[list_of_labels[index]], item)
         # html entities
+        menuhtml.setStyleSheet("padding:0;margin:0;menu-scrollable:1;")
         for html_char in tuple(sorted(entities.html5.items())):
-            action = menu22.addAction(html_char[1])
+            action = menuhtml.addAction(html_char[1])
             action.triggered.connect(
                 lambda _, ch=html_char[0]: QApplication.clipboard().setText(
                     "&{html_entity}".format(html_entity=ch)))
-        #
         self.traymenu.addSeparator()
         # help
         helpMenu = self.traymenu.addMenu("Help...")
@@ -442,7 +297,8 @@ class MainWindow(QSystemTrayIcon):
         self.add_autostart()
 
     def build_submenu(self, char_list, submenu):
-        for _char in char_list:
+        """Take a list of characters and a submenu and build actions on it."""
+        for _char in sorted(char_list):
             action = submenu.addAction(_char.strip())
             action.triggered.connect(
                 lambda _, char=_char: QApplication.clipboard().setText(char))
