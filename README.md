@@ -25,12 +25,26 @@ wget -O - https://raw.githubusercontent.com/juancarlospaco/unicodemoticon/master
 
 # Install permanently on the system:
 
+**PIP:** *(Recommended!)*
 ```
-sudo apt-get install python3-pyqt5 ttf-ancient-fonts  # OR  sudo yum install python3-qt5  OR  sudo pacman -S python-pyqt5
-sudo wget -O /usr/bin/unicodemoticon https://raw.githubusercontent.com/juancarlospaco/unicodemoticon/master/unicodemoticon.py
-sudo chmod +x /usr/bin/unicodemoticon
-unicodemoticon
+sudo pip3 install unicodemoticon
 ```
+
+**PIP from Git:**
+```
+sudo pip3 install git+https://raw.githubusercontent.com/juancarlospaco/unicodemoticon/master/unicodemoticon.py
+```
+
+**WGET:**
+```
+sudo wget -O /usr/bin/unicodemoticon.py https://raw.githubusercontent.com/juancarlospaco/unicodemoticon/master/unicodemoticon.py
+sudo chmod +x /usr/bin/unicodemoticon.py
+unicodemoticon.py
+```
+
+**MANUALLY:**
+
+- Save [this file](https://raw.githubusercontent.com/juancarlospaco/unicodemoticon/master/unicodemoticon.py) and run it with Python3.
 
 
 # Why?:
