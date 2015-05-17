@@ -337,15 +337,18 @@ class MainWindow(QSystemTrayIcon):
             item.setFont(QFont('Oxygen', 25))
             self.build_submenu(UNICODEMOTICONS[list_of_labels[index]], item)
         # html entities
-        menuhtml0.setStyleSheet(("font-size:25px;padding:0;margin:0;border:0;"
-                                 "font-family:Oxygen;menu-scrollable:1;"))
+        added_html_entities = []
+        menuhtml0.setStyleSheet("font-size:25px;padding:0;margin:0;border:0;")
         for html_char in tuple(sorted(entities.html5.items())):
             if html_char[1] in HTMLS:
-                action = menuhtml0.addAction(html_char[1])
-                action.triggered.connect(
-                    lambda _, ch=html_char[0]:
-                        QApplication.clipboard().setText(
-                            "&{html_entity}".format(html_entity=ch)))
+                added_html_entities.append(
+                    html_char[0].lower().replace(";", ""))
+                if not html_char[0].lower() in added_html_entities:
+                    action = menuhtml0.addAction(html_char[1])
+                    action.triggered.connect(
+                        lambda _, ch=html_char[0]:
+                            QApplication.clipboard().setText(
+                                "&{html_entity}".format(html_entity=ch)))
         self.traymenu.addSeparator()
         # help
         helpMenu = self.traymenu.addMenu("Help...")
