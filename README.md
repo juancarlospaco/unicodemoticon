@@ -56,6 +56,7 @@ unicodemoticon.py
 
 # Requisites:
 
+- **Linux / Os X** *(No MS Window)*
 - [Python 3.x](https://www.python.org "Python Homepage") *(No Python2)*
 - [PyQt 5.x](http://www.riverbankcomputing.co.uk/software/pyqt/download5 "PyQt5 Homepage")
 - ttf-ancient-fonts *(Linux Package)*
