@@ -14,6 +14,7 @@ unicodemoticon
 - Set its own Process name and show up on Process lists.
 - Can check for updates for itself.
 - Smooth CPU usage.
+- HTML5 Entities, eg. `&copy;`.
 
 
 # Try it !:
