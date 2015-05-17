@@ -15,6 +15,7 @@ unicodemoticon
 - Can check for updates for itself.
 - Smooth CPU usage.
 - HTML5 Entities, eg. `&copy;`.
+- Multiple characters Emoticons, eg. `¯\_(ツ)_/¯`.
 
 
 # Try it !:
