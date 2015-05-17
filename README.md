@@ -17,8 +17,8 @@ unicodemoticon
 - HTML5 Entities, eg. `&copy;` and Multiple characters Emoticons, eg. `¯\_(ツ)_/¯`.
 
 
-# Try it !:
-
+# Try it !: 
+*(Without installing anything)*
 ```
 wget -O - https://raw.githubusercontent.com/juancarlospaco/unicodemoticon/master/unicodemoticon.py | python3
 ```
