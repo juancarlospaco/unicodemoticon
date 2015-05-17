@@ -14,8 +14,7 @@ unicodemoticon
 - Set its own Process name and show up on Process lists.
 - Can check for updates for itself.
 - Smooth CPU usage.
-- HTML5 Entities, eg. `&copy;`.
-- Multiple characters Emoticons, eg. `¯\_(ツ)_/¯`.
+- HTML5 Entities, eg. `&copy;` and Multiple characters Emoticons, eg. `¯\_(ツ)_/¯`.
 
 
 # Try it !:
