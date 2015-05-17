@@ -54,7 +54,7 @@ QWidget:disabled { color: #404040 }"""
 AUTOSTART_DESKTOP_FILE = """
 [Desktop Entry]
 Comment=Trayicon with Unicode Emoticons.
-Exec=chrt --idle 0 /usr/bin/unicodemoticon
+Exec=chrt --idle 0 unicodemoticon.py
 GenericName=Trayicon with Unicode Emoticons.
 Icon=system-run
 Name=UnicodEmoticon
