@@ -27,7 +27,9 @@ wget -O - https://raw.githubusercontent.com/juancarlospaco/unicodemoticon/master
 
 **PIP:** *(Recommended!)*
 ```
-sudo apt-get install python3-pyqt5 ttf-ancient-fonts
+sudo apt-get install python3-pyqt5 ttf-ancient-fonts  
+#  sudo yum install python3-pyqt5 ttf-ancient-fonts
+#  sudo pacman -Syu python-qt5 ttf-ancient-fonts
 sudo pip3 install unicodemoticon
 ```
 
