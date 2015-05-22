@@ -66,6 +66,16 @@ unicodemoticon.py
 [Oxygen](https://www.google.com/fonts/specimen/Oxygen) and [Ubuntu](https://www.google.com/fonts/specimen/Ubuntu) Fonts Recommended but Optional.
 
 
+# Vim:
+
+- Add in your `~/.vimrc` file this lines:
+
+```
+:set encoding=utf-8
+:set termencoding=utf-8
+```
+
+
 # Coding Style Guide:
 
 - Lint, [PEP-8](https://www.python.org/dev/peps/pep-0008), [PEP-257](https://www.python.org/dev/peps/pep-0257), [PyLama](https://github.com/klen/pylama#-pylama), [iSort](https://github.com/timothycrosley/isort) must Pass Ok. `pip install pep8 pep257 pylama isort`
