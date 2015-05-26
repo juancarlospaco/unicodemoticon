@@ -9,8 +9,7 @@ unicodemoticon
 
 
 - Trayicon with Unicode Emoticons using Python3 Qt5.
-- StandAlone, single-file, no-dependencies, easy to use.
-- No Dependencies at all, just needs Python Standard Built-in Libs.
+- StandAlone, single-file, easy to use.
 - Set its own Process name and show up on Process lists.
 - Can check for updates for itself.
 - Smooth CPU usage.
