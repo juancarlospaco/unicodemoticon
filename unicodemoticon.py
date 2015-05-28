@@ -5,7 +5,7 @@
 # metadata
 """UnicodEmoticons."""
 __package__ = "unicodemoticons"
-__version__ = '1.0.1'
+__version__ = '1.0.2'
 __license__ = ' GPLv3+ LGPLv3+ '
 __author__ = ' Juan Carlos '
 __email__ = ' juancarlospaco@gmail.com '
@@ -44,6 +44,12 @@ except ImportError:
     resource = None
 
 
+QSS_STYLE = """
+QWidget { background-color: #302F2F; border-radius: 9px; font-family: Oxygen }
+QWidget:item:selected { background-color: skyblue ; color: black }
+QMenu { border: 1px solid gray; color: silver; font-weight: light }
+QMenu::item { padding: 1px 1em 1px 1em; margin: 0; border: 0 }
+QWidget:disabled { color: gray; font-weight: bold }"""
 AUTOSTART_DESKTOP_FILE = """
 [Desktop Entry]
 Comment=Trayicon with Unicode Emoticons.
