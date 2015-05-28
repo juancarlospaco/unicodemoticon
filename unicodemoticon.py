@@ -44,13 +44,6 @@ except ImportError:
     resource = None
 
 
-QSS_STYLE = """
-QWidget { background-color: #302F2F; border-radius: 9px; font-family: Oxygen }
-QWidget:item:selected { background-color: skyblue }
-QMenu { border: 1px solid gray; color: silver; font-weight: light }
-QMenu::item { padding: 1px 1em 1px 1em; margin: 0; border: 0 }
-QMenu::item:selected { color: black }
-QWidget:disabled { color: #404040 }"""
 AUTOSTART_DESKTOP_FILE = """
 [Desktop Entry]
 Comment=Trayicon with Unicode Emoticons.
@@ -299,7 +292,6 @@ class MainWindow(QSystemTrayIcon):
         self.traymenu = QMenu("Emoticons")
         self.traymenu.addAction("Emoticons").setDisabled(True)
         self.traymenu.setIcon(icon)
-        self.traymenu.setStyleSheet(QSS_STYLE.strip())
         self.traymenu.addSeparator()
         self.activated.connect(self.click_trap)
         # menus
