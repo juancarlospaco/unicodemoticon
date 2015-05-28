@@ -36,7 +36,7 @@ from PyQt5.QtGui import QCursor, QFont, QIcon
 from PyQt5.QtNetwork import (QNetworkAccessManager, QNetworkProxyFactory,
                              QNetworkRequest)
 from PyQt5.QtWidgets import (QApplication, QMenu, QMessageBox, QProgressDialog,
-                             QStyle, QSystemTrayIcon)
+                             QStyle, QSystemTrayIcon, QInputDialog)
 
 try:
     import resource  # windows dont have resource
@@ -64,8 +64,15 @@ Type=Application
 X-DBUS-ServiceName=unicodemoticon
 X-DBUS-StartupType=none
 X-KDE-StartupNotify=false
-X-KDE-SubstituteUID=false
-"""
+X-KDE-SubstituteUID=false"""
+STD_ICON_NAMES = tuple(sorted(set("""emblem-default emblem-documents start-here
+emblem-downloads emblem-favorite emblem-important emblem-mail emblem-photos
+emblem-readonly emblem-shared emblem-symbolic-link emblem-synchronized
+emblem-system emblem-unreadable face-angel face-angry face-crying face-devilish
+face-embarrassed face-cool face-kiss face-laugh face-monkey face-plain
+face-raspberry face-sad face-sick face-smile face-smile-big face-smirk
+face-surprise face-tired face-uncertain face-wink face-worried go-home
+""".strip().lower().replace("\n", " ").split(" "))))  # use your themes icons
 HTMLS = (
     "©®µ¶€℅№∗√∞≋≡≢⊕⊖⊗⊛☆★⏧⌖☎♀♂✓✗⦿⧉⩸*¢£¥×¤ж—†•π℗Ω≬⊹✠⩐∰§´»«@θ¯⋄"
     "¼½¾⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞²³𝒜𝒞𝒟𝒢𝒥𝒦𝒩𝒪𝒫𝒬𝒮𝒯𝒰𝒱𝒲𝒳𝒴𝒵𝔅𝔇𝔉𝔐ℵαβγδελμψ^@⋙⋘")
@@ -95,7 +102,7 @@ UNICODEMOTICONS = {
         "ⓐⓑⓒⓓⓔⓕⓖⓗⓘⓙⓚⓛⓜⓝⓞⓟⓠⓡⓢⓣⓤⓥⓦⓨⓩ",
 
     "simbols":
-        "‼⁉…❓✔✗☑☒➖➗❌™®©Ω℮₤₧❎✅➿♿☠☯☮☘💲💯🚭🚮💤㋡🔞🚼🛀🚬🚭",
+        "‼⁉…❓✔✗☑☒➖➗❌™®©Ω℮₤₧❎✅➿♿☠☯☮☘💲💯🚭🚮💤㋡🔞🚼🛀🚬🚭🌀﻿",
 
     "stars":
         "✵✪✬✫✻✴☆✨✶✩★✾❄❀✿🃏⚝⚹⚜🌟🌠💫💥",
@@ -178,7 +185,11 @@ UNICODEMOTICONS = {
          "٩(｡͡•‿•｡)۶", "∩(︶▽︶)∩", "☜(ﾟヮﾟ☜)", "Ƹ̵̡Ӝ̵̨̄Ʒ", "┐(;´༎ຶД༎ຶ`)┌",
          "(✿つ°ヮ°)つ  └⋃┘", "(つ°ヮ°)つ  （。Y。）", "(✿ ◕‿◕) ᓄ✂╰⋃╯",
          "(つ°ヮ°)つ  (‿|‿)",  "▄︻̷̿┻̿═━一", "(｡♥‿‿♥｡)", "╭∩╮（︶︿︶）╭∩╮",
-         "<('()))}><{", "┐(´～`；)┌")
+         "<('()))}><{", "┐(´～`；)┌", "(╯°□°）╯︵ ┻━┻", "(ง'̀-'́)ง", "ᕙ(⇀‸↼‶)ᕗ",
+         "ლ(=ↀωↀ=)ლ", "ヾ(*ΦωΦ)ﾉ", "m_༼ ༎ຶ ෴ ༎ຶ༽_m", "\(•⊙ω⊙•)/",
+         "o(╥﹏╥)o", "(　-̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥᷄◞ω◟-̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥᷅ )", "(•ิ_•ิ)?", "*｡٩(ˊωˋ*)و✧*｡", "₍₍ ᕕ( ･᷄ὢ･᷅ )ᕗ⁾⁾",
+         "(－‸ლ)", "(͠≖ ͜ʖ͠≖)", "╭∩╮( ͡⚆ ͜ʖ ͡⚆)╭∩╮", "ლ(╹◡╹ლ)", "(๑˃̵ᴗ˂̵)و",
+         "(V) (°,,,°) (V)", "( ͠° ͟ʖ ͡°)", "ಠ_ರೃ")
 }
 
 
@@ -299,7 +310,6 @@ class MainWindow(QSystemTrayIcon):
         self.traymenu = QMenu("Emoticons")
         self.traymenu.addAction("Emoticons").setDisabled(True)
         self.traymenu.setIcon(icon)
-        self.traymenu.setStyleSheet(QSS_STYLE.strip())
         self.traymenu.addSeparator()
         self.activated.connect(self.click_trap)
         # menus
@@ -364,9 +374,11 @@ class MainWindow(QSystemTrayIcon):
                                 "&{html_entity}".format(html_entity=ch)))
         self.traymenu.addSeparator()
         # help
-        helpMenu = self.traymenu.addMenu("Help...")
+        helpMenu = self.traymenu.addMenu("Options...")
         helpMenu.addAction("About Python 3",
                            lambda: open_new_tab('https://www.python.org'))
+        helpMenu.addAction("About Qt 5",
+                           lambda: open_new_tab('http://www.qt.io'))
         helpMenu.addAction("About " + __doc__, lambda: open_new_tab(__url__))
         helpMenu.addSeparator()
         if not sys.platform.startswith("win"):
@@ -377,11 +389,16 @@ class MainWindow(QSystemTrayIcon):
         helpMenu.addAction("Report Bugs", lambda:
                            open_new_tab(__url__ + '/issues?state=open'))
         helpMenu.addAction("Check for updates", lambda: Downloader())
+        helpMenu.addSeparator()
+        helpMenu.addAction("Set Icon", self.set_icon)
+        helpMenu.addAction("Set UI Style", lambda: open_new_tab(
+            path.join(path.expanduser("~"), ".unicodemoticon.css")))
         self.traymenu.addSeparator()
         self.traymenu.addAction("Quit", lambda: self.close())
         self.setContextMenu(self.traymenu)
         self.show()
         self.add_autostart()
+        self.traymenu.setStyleSheet(self.set_or_get_stylesheet())
 
     def build_submenu(self, char_list, submenu):
         """Take a list of characters and a submenu and build actions on it."""
@@ -404,6 +421,28 @@ class MainWindow(QSystemTrayIcon):
             log.info("Writing AutoStart file: " + desktop_file)
             with open(desktop_file, "w", encoding="utf-8") as desktop_file:
                 desktop_file.write(AUTOSTART_DESKTOP_FILE)
+
+    def set_or_get_stylesheet(self, stylesheet=QSS_STYLE):
+        """Add a default stylesheet if needed."""
+        style_file = path.join(path.expanduser("~"), ".unicodemoticon.css")
+        log.info("To Customize the Look'n'Feel Edit the file: " + style_file)
+        if not os.path.isfile(style_file):
+            log.info("Writing Default CSS StyleSheet file: " + style_file)
+            with open(style_file, "w", encoding="utf-8") as style_file_object:
+                style_file_object.write(stylesheet.strip())
+        log.info("Reading CSS StyleSheet file: " + style_file)
+        with open(style_file, "r", encoding="utf-8") as style_file_object:
+            stylesheet = style_file_object.read().strip()
+        return stylesheet
+
+    def set_icon(self, icon=None):
+        """Return a string with opendesktop standard icon name for Qt."""
+        if not icon:
+            icon = QInputDialog.getItem(None, __doc__, "<b>Choose Icon name?:",
+                                        STD_ICON_NAMES, 0, False)[0]
+        if icon:
+            return self.setIcon(QIcon.fromTheme("{}".format(icon)))
+
 
     def close(self):
         """Overload close method."""
@@ -464,6 +503,7 @@ def main():
     app.setApplicationName(APPNAME)
     app.setOrganizationName(APPNAME)
     app.setOrganizationDomain(APPNAME)
+    app.instance().setQuitOnLastWindowClosed(False)  # no quit on dialog close
     icon = QIcon(app.style().standardPixmap(QStyle.SP_FileIcon))
     app.setWindowIcon(icon)
     win = MainWindow(icon)
