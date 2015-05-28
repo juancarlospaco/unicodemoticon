@@ -9,8 +9,7 @@ unicodemoticon
 
 
 - Trayicon with Unicode Emoticons using Python3 Qt5.
-- StandAlone, single-file, no-dependencies, easy to use.
-- No Dependencies at all, just needs Python Standard Built-in Libs.
+- StandAlone, single-file, easy to use.
 - Set its own Process name and show up on Process lists.
 - Can check for updates for itself.
 - Smooth CPU usage.
@@ -64,6 +63,16 @@ unicodemoticon.py
 - ttf-ancient-fonts *(Linux Package)*
 
 [Oxygen](https://www.google.com/fonts/specimen/Oxygen) and [Ubuntu](https://www.google.com/fonts/specimen/Ubuntu) Fonts Recommended but Optional.
+
+
+# Vim:
+
+- Add in your `~/.vimrc` file this lines:
+
+```
+:set encoding=utf-8
+:set termencoding=utf-8
+```
 
 
 # Coding Style Guide:
