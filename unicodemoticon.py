@@ -302,7 +302,7 @@ class MainWindow(QSystemTrayIcon):
     def __init__(self, icon, parent=None):
         """Tray icon main widget."""
         super(MainWindow, self).__init__(icon, parent)
-        log.info("Iniciando {}.".format(__doc__))
+        log.debug("Iniciando {}.".format(__doc__))
         self.setIcon(icon)
         self.setToolTip(__doc__ + "\nPick 1 Emoticon, use CTRL+V to Paste it!")
         self.traymenu = QMenu("Emoticons")
@@ -347,6 +347,7 @@ class MainWindow(QSystemTrayIcon):
         menu32 = self.traymenu.addMenu(list_of_labels[32].title())
         self.traymenu.addSeparator()
         menuhtml0 = self.traymenu.addMenu("HTML5 Code")
+        log.debug("Building Emoticons SubMenus.")
         for index, item in enumerate((
             menu0, menu1, menu2, menu3, menu4, menu5, menu6, menu7, menu8,
             menu9, menu10, menu11, menu12, menu13, menu14, menu15, menu16,
@@ -430,7 +431,7 @@ class MainWindow(QSystemTrayIcon):
             log.info("Writing Default CSS StyleSheet file: " + style_file)
             with open(style_file, "w", encoding="utf-8") as style_file_object:
                 style_file_object.write(stylesheet.strip())
-        log.info("Reading CSS StyleSheet file: " + style_file)
+        log.debug("Reading CSS StyleSheet file: " + style_file)
         with open(style_file, "r", encoding="utf-8") as style_file_object:
             stylesheet = style_file_object.read().strip()
         return stylesheet
@@ -446,6 +447,7 @@ class MainWindow(QSystemTrayIcon):
 
     def close(self):
         """Overload close method."""
+        log.debug("Closing.")
         return sys.exit(0)
 
 
