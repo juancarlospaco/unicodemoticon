@@ -44,14 +44,12 @@ except ImportError:
     resource = None
 
 
-QSS_STYLE = """
+QSS_STYLE = """QWidget:disabled { color: gray; font-weight: bold }
 QWidget { background-color: #302F2F; border-radius: 9px; font-family: Oxygen }
 QWidget:item:selected { background-color: skyblue ; color: black }
 QMenu { border: 1px solid gray; color: silver; font-weight: light }
-QMenu::item { padding: 1px 1em 1px 1em; margin: 0; border: 0 }
-QWidget:disabled { color: gray; font-weight: bold }"""
-AUTOSTART_DESKTOP_FILE = """
-[Desktop Entry]
+QMenu::item { padding: 1px 1em 1px 1em; margin: 0; border: 0 }"""
+AUTOSTART_DESKTOP_FILE = """[Desktop Entry]
 Comment=Trayicon with Unicode Emoticons.
 Exec=chrt --idle 0 unicodemoticon.py
 GenericName=Trayicon with Unicode Emoticons.
@@ -72,9 +70,8 @@ face-embarrassed face-cool face-kiss face-laugh face-monkey face-plain
 face-raspberry face-sad face-sick face-smile face-smile-big face-smirk
 face-surprise face-tired face-uncertain face-wink face-worried go-home
 """.strip().lower().replace("\n", " ").split(" "))))  # use your themes icons
-HTMLS = (
-    "©®µ¶€℅№∗√∞≋≡≢⊕⊖⊗⊛☆★⏧⌖☎♀♂✓✗⦿⧉⩸*¢£¥×¤ж—†•π℗Ω≬⊹✠⩐∰§´»«@θ¯⋄"
-    "¼½¾⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞²³𝒜𝒞𝒟𝒢𝒥𝒦𝒩𝒪𝒫𝒬𝒮𝒯𝒰𝒱𝒲𝒳𝒴𝒵𝔅𝔇𝔉𝔐ℵαβγδελμψ^@⋙⋘")
+HTMLS = """©®€℅№∗√∞≋≡≢⊕⊖⊗⊛☆★⏧⌖☎♀♂✓✗⦿⧉⩸*¢£¥×¤ж—†•π℗Ω≬⊹✠⩐∰§´»«@θ¯⋄∇
+♥✗¼½¾⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞²³𝒜𝒞𝒟𝒢𝒥𝒦𝒩𝒪𝒫𝒬𝒮𝒯𝒰𝒱𝒲𝒳𝒴𝒵𝔅𝔇𝔉𝔐ℵαβγδελμψ^@⋙⋘™✔♫"""
 UNICODEMOTICONS = {
     "sex":
         "♀♂⚢⚣⚤⚥⚧☿👭👬👫",
@@ -186,9 +183,11 @@ UNICODEMOTICONS = {
          "(つ°ヮ°)つ  (‿|‿)",  "▄︻̷̿┻̿═━一", "(｡♥‿‿♥｡)", "╭∩╮（︶︿︶）╭∩╮",
          "<('()))}><{", "┐(´～`；)┌", "(╯°□°）╯︵ ┻━┻", "(ง'̀-'́)ง", "ᕙ(⇀‸↼‶)ᕗ",
          "ლ(=ↀωↀ=)ლ", "ヾ(*ΦωΦ)ﾉ", "m_༼ ༎ຶ ෴ ༎ຶ༽_m", "\(•⊙ω⊙•)/",
-         "o(╥﹏╥)o", "(　-̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥᷄◞ω◟-̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥᷅ )", "(•ิ_•ิ)?", "*｡٩(ˊωˋ*)و✧*｡", "₍₍ ᕕ( ･᷄ὢ･᷅ )ᕗ⁾⁾",
+         "o(╥﹏╥)o",
          "(－‸ლ)", "(͠≖ ͜ʖ͠≖)", "╭∩╮( ͡⚆ ͜ʖ ͡⚆)╭∩╮", "ლ(╹◡╹ლ)", "(๑˃̵ᴗ˂̵)و",
-         "(V) (°,,,°) (V)", "( ͠° ͟ʖ ͡°)", "ಠ_ರೃ")
+         "(V) (°,,,°) (V)", "( ͠° ͟ʖ ͡°)", "ಠ_ರೃ", "🌀_🌀", "♥‿♥",
+         "₍₍ ᕕ( ･᷄ὢ･᷅ )ᕗ⁾⁾",  "*｡٩(ˊωˋ*)و✧*｡",  "(•ิ_•ิ)?",
+         "(　-̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥᷄◞ω◟-̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥᷅ )")
 }
 
 
@@ -362,11 +361,12 @@ class MainWindow(QSystemTrayIcon):
         added_html_entities = []
         menuhtml0.setStyleSheet("font-size:25px;padding:0;margin:0;border:0;")
         for html_char in tuple(sorted(entities.html5.items())):
-            if html_char[1] in HTMLS:
+            if html_char[1] in HTMLS.strip().replace("\n", ""):
                 added_html_entities.append(
                     html_char[0].lower().replace(";", ""))
                 if not html_char[0].lower() in added_html_entities:
                     action = menuhtml0.addAction(html_char[1])
+                    action.hovered.connect(lambda ch=html_char: log.debug(ch))
                     action.triggered.connect(
                         lambda _, ch=html_char[0]:
                             QApplication.clipboard().setText(
@@ -403,6 +403,7 @@ class MainWindow(QSystemTrayIcon):
         """Take a list of characters and a submenu and build actions on it."""
         for _char in sorted(char_list):
             action = submenu.addAction(_char.strip())
+            action.hovered.connect(lambda char=_char: log.debug(char))
             action.triggered.connect(
                 lambda _, char=_char: QApplication.clipboard().setText(char))
 
@@ -440,8 +441,8 @@ class MainWindow(QSystemTrayIcon):
             icon = QInputDialog.getItem(None, __doc__, "<b>Choose Icon name?:",
                                         STD_ICON_NAMES, 0, False)[0]
         if icon:
+            log.debug("Setting Tray Icon name to: {}.".format(icon))
             return self.setIcon(QIcon.fromTheme("{}".format(icon)))
-
 
     def close(self):
         """Overload close method."""
