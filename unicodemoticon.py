@@ -4,7 +4,7 @@
 
 # metadata
 """UnicodEmoticons."""
-__package__ = "unicodemoticons"
+__package__ = "unicodemoticon"
 __version__ = '1.0.2'
 __license__ = ' GPLv3+ LGPLv3+ '
 __author__ = ' Juan Carlos '
@@ -376,23 +376,20 @@ class MainWindow(QSystemTrayIcon):
         # help
         helpMenu = self.traymenu.addMenu("Options...")
         helpMenu.addAction("About Python 3",
-                           lambda: open_new_tab('https://www.python.org'))
-        helpMenu.addAction("About Qt 5",
-                           lambda: open_new_tab('http://www.qt.io'))
+                           lambda: open_new_tab('https://python.org'))
+        helpMenu.addAction("About Qt 5", lambda: open_new_tab('http://qt.io'))
         helpMenu.addAction("About " + __doc__, lambda: open_new_tab(__url__))
         helpMenu.addSeparator()
-        if not sys.platform.startswith("win"):
-            helpMenu.addAction("View Source Code", lambda: call(
-                ('xdg-open ' if sys.platform.startswith("linux") else 'open ')
-                + __file__, shell=True))
+        helpMenu.addAction("View Source Code", lambda: open_new_tab(__file__))
         helpMenu.addSeparator()
         helpMenu.addAction("Report Bugs", lambda:
                            open_new_tab(__url__ + '/issues?state=open'))
         helpMenu.addAction("Check for updates", lambda: Downloader())
         helpMenu.addSeparator()
         helpMenu.addAction("Set Icon", self.set_icon)
-        helpMenu.addAction("Set UI Style", lambda: open_new_tab(
-            path.join(path.expanduser("~"), ".unicodemoticon.css")))
+        helpMenu.addAction("Set UI Style", lambda: open_new_tab(path.join(
+            self.get_or_set_config_folder("unicodemoticon"),
+            "unicodemoticon.css")))
         self.traymenu.addSeparator()
         self.traymenu.addAction("Quit", lambda: self.close())
         self.setContextMenu(self.traymenu)
@@ -425,7 +422,8 @@ class MainWindow(QSystemTrayIcon):
 
     def set_or_get_stylesheet(self, stylesheet=QSS_STYLE):
         """Add a default stylesheet if needed."""
-        style_file = path.join(path.expanduser("~"), ".unicodemoticon.css")
+        style_file = path.join(self.get_or_set_config_folder("unicodemoticon"),
+                               "unicodemoticon.css")
         log.info("To Customize the Look'n'Feel Edit the file: " + style_file)
         if not os.path.isfile(style_file):
             log.info("Writing Default CSS StyleSheet file: " + style_file)
@@ -435,6 +433,23 @@ class MainWindow(QSystemTrayIcon):
         with open(style_file, "r", encoding="utf-8") as style_file_object:
             stylesheet = style_file_object.read().strip()
         return stylesheet
+
+    def get_or_set_config_folder(self, appname):
+        """Get config folder cross-platform, try to always return a path."""
+        if sys.platform.startswith("darwin"):  # Apples Macos
+            config_path = os.path.expanduser("~/Library/Preferences")
+        elif sys.platform.startswith("win"):  # Windown
+            config_path = os.getenv("APPDATA", os.path.expanduser("~/.config"))
+        else:
+            config_path = os.getenv("XDG_CONFIG_HOME",
+                                    os.path.expanduser("~/.config"))
+        if appname and len(appname) and isinstance(appname, str):
+            config_path = os.path.join(config_path, appname.strip().lower())
+        log.debug("Config folder for {} is: {}.".format(appname, config_path))
+        if not os.path.isdir(config_path):
+            log.debug("Creating new Config folder: {}.".format(config_path))
+            os.makedirs(config_path)
+        return config_path
 
     def set_icon(self, icon=None):
         """Return a string with opendesktop standard icon name for Qt."""
