@@ -413,19 +413,20 @@ class MainWindow(QSystemTrayIcon):
 
     def add_desktop_files(self):
         """Add to autostart of the Desktop."""
-        desktop_file = path.join(path.expanduser("~"),
-                                 ".config/autostart/unicodemoticon.desktop")
-        if (path.isdir(path.join(path.expanduser("~"), ".config/autostart"))
-                and not path.isfile(desktop_file)):
-            log.info("Writing Auto-Start file: " + desktop_file)
-            with open(desktop_file, "w", encoding="utf-8") as desktop_file:
-                desktop_file.write(AUTOSTART_DESKTOP_FILE)
+        autostart_file = path.join(self.get_or_set_config_folder("autostart"),
+                                   "unicodemoticon.desktop")
+        config_folder_exists = os.path.isdir(os.path.join(path.expanduser("~"),
+                                                          ".config/autostart"))
+        if config_folder_exists and not os.path.isfile(autostart_file):
+            log.info("Writing Auto-Start file: " + autostart_file)
+            with open(autostart_file, "w", encoding="utf-8") as start_file:
+                start_file.write(AUTOSTART_DESKTOP_FILE)
         desktop_file = path.join(
             path.expanduser("~"),
             ".local/share/applications/unicodemoticon.desktop")
-        if path.isdir(path.join(
-            path.expanduser("~"), ".local/share/applications"
-            ) and not path.isfile(desktop_file)):
+        apps_folder_exists = os.path.isdir(os.path.join(
+            os.path.expanduser("~"), ".local/share/applications"))
+        if apps_folder_exists and not os.path.isfile(desktop_file):
             log.info("Writing Desktop Launcher file: " + desktop_file)
             with open(desktop_file, "w", encoding="utf-8") as desktop_file:
                 desktop_file.write(AUTOSTART_DESKTOP_FILE)
@@ -444,7 +445,7 @@ class MainWindow(QSystemTrayIcon):
             stylesheet = style_file_object.read().strip()
         return stylesheet
 
-    def get_or_set_config_folder(self, appname):
+    def get_or_set_config_folder(self, appname=None):
         """Get config folder cross-platform, try to always return a path."""
         if sys.platform.startswith("darwin"):  # Apples Macos
             config_path = os.path.expanduser("~/Library/Preferences")
@@ -454,7 +455,7 @@ class MainWindow(QSystemTrayIcon):
             config_path = os.getenv("XDG_CONFIG_HOME",
                                     os.path.expanduser("~/.config"))
         if appname and len(appname) and isinstance(appname, str):
-            config_path = os.path.join(config_path, appname.strip().lower())
+            config_path = os.path.join(config_path, appname.strip())
         log.debug("Config folder for {} is: {}.".format(appname, config_path))
         if not os.path.isdir(config_path):
             log.debug("Creating new Config folder: {}.".format(config_path))
