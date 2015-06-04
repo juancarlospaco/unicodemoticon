@@ -58,6 +58,7 @@ Name=UnicodEmoticon
 StartupNotify=false
 Terminal=false
 Type=Application
+Categories=Utility
 X-DBUS-ServiceName=unicodemoticon
 X-DBUS-StartupType=none
 X-KDE-StartupNotify=false
@@ -394,7 +395,7 @@ class MainWindow(QSystemTrayIcon):
         self.traymenu.addAction("Quit", lambda: self.close())
         self.setContextMenu(self.traymenu)
         self.show()
-        self.add_autostart()
+        self.add_desktop_files()
         self.traymenu.setStyleSheet(self.set_or_get_stylesheet())
 
     def build_submenu(self, char_list, submenu):
@@ -410,13 +411,22 @@ class MainWindow(QSystemTrayIcon):
         if value == self.Trigger:  # left click
             self.traymenu.exec_(QCursor.pos())
 
-    def add_autostart(self):
+    def add_desktop_files(self):
         """Add to autostart of the Desktop."""
         desktop_file = path.join(path.expanduser("~"),
                                  ".config/autostart/unicodemoticon.desktop")
         if (path.isdir(path.join(path.expanduser("~"), ".config/autostart"))
                 and not path.isfile(desktop_file)):
-            log.info("Writing AutoStart file: " + desktop_file)
+            log.info("Writing Auto-Start file: " + desktop_file)
+            with open(desktop_file, "w", encoding="utf-8") as desktop_file:
+                desktop_file.write(AUTOSTART_DESKTOP_FILE)
+        desktop_file = path.join(
+            path.expanduser("~"),
+            ".local/share/applications/unicodemoticon.desktop")
+        if path.isdir(path.join(
+            path.expanduser("~"), ".local/share/applications"
+            ) and not path.isfile(desktop_file)):
+            log.info("Writing Desktop Launcher file: " + desktop_file)
             with open(desktop_file, "w", encoding="utf-8") as desktop_file:
                 desktop_file.write(AUTOSTART_DESKTOP_FILE)
 
