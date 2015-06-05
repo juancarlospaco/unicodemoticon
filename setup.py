@@ -18,7 +18,7 @@
 #
 # To generate PKGBUILD ArchLinux from Python Package:
 # sudo pip3 install git+https://github.com/bluepeppers/pip2arch.git
-# pip2arch PackageNameHere
+# pip2arch.py PackageNameHere
 #
 #
 # To Upload to PyPI by executing:
