@@ -525,6 +525,7 @@ def main():
     log.debug("FileSystem Encoding: {}.".format(sys.getfilesystemencoding()))
     log.debug("PYTHONIOENCODING Encoding: {}.".format(
         os.environ.get("PYTHONIOENCODING", None)))
+    os.environ["PYTHONIOENCODING"] = "utf-8"
     try:
         os.nice(19)  # smooth cpu priority
         libc = cdll.LoadLibrary('libc.so.6')  # set process name
