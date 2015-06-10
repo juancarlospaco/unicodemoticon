@@ -518,6 +518,13 @@ def main():
     log.basicConfig(level=-1, format="%(levelname)s:%(asctime)s %(message)s")
     log.getLogger().addHandler(log.StreamHandler(sys.stderr))
     log.info(__doc__)
+    log.debug("STDOUT Encoding: {}.".format(sys.stdout.encoding))
+    log.debug("STDIN Encoding: {}.".format(sys.stdin.encoding))
+    log.debug("STDERR Encoding: {}.".format(sys.stderr.encoding))
+    log.debug("Default Encoding: {}.".format(sys.getdefaultencoding()))
+    log.debug("FileSystem Encoding: {}.".format(sys.getfilesystemencoding()))
+    log.debug("PYTHONIOENCODING Encoding: {}.".format(
+        os.environ.get("PYTHONIOENCODING", None)))
     try:
         os.nice(19)  # smooth cpu priority
         libc = cdll.LoadLibrary('libc.so.6')  # set process name
