@@ -46,9 +46,9 @@ except ImportError:
 
 QSS_STYLE = """QWidget:disabled { color: gray; font-weight: bold }
 QWidget { background-color: #302F2F; border-radius: 9px; font-family: Oxygen }
-QWidget:item:selected { background-color: skyblue ; color: black }
-QMenu { border: 1px solid gray; color: silver; font-weight: light }
-QMenu::item { padding: 1px 1em 1px 1em; margin: 0; border: 0 }"""
+QMenu[emoji_menu] { border: 1px solid gray; color: silver; font-weight: light }
+QMenu[emoji_menu]::item { padding: 1px 1em 1px 1em; margin: 0; border: 0 }
+QMenu[emoji_menu]::item:selected { background-color: skyblue ; color: black }"""
 
 AUTOSTART_DESKTOP_FILE = """[Desktop Entry]
 Comment=Trayicon with Unicode Emoticons.
@@ -371,6 +371,7 @@ class MainWindow(QSystemTrayIcon):
 
     def build_submenu(self, char_list, submenu):
         """Take a list of characters and a submenu and build actions on it."""
+        submenu.setProperty("emoji_menu", True)
         for _char in sorted(char_list):
             action = submenu.addAction(_char.strip())
             action.hovered.connect(lambda char=_char: log.debug(char))
