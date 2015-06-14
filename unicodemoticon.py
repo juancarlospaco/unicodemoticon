@@ -36,7 +36,7 @@ from PyQt5.QtGui import QCursor, QFont, QIcon
 from PyQt5.QtNetwork import (QNetworkAccessManager, QNetworkProxyFactory,
                              QNetworkRequest)
 from PyQt5.QtWidgets import (QApplication, QMenu, QMessageBox, QProgressDialog,
-                             QStyle, QSystemTrayIcon, QInputDialog)
+                             QStyle, QSystemTrayIcon, QInputDialog, QAction)
 
 try:
     import resource  # windows dont have resource
@@ -49,6 +49,7 @@ QWidget { background-color: #302F2F; border-radius: 9px; font-family: Oxygen }
 QWidget:item:selected { background-color: skyblue ; color: black }
 QMenu { border: 1px solid gray; color: silver; font-weight: light }
 QMenu::item { padding: 1px 1em 1px 1em; margin: 0; border: 0 }"""
+
 AUTOSTART_DESKTOP_FILE = """[Desktop Entry]
 Comment=Trayicon with Unicode Emoticons.
 Exec=chrt --idle 0 unicodemoticon.py
@@ -63,6 +64,7 @@ X-DBUS-ServiceName=unicodemoticon
 X-DBUS-StartupType=none
 X-KDE-StartupNotify=false
 X-KDE-SubstituteUID=false"""
+
 STD_ICON_NAMES = tuple(sorted(set("""emblem-default emblem-documents start-here
 emblem-downloads emblem-favorite emblem-important emblem-mail emblem-photos
 emblem-readonly emblem-shared emblem-symbolic-link emblem-synchronized
@@ -71,8 +73,10 @@ face-embarrassed face-cool face-kiss face-laugh face-monkey face-plain
 face-raspberry face-sad face-sick face-smile face-smile-big face-smirk
 face-surprise face-tired face-uncertain face-wink face-worried go-home
 """.strip().lower().replace("\n", " ").split(" "))))  # use your themes icons
-HTMLS = """©®€℅№∗√∞≋≡≢⊕⊖⊗⊛☆★⏧⌖☎♀♂✓✗⦿⧉⩸*¢£¥×¤ж—†•π℗Ω≬⊹✠⩐∰§´»«@θ¯⋄∇
-♥✗¼½¾⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞²³𝒜𝒞𝒟𝒢𝒥𝒦𝒩𝒪𝒫𝒬𝒮𝒯𝒰𝒱𝒲𝒳𝒴𝒵𝔅𝔇𝔉𝔐ℵαβγδελμψ^@⋙⋘™✔♫"""
+
+HTMLS = ("©®€℅№∗√∞≋≡≢⊕⊖⊗⊛☆★⏧⌖☎♀♂✓✗⦿⧉⩸*¢£¥×¤ж—†•π℗Ω≬⊹✠⩐∰§´»«@θ¯⋄∇♥✗"
+         "¼½¾⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞²³𝒜𝒞𝒟𝒢𝒥𝒦𝒩𝒪𝒫𝒬𝒮𝒯𝒰𝒱𝒲𝒳𝒴𝒵𝔅𝔇𝔉𝔐ℵαβγδελμψ^@⋙⋘™✔♫")
+
 UNICODEMOTICONS = {
     "sex":
         "♀♂⚢⚣⚤⚥⚧☿👭👬👫",
@@ -98,7 +102,7 @@ UNICODEMOTICONS = {
     "letters":
         "ⓐⓑⓒⓓⓔⓕⓖⓗⓘⓙⓚⓛⓜⓝⓞⓟⓠⓡⓢⓣⓤⓥⓦⓨⓩ",
 
-    "simbols":
+    "symbols":
         "‼⁉…❓✔✗☑☒➖➗❌™®©Ω℮₤₧❎✅➿♿☠☯☮☘💲💯🚭🚮💤㋡🔞🚼🛀🚬🚭🌀﻿",
 
     "stars":
@@ -303,7 +307,7 @@ class MainWindow(QSystemTrayIcon):
     def __init__(self, icon, parent=None):
         """Tray icon main widget."""
         super(MainWindow, self).__init__(icon, parent)
-        log.debug("Iniciando {}.".format(__doc__))
+        log.debug("Starting {}.".format(__doc__))
         self.setIcon(icon)
         self.setToolTip(__doc__ + "\nPick 1 Emoticon, use CTRL+V to Paste it!")
         self.traymenu = QMenu("Emoticons")
@@ -329,7 +333,7 @@ class MainWindow(QSystemTrayIcon):
         added_html_entities = []
         menuhtml0.setStyleSheet("font-size:25px;padding:0;margin:0;border:0;")
         for html_char in tuple(sorted(entities.html5.items())):
-            if html_char[1] in HTMLS.strip().replace("\n", ""):
+            if html_char[1] in HTMLS:
                 added_html_entities.append(
                     html_char[0].lower().replace(";", ""))
                 if not html_char[0].lower() in added_html_entities:
@@ -358,7 +362,8 @@ class MainWindow(QSystemTrayIcon):
             self.get_or_set_config_folder("unicodemoticon"),
             "unicodemoticon.css")))
         self.traymenu.addSeparator()
-        self.traymenu.addAction("Quit", lambda: self.close())
+        quit_action = self.traymenu.addAction("Quit", lambda: self.close())
+        quit_action.setMenuRole(QAction.QuitRole)
         self.setContextMenu(self.traymenu)
         self.show()
         self.add_desktop_files()
@@ -513,8 +518,10 @@ def main():
     log.info('Total Maximum RAM Memory used: ~{} MegaBytes.'.format(int(
         resource.getrusage(resource.RUSAGE_SELF).ru_maxrss *
         resource.getpagesize() / 1024 / 1024 if resource else 0)))
-    sys.exit(app.exec_())
+    sys.exit(app.exec())
 
 
 if __name__ in '__main__':
     main()
+
+# kate: space-indent on; indent-width 4;
