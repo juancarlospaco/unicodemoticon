@@ -4,7 +4,6 @@
 
 # metadata
 """UnicodEmoticons."""
-__package__ = "unicodemoticon"
 __version__ = '1.0.4'
 __license__ = ' GPLv3+ LGPLv3+ '
 __author__ = ' Juan Carlos '
@@ -15,6 +14,7 @@ __source__ = ('https://raw.githubusercontent.com/juancarlospaco/'
 
 
 # imports
+import curses
 import logging as log
 import os
 import signal
@@ -454,7 +454,6 @@ class MainWindow(QSystemTrayIcon):
 
 def main():
     """Main Loop."""
-    APPNAME = str(__package__ or __doc__)[:99].lower().strip().replace(" ", "")
     if not sys.platform.startswith("win") and sys.stderr.isatty():
         def add_color_emit_ansi(fn):
             """Add methods we need to the class."""
@@ -469,6 +468,9 @@ def main():
                 levelno = new_args[1].levelno
                 if levelno >= 50:
                     color = '\x1b[31;5;7m\n '  # blinking red with black
+                    curses.initscr()  # flash the screen
+                    curses.flash()
+                    curses.endwin()
                 elif levelno >= 40:
                     color = '\x1b[31m'  # red
                 elif levelno >= 30:
@@ -501,16 +503,16 @@ def main():
     try:
         os.nice(19)  # smooth cpu priority
         libc = cdll.LoadLibrary('libc.so.6')  # set process name
-        buff = create_string_buffer(len(APPNAME) + 1)
-        buff.value = bytes(APPNAME.encode("utf-8"))
+        buff = create_string_buffer(len("unicodemoticon") + 1)
+        buff.value = bytes("unicodemoticon".encode("utf-8"))
         libc.prctl(15, byref(buff), 0, 0, 0)
     except Exception as reason:
         log.warning(reason)
     signal.signal(signal.SIGINT, signal.SIG_DFL)  # CTRL+C work to quit app
     app = QApplication(sys.argv)
-    app.setApplicationName(APPNAME)
-    app.setOrganizationName(APPNAME)
-    app.setOrganizationDomain(APPNAME)
+    app.setApplicationName("unicodemoticon")
+    app.setOrganizationName("unicodemoticon")
+    app.setOrganizationDomain("unicodemoticon")
     app.instance().setQuitOnLastWindowClosed(False)  # no quit on dialog close
     icon = QIcon(app.style().standardPixmap(QStyle.SP_FileIcon))
     app.setWindowIcon(icon)
@@ -524,5 +526,6 @@ def main():
 
 if __name__ in '__main__':
     main()
+
 
 # kate: space-indent on; indent-width 4;
