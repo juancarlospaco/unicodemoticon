@@ -313,52 +313,18 @@ class MainWindow(QSystemTrayIcon):
         self.activated.connect(self.click_trap)
         # menus
         list_of_labels = sorted(UNICODEMOTICONS.keys())
-        menu0 = self.traymenu.addMenu(list_of_labels[0].title())
-        menu1 = self.traymenu.addMenu(list_of_labels[1].title())
-        menu2 = self.traymenu.addMenu(list_of_labels[2].title())
-        menu3 = self.traymenu.addMenu(list_of_labels[3].title())
-        menu4 = self.traymenu.addMenu(list_of_labels[4].title())
-        menu5 = self.traymenu.addMenu(list_of_labels[5].title())
-        menu6 = self.traymenu.addMenu(list_of_labels[6].title())
-        menu7 = self.traymenu.addMenu(list_of_labels[7].title())
-        menu8 = self.traymenu.addMenu(list_of_labels[8].title())
-        menu9 = self.traymenu.addMenu(list_of_labels[9].title())
-        menu10 = self.traymenu.addMenu(list_of_labels[10].title())
-        menu11 = self.traymenu.addMenu(list_of_labels[11].title())
-        menu12 = self.traymenu.addMenu(list_of_labels[12].title())
-        menu13 = self.traymenu.addMenu(list_of_labels[13].title())
-        menu14 = self.traymenu.addMenu(list_of_labels[14].title())
-        menu15 = self.traymenu.addMenu(list_of_labels[15].title())
-        menu16 = self.traymenu.addMenu(list_of_labels[16].title())
-        menu17 = self.traymenu.addMenu(list_of_labels[17].title())
-        menu18 = self.traymenu.addMenu(list_of_labels[18].title())
-        menu19 = self.traymenu.addMenu(list_of_labels[19].title())
-        menu20 = self.traymenu.addMenu(list_of_labels[20].title())
-        menu21 = self.traymenu.addMenu(list_of_labels[21].title())
-        menu22 = self.traymenu.addMenu(list_of_labels[22].title())
-        menu23 = self.traymenu.addMenu(list_of_labels[23].title())
-        menu24 = self.traymenu.addMenu(list_of_labels[24].title())
-        menu25 = self.traymenu.addMenu(list_of_labels[25].title())
-        menu26 = self.traymenu.addMenu(list_of_labels[26].title())
-        menu27 = self.traymenu.addMenu(list_of_labels[27].title())
-        menu28 = self.traymenu.addMenu(list_of_labels[28].title())
-        menu29 = self.traymenu.addMenu(list_of_labels[29].title())
-        menu30 = self.traymenu.addMenu(list_of_labels[30].title())
-        menu31 = self.traymenu.addMenu(list_of_labels[31].title())
-        menu32 = self.traymenu.addMenu(list_of_labels[32].title())
+        menus = [
+          self.traymenu.addMenu(label.title())
+            for i, label in enumerate(list_of_labels)
+        ]
         self.traymenu.addSeparator()
         menuhtml0 = self.traymenu.addMenu("HTML5 Code")
         log.debug("Building Emoticons SubMenus.")
-        for index, item in enumerate((
-            menu0, menu1, menu2, menu3, menu4, menu5, menu6, menu7, menu8,
-            menu9, menu10, menu11, menu12, menu13, menu14, menu15, menu16,
-            menu17, menu18, menu19, menu20, menu21, menu22, menu23, menu24,
-            menu25, menu26, menu27, menu28, menu29, menu30, menu31, menu32,
-                )):
+        for item, label in zip(menus, list_of_labels):
             item.setStyleSheet(("font-size:25px;padding:0;margin:0;border:0;"
                                 "font-family:Oxygen;menu-scrollable:1;"))
             item.setFont(QFont('Oxygen', 25))
-            self.build_submenu(UNICODEMOTICONS[list_of_labels[index]], item)
+            self.build_submenu(UNICODEMOTICONS[label], item)
         # html entities
         added_html_entities = []
         menuhtml0.setStyleSheet("font-size:25px;padding:0;margin:0;border:0;")
