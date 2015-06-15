@@ -29,14 +29,16 @@ from subprocess import call
 from tempfile import gettempdir
 from urllib import request
 from webbrowser import open_new_tab
+
 from html import entities
 
 from PyQt5.QtCore import QUrl
 from PyQt5.QtGui import QCursor, QFont, QIcon
 from PyQt5.QtNetwork import (QNetworkAccessManager, QNetworkProxyFactory,
                              QNetworkRequest)
-from PyQt5.QtWidgets import (QApplication, QMenu, QMessageBox, QProgressDialog,
-                             QStyle, QSystemTrayIcon, QInputDialog, QAction)
+from PyQt5.QtWidgets import (QAction, QApplication, QInputDialog, QMenu,
+                             QMessageBox, QProgressDialog, QStyle,
+                             QSystemTrayIcon)
 
 try:
     import resource  # windows dont have resource
@@ -48,7 +50,7 @@ QSS_STYLE = """QWidget:disabled { color: gray; font-weight: bold }
 QWidget { background-color: #302F2F; border-radius: 9px; font-family: Oxygen }
 QMenu[emoji_menu] { border: 1px solid gray; color: silver; font-weight: light }
 QMenu[emoji_menu]::item { padding: 1px 1em 1px 1em; margin: 0; border: 0 }
-QMenu[emoji_menu]::item:selected { background-color: skyblue ; color: black }"""
+QMenu[emoji_menu]::item:selected { background-color:skyblue ; color:black }"""
 
 AUTOSTART_DESKTOP_FILE = """[Desktop Entry]
 Comment=Trayicon with Unicode Emoticons.
@@ -72,6 +74,11 @@ emblem-system emblem-unreadable face-angel face-angry face-crying face-devilish
 face-embarrassed face-cool face-kiss face-laugh face-monkey face-plain
 face-raspberry face-sad face-sick face-smile face-smile-big face-smirk
 face-surprise face-tired face-uncertain face-wink face-worried go-home
+insert-image insert-link insert-object insert-text list-add edit-copy
+edit-find-replace edit-paste tools-check-spelling accessories-character-map
+accessories-dictionary accessories-text-editor preferences-desktop-font
+preferences-desktop-keyboard applications-other applications-utilities
+preferences-other user-bookmarks application-x-executable image-missing
 """.strip().lower().replace("\n", " ").split(" "))))  # use your themes icons
 
 HTMLS = ("©®€℅№∗√∞≋≡≢⊕⊖⊗⊛☆★⏧⌖☎♀♂✓✗⦿⧉⩸*¢£¥×¤ж—†•π℗Ω≬⊹✠⩐∰§´»«@θ¯⋄∇♥✗"
