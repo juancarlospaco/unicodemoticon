@@ -317,10 +317,7 @@ class MainWindow(QSystemTrayIcon):
         self.activated.connect(self.click_trap)
         # menus
         list_of_labels = sorted(UNICODEMOTICONS.keys())
-        menus = [
-          self.traymenu.addMenu(label.title())
-            for i, label in enumerate(list_of_labels)
-        ]
+        menus = [self.traymenu.addMenu(lbl.title()) for lbl in list_of_labels]
         self.traymenu.addSeparator()
         menuhtml0 = self.traymenu.addMenu("HTML5 Code")
         log.debug("Building Emoticons SubMenus.")
