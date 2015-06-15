@@ -20,6 +20,7 @@ import os
 import signal
 import sys
 import time
+import socket
 from copy import copy
 from ctypes import byref, cdll, create_string_buffer
 from datetime import datetime
@@ -205,6 +206,15 @@ UNICODEMOTICONS = {
 
 
 ###############################################################################
+
+
+try:  # Single instance app ~crossplatform, uses udp socket.
+    __lock = socket.socket(socket.AF_UNIX if sys.platform.startswith("linux")
+                           else socket.AF_INET, socket.SOCK_STREAM)
+    __lock.bind("\0_unicodemoticon_lock"
+                if sys.platform.startswith("linux") else ("127.0.0.1", 8000))
+except socket.error as e:
+    sys.exit("App already running, ({e},Reboot to Fix). Exiting.".format(e=e))
 
 
 class Downloader(QProgressDialog):
