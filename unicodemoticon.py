@@ -208,6 +208,8 @@ UNICODEMOTICONS = {
 ###############################################################################
 
 
+if not os.geteuid():  # root check, dont run as root
+    sys.exit("Do NOT Run as root!. Exiting.")
 try:  # Single instance app ~crossplatform, uses udp socket.
     __lock = socket.socket(socket.AF_UNIX if sys.platform.startswith("linux")
                            else socket.AF_INET, socket.SOCK_STREAM)
