@@ -26,6 +26,7 @@ from ctypes import byref, cdll, create_string_buffer
 from datetime import datetime
 from getopt import getopt
 from os import path
+from platform import platform, python_version
 from subprocess import call
 from tempfile import gettempdir
 from urllib import request
@@ -206,17 +207,6 @@ UNICODEMOTICONS = {
 
 
 ###############################################################################
-
-
-if not sys.platform.startswith("win") and not os.geteuid():
-    sys.exit("Do NOT Run as root!. Exiting.")  # root check, dont run as root
-try:  # Single instance app ~crossplatform, uses udp socket.
-    __lock = socket.socket(socket.AF_UNIX if sys.platform.startswith("linux")
-                           else socket.AF_INET, socket.SOCK_STREAM)
-    __lock.bind("\0_unicodemoticon_lock"
-                if sys.platform.startswith("linux") else ("127.0.0.1", 8000))
-except socket.error as e:
-    sys.exit("App already running, ({e},Reboot to Fix). Exiting.".format(e=e))
 
 
 class Downloader(QProgressDialog):
@@ -469,8 +459,94 @@ class MainWindow(QSystemTrayIcon):
 ###############################################################################
 
 
-def main():
-    """Main Loop."""
+def make_post_execution_message(app=__doc__.splitlines()[0].strip()):
+    """Simple Post-Execution Message with information about RAM and Time.
+    >>> make_post_execution_message() >= 0
+    True
+    """
+    ram_use = int(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss *
+                  resource.getpagesize() / 1024 / 1024 if resource else 0)
+    log.info("Total Maximum RAM Memory used: ~{0} MegaBytes.".format(ram_use))
+    print("Thanks for using this App,share your experience!{0}".format("""
+    Twitter: https://twitter.com/home?status=I%20Like%20{n}!:%20{u}
+    Facebook: https://www.facebook.com/share.php?u={u}&t=I%20Like%20{n}
+    G+: https://plus.google.com/share?url={u}""".format(u=__url__, n=app)))
+    return ram_use
+
+
+def make_root_check_and_encoding_debug():
+    """Debug and Log Encodings and Check for root/administrator,return Boolean.
+
+    >>> make_root_check_and_encoding_debug()
+    True
+    """
+    log.info(__doc__ + __version__)
+    log.debug("Python {0} on {1}.".format(python_version(), platform()))
+    log.debug("STDIN Encoding: {0}.".format(sys.stdin.encoding))
+    log.debug("STDERR Encoding: {0}.".format(sys.stderr.encoding))
+    log.debug("STDOUT Encoding:{}".format(getattr(sys.stdout, "encoding", "")))
+    log.debug("Default Encoding: {0}.".format(sys.getdefaultencoding()))
+    log.debug("FileSystem Encoding: {0}.".format(sys.getfilesystemencoding()))
+    log.debug("PYTHONIOENCODING Encoding: {0}.".format(
+        os.environ.get("PYTHONIOENCODING", None)))
+    os.environ["PYTHONIOENCODING"] = "utf-8"
+    if not sys.platform.startswith("win"):  # root check
+        if not os.geteuid():
+            log.critical("Runing as root is not Recommended,NOT Run as root!.")
+            return False
+    elif sys.platform.startswith("win"):  # administrator check
+        if getuser().lower().startswith("admin"):
+            log.critical("Runing as Administrator is not Recommended!.")
+            return False
+    return True
+
+
+def set_process_name_and_cpu_priority(name):
+    """Set process name and cpu priority.
+
+    >>> set_process_name_and_cpu_priority("test_test")
+    True
+    """
+    try:
+        os.nice(19)  # smooth cpu priority
+        libc = cdll.LoadLibrary("libc.so.6")  # set process name
+        buff = create_string_buffer(len(name.lower().strip()) + 1)
+        buff.value = bytes(name.lower().strip().encode("utf-8"))
+        libc.prctl(15, byref(buff), 0, 0, 0)
+    except Exception:
+        return False  # this may fail on windows and its normal, so be silent.
+    else:
+        log.debug("Process Name set to: {0}.".format(name))
+        return True
+
+
+def set_single_instance(name, single_instance=True, port=8888):
+    """Set process name and cpu priority, return socket.socket object or None.
+
+    >>> isinstance(set_single_instance("test"), socket.socket)
+    True
+    """
+    __lock = None
+    if single_instance:
+        try:  # Single instance app ~crossplatform, uses udp socket.
+            log.info("Creating Abstract UDP Socket Lock for Single Instance.")
+            __lock = socket.socket(
+                socket.AF_UNIX if sys.platform.startswith("linux")
+                else socket.AF_INET, socket.SOCK_STREAM)
+            __lock.bind(
+                "\0_{name}__lock".format(name=str(name).lower().strip())
+                if sys.platform.startswith("linux") else ("127.0.0.1", port))
+        except socket.error as e:
+            log.warning(e)
+        else:
+            log.info("Socket Lock for Single Instance: {}.".format(__lock))
+    else:  # if multiple instance want to touch same file bad things can happen
+        log.warning("Multiple instance on same file can cause Race Condition.")
+    return __lock
+
+
+def make_logger(name=str(os.getpid())):
+    """Build and return a Logging Logger."""
     if not sys.platform.startswith("win") and sys.stderr.isatty():
         def add_color_emit_ansi(fn):
             """Add methods we need to the class."""
@@ -485,9 +561,6 @@ def main():
                 levelno = new_args[1].levelno
                 if levelno >= 50:
                     color = '\x1b[31;5;7m\n '  # blinking red with black
-                    curses.initscr()  # flash the screen
-                    curses.flash()
-                    curses.endwin()
                 elif levelno >= 40:
                     color = '\x1b[31m'  # red
                 elif levelno >= 30:
@@ -506,25 +579,18 @@ def main():
             return new
         # all non-Windows platforms support ANSI Colors so we use them
         log.StreamHandler.emit = add_color_emit_ansi(log.StreamHandler.emit)
+    else:
+        log.debug("Colored Logs not supported on {0}.".format(sys.platform))
     log.basicConfig(level=-1, format="%(levelname)s:%(asctime)s %(message)s")
-    log.getLogger().addHandler(log.StreamHandler(sys.stderr))
-    log.info(__doc__)
-    log.debug("STDOUT Encoding: {}.".format(sys.stdout.encoding))
-    log.debug("STDIN Encoding: {}.".format(sys.stdin.encoding))
-    log.debug("STDERR Encoding: {}.".format(sys.stderr.encoding))
-    log.debug("Default Encoding: {}.".format(sys.getdefaultencoding()))
-    log.debug("FileSystem Encoding: {}.".format(sys.getfilesystemencoding()))
-    log.debug("PYTHONIOENCODING Encoding: {}.".format(
-        os.environ.get("PYTHONIOENCODING", None)))
-    os.environ["PYTHONIOENCODING"] = "utf-8"
-    try:
-        os.nice(19)  # smooth cpu priority
-        libc = cdll.LoadLibrary('libc.so.6')  # set process name
-        buff = create_string_buffer(len("unicodemoticon") + 1)
-        buff.value = bytes("unicodemoticon".encode("utf-8"))
-        libc.prctl(15, byref(buff), 0, 0, 0)
-    except Exception as reason:
-        log.warning(reason)
+    return log
+
+
+def main():
+    """Main Loop."""
+    make_logger("unicodemoticon")
+    make_root_check_and_encoding_debug()
+    set_process_name_and_cpu_priority("unicodemoticon")
+    set_single_instance("unicodemoticon")
     signal.signal(signal.SIGINT, signal.SIG_DFL)  # CTRL+C work to quit app
     app = QApplication(sys.argv)
     app.setApplicationName("unicodemoticon")
@@ -535,9 +601,7 @@ def main():
     app.setWindowIcon(icon)
     win = MainWindow(icon)
     win.show()
-    log.info('Total Maximum RAM Memory used: ~{} MegaBytes.'.format(int(
-        resource.getrusage(resource.RUSAGE_SELF).ru_maxrss *
-        resource.getpagesize() / 1024 / 1024 if resource else 0)))
+    make_post_execution_message()
     sys.exit(app.exec())
 
 
