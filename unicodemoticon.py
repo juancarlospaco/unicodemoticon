@@ -14,7 +14,6 @@ __source__ = ('https://raw.githubusercontent.com/juancarlospaco/'
 
 
 # imports
-import curses
 import logging as log
 import os
 import signal
