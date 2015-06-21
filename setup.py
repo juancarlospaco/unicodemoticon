@@ -37,39 +37,65 @@ import logging as log
 from setuptools import setup
 
 
-log.basicConfig(level=-1)
-try:
-    os.nice(19)  # smooth cpu priority
-except Exception as reason:
-    log.warning(reason)
-
-
-# Should be all UTF-8 for best results
-log.debug("STDOUT Encoding: {}.".format(sys.stdout.encoding))
-log.debug("STDIN Encoding: {}.".format(sys.stdin.encoding))
-log.debug("STDERR Encoding: {}.".format(sys.stderr.encoding))
-log.debug("Default Encoding: {}.".format(sys.getdefaultencoding()))
-log.debug("FileSystem Encoding: {}.".format(sys.getfilesystemencoding()))
-log.debug("PYTHONIOENCODING Encoding: {}.".format(
-          os.environ.get("PYTHONIOENCODING", None)))
-os.environ["PYTHONIOENCODING"] = "utf-8"
+##############################################################################
+# EDIT HERE
 
 
 DESCRIPTION = ("Like a Color Picker but for Unicode Emoticons. "
-                 "Trayicon with Unicode Emoticons using Python3 Qt5.")
+               "Trayicon with Unicode Emoticons using Python3 Qt5.")
 MODULE_PATH = os.path.join(os.path.dirname(__file__), "unicodemoticon.py")
 REQUIREMENTS_FILE = os.path.join(os.path.dirname(__file__), "requirements.txt")
-
-
+log.basicConfig(level=-1)
 log.debug("Reading source code file {what}.".format(what=MODULE_PATH))
 with open(str(MODULE_PATH), encoding="utf-8-sig") as source_code_file:
     SOURCE = source_code_file.read()
+
+
+##############################################################################
+# Dont touch below
+
+
+# Should be all UTF-8 for best results
+def make_root_check_and_encoding_debug():
+    """Debug and Log Encodings and Check for root/administrator,return Boolean.
+
+    >>> make_root_check_and_encoding_debug()
+    True
+    """
+    log.info(__doc__)
+    log.debug("STDIN Encoding: {0}.".format(sys.stdin.encoding))
+    log.debug("STDERR Encoding: {0}.".format(sys.stderr.encoding))
+    log.debug("STDOUT Encoding:{}".format(getattr(sys.stdout, "encoding", "")))
+    log.debug("Default Encoding: {0}.".format(sys.getdefaultencoding()))
+    log.debug("FileSystem Encoding: {0}.".format(sys.getfilesystemencoding()))
+    log.debug("PYTHONIOENCODING Encoding: {0}.".format(
+        os.environ.get("PYTHONIOENCODING", None)))
+    os.environ["PYTHONIOENCODING"] = "utf-8"
+    if not sys.platform.startswith("win"):  # root check
+        if not os.geteuid():
+            log.critical("Runing as root is not Recommended,NOT Run as root!.")
+            return False
+    return True
+
+
+def set_process_name_and_cpu_priority(name):
+    """Set process name and cpu priority.
+
+    >>> set_process_name_and_cpu_priority("test_test")
+    True
+    """
+    try:
+        os.nice(19)  # smooth cpu priority
+        return True
+    except Exception:
+        return False  # this may fail on windows and its normal, so be silent.
 
 
 def find_this(search, source=SOURCE):
     """Take a string and a filename path string and return the found value."""
     log.debug("Searching for {what}.".format(what=search))
     if not search or not source:
+        log.warning("Not found on source: {what}.".format(what=search))
         return ""
     return str(re.compile(r".*__{what}__ = '(.*?)'".format(
         what=search), re.S).match(source).group(1)).strip().replace("'", "")
@@ -77,14 +103,16 @@ def find_this(search, source=SOURCE):
 
 def parse_requirements(path=REQUIREMENTS_FILE):
     """Rudimentary parser for the requirements.txt file.
+
     We just want to separate regular packages from links to pass them to the
     'install_requires' and 'dependency_links' params of the 'setup()'.
     """
+    log.debug("Parsing Requirements from file {what}.".format(what=path))
     pkgs, links = ["pip"], []
     if not os.path.isfile(path):
         return pkgs, links
     try:
-        requirements = map(str.strip, local_file(path).splitlines())
+        requirements = map(str.strip, path.splitlines())
     except Exception as reason:
         log.warning(reason)
         return pkgs, links
@@ -97,11 +125,18 @@ def parse_requirements(path=REQUIREMENTS_FILE):
             pkgs.append('{package}=={ver}'.format(package=name, ver=version))
         else:
             pkgs.append(req)
+    log.debug("Requirements found: {what}.".format(what=(pkgs, links)))
     return pkgs, links
 
 
+make_root_check_and_encoding_debug()
+set_process_name_and_cpu_priority("setup_py")
 install_requires_list, dependency_links_list = parse_requirements()
 log.info("Starting build of setuptools.setup().")
+
+
+##############################################################################
+# EDIT HERE
 
 
 setup(
