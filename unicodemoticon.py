@@ -4,7 +4,7 @@
 
 # metadata
 """UnicodEmoticons."""
-__version__ = '1.0.4'
+__version__ = '1.0.6'
 __license__ = ' GPLv3+ LGPLv3+ '
 __author__ = ' Juan Carlos '
 __email__ = ' juancarlospaco@gmail.com '
@@ -33,12 +33,12 @@ from webbrowser import open_new_tab
 
 from html import entities
 
-from PyQt5.QtCore import QUrl
+from PyQt5.QtCore import QUrl, QTimer, Qt
 from PyQt5.QtGui import QCursor, QFont, QIcon
 from PyQt5.QtNetwork import (QNetworkAccessManager, QNetworkProxyFactory,
                              QNetworkRequest)
 from PyQt5.QtWidgets import (QAction, QApplication, QInputDialog, QMenu,
-                             QMessageBox, QProgressDialog, QStyle,
+                             QMessageBox, QProgressDialog, QStyle, QLabel,
                              QSystemTrayIcon)
 
 try:
@@ -51,7 +51,7 @@ QSS_STYLE = """QWidget:disabled { color: gray; font-weight: bold }
 QWidget { background-color: #302F2F; border-radius: 9px; font-family: Oxygen }
 QMenu[emoji_menu] { border: 1px solid gray; color: silver; font-weight: light }
 QMenu[emoji_menu]::item { padding: 1px 1em 1px 1em; margin: 0; border: 0 }
-QMenu[emoji_menu]::item:selected { background-color:skyblue ; color:black }"""
+QMenu[emoji_menu]::item:selected { background-color: skyblue ; color:black }"""
 
 AUTOSTART_DESKTOP_FILE = """[Desktop Entry]
 Comment=Trayicon with Unicode Emoticons.
@@ -99,16 +99,14 @@ UNICODEMOTICONS = {
         "😐😒😓😔😕😖😤😞😟😠😡😢😣😥😦😧😨😩😪😫😭😮😯😰😱😲😳😴😵☹😷",
 
     "music":
-        "♫♪♭♩🎶🎨🎬🎤🎧🎼🎵🎹🎻🎺🎷🎸",
+        ("♫♪♭♩🎶🎵🎼", "🎨🎬🎤🎧🎹", "🎻🎺🎷🎸"),
 
     "arrows":
         "⇉⇇⇈⇊➺⇦⇨⇧⇩↔↕↖↗↘↙↯↰↱↲↳↴↵↶↷↺↻➭🔄⏪⏩⏫⏬",
 
-    "numbers":
-        "①②③④⑤⑥⑦⑧⑨⑩➊➋➌➍➎➏➐➑➒➓½¾⒈⒉⒊⒋⒌⒍⒎⒏⒐⒑∞",
-
-    "letters":
-        "ⓐⓑⓒⓓⓔⓕⓖⓗⓘⓙⓚⓛⓜⓝⓞⓟⓠⓡⓢⓣⓤⓥⓦⓨⓩ",
+    "alphanumeric":
+        ("①②③④⑤⑥⑦⑧⑨⑩", "➊➋➌➍➎➏➐➑➒➓", "½¾∞", "⒈⒉⒊⒋⒌⒍⒎⒏⒐⒑",
+         "ⓐⓑⓒⓓⓔⓕⓖⓗⓘⓙⓚⓛⓜⓝⓞⓟⓠⓡⓢⓣⓤⓥⓦⓨⓩ"),
 
     "symbols":
         "‼⁉…❓✔✗☑☒➖➗❌™®©Ω℮₤₧❎✅➿♿☠☯☮☘💲💯🚭🚮💤㋡🔞🚼🛀🚬🚭🌀﻿",
@@ -130,9 +128,6 @@ UNICODEMOTICONS = {
 
     "plants":
         "💐🌸🌷🍀🌹🌻🌺🍁🍃🍂🌿🌾🍄🌵🌴🌲🌳🌰🌱🌼",
-
-    "tech":
-        "☎✉✎⌛⏳⏰⌚✂ℹ☢☣☤✇✆",
 
     "geometry":
         "■●▲▼▓▒░◑◐〇◈▣▨▧▩◎◊□◕☉",
@@ -177,7 +172,7 @@ UNICODEMOTICONS = {
         "🎍🎎🎒🎓🎏🎃👻🎅🎄🎁🎋🎉🎊🎈🎌🌎💩⚙⚖⚔⚒🔐🔗🔩",
 
     "tech":
-        "🎥📷📹📼💿📀💽💾💻📱☎📞📟📠📡📺📻🔊🔉🔇🔔🔕📢⏰🔓🔒🔑💡🔌🔍🔧🔨📲⚛",
+        "🎥📷📹📼💿📀💽💾💻📱☎📞📟📠📡📺📻🔊🔉🔇🔔🔕📢⏰🔓🔒🔑💡🔌🔍🔧🔨📲⚛⌛⏳⏰⌚✂ℹ☢☣☤✇✆",
 
     "transport":
         "⛵🚤🚣⚓🚀✈💺🚁🚂🚊🚆🚈🚇🚋🚎🚌🚍🚙🚕🚖🚛🚚🚓🚔🚒🚑🚐🚲🚡🚟🚜",
@@ -194,14 +189,21 @@ UNICODEMOTICONS = {
          "٩(｡͡•‿•｡)۶", "∩(︶▽︶)∩", "☜(ﾟヮﾟ☜)", "Ƹ̵̡Ӝ̵̨̄Ʒ", "┐(;´༎ຶД༎ຶ`)┌",
          "(✿つ°ヮ°)つ  └⋃┘", "(つ°ヮ°)つ  （。Y。）", "(✿ ◕‿◕) ᓄ✂╰⋃╯",
          "(つ°ヮ°)つ  (‿|‿)",  "▄︻̷̿┻̿═━一", "(｡♥‿‿♥｡)", "╭∩╮（︶︿︶）╭∩╮",
-         "<('()))}><{", "┐(´～`；)┌", "(╯°□°）╯︵ ┻━┻", "(ง'̀-'́)ง", "ᕙ(⇀‸↼‶)ᕗ",
-         "ლ(=ↀωↀ=)ლ", "ヾ(*ΦωΦ)ﾉ", "m_༼ ༎ຶ ෴ ༎ຶ༽_m", "\(•⊙ω⊙•)/",
+         "<('()))}><{", "┐(´～`；)┌", "(╯°□°）╯︵ ┻━┻", "(ง'̀-'́)ง", "ᕙ(⇀‸↼‶)ᕗ"),
+
+    "multi-character 2":
+         ("ლ(=ↀωↀ=)ლ", "ヾ(*ΦωΦ)ﾉ", "m_༼ ༎ຶ ෴ ༎ຶ༽_m", "\(•⊙ω⊙•)/",
          "o(╥﹏╥)o",
          "(－‸ლ)", "(͠≖ ͜ʖ͠≖)", "╭∩╮( ͡⚆ ͜ʖ ͡⚆)╭∩╮", "ლ(╹◡╹ლ)", "(๑˃̵ᴗ˂̵)و",
          "(V) (°,,,°) (V)", "( ͠° ͟ʖ ͡°)", "ಠ_ರೃ", "🌀_🌀", "♥‿♥",
          "₍₍ ᕕ( ･᷄ὢ･᷅ )ᕗ⁾⁾",  "*｡٩(ˊωˋ*)و✧*｡",  "(•ิ_•ิ)?",
          "(　-̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥᷄◞ω◟-̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥᷅ )",
-         "(つ°ヮ°)つ  (≬)")
+         "(つ°ヮ°)つ  (≬)", "┻━┻ ︵ \(°□°)/ ︵ ┻━┻",
+         "¸.·´¯`·.´¯`·.¸¸.·´¯`·.¸><(((º>", "ᶠᶸᶜᵏ♥ᵧₒᵤ", "\,,/(◣_◢)\,,/",
+         "(⌐■_■)--︻╦╤─ - - - (╥﹏╥)", "\m/_(>_<)_\m/", "Yᵒᵘ Oᶰˡʸ Lᶤᵛᵉ Oᶰᶜᵉ",
+         "(つ -‘ _ ‘- )つ", "^⨀ᴥ⨀^", "ლ(́◕◞Ѿ◟◕‵ლ)", "┌∩┐(⋟﹏⋞)┌∩┐",
+         "ˁ˚ᴥ˚ˀ", "ヽ(￣(ｴ)￣)ﾉ", "(⋟﹏⋞)", "⊂(✰‿✰)つ",
+         "(づ ￣ ³￣)づ ⓈⓂⓄⓄⓉⒽ", "❚█══█❚ ▐━━━━━▌")
 }
 
 
@@ -323,27 +325,39 @@ class MainWindow(QSystemTrayIcon):
         self.traymenu.addAction("Emoticons").setDisabled(True)
         self.traymenu.setIcon(icon)
         self.traymenu.addSeparator()
+        self.traymenu.setProperty("emoji_menu", True)
         self.activated.connect(self.click_trap)
+        self.timer, self.preview = QTimer(self), QLabel("Preview")
+        self.timer.setSingleShot(True)
+        self.timer.timeout.connect(lambda: self.preview.hide())
+        font = self.preview.font()
+        font.setPixelSize(100)
+        self.preview.setFont(font)
+        self.preview.setDisabled(True)
+        self.preview.setWindowFlags(Qt.FramelessWindowHint | Qt.Tool)
+        self.preview.setAttribute(Qt.WA_TranslucentBackground, True)
         # menus
         list_of_labels = sorted(UNICODEMOTICONS.keys())
         menus = [self.traymenu.addMenu(lbl.title()) for lbl in list_of_labels]
         self.traymenu.addSeparator()
-        menuhtml0 = self.traymenu.addMenu("HTML5 Code")
+        menu_html = self.traymenu.addMenu("HTML5 Code")
+        menu_html.setProperty("emoji_menu", True)
         log.debug("Building Emoticons SubMenus.")
         for item, label in zip(menus, list_of_labels):
-            item.setStyleSheet(("font-size:25px;padding:0;margin:0;border:0;"
-                                "font-family:Oxygen;menu-scrollable:1;"))
-            item.setFont(QFont('Oxygen', 25))
+            item.setStyleSheet("padding:0;margin:0;border:0;menu-scrollable:1")
+            font = item.font()
+            font.setPixelSize(18)
+            item.setFont(font)
             self.build_submenu(UNICODEMOTICONS[label], item)
         # html entities
         added_html_entities = []
-        menuhtml0.setStyleSheet("font-size:25px;padding:0;margin:0;border:0;")
+        menu_html.setStyleSheet("font-size:25px;padding:0;margin:0;border:0")
         for html_char in tuple(sorted(entities.html5.items())):
             if html_char[1] in HTMLS:
                 added_html_entities.append(
                     html_char[0].lower().replace(";", ""))
                 if not html_char[0].lower() in added_html_entities:
-                    action = menuhtml0.addAction(html_char[1])
+                    action = menu_html.addAction(html_char[1])
                     action.hovered.connect(lambda ch=html_char: log.debug(ch))
                     action.triggered.connect(
                         lambda _, ch=html_char[0]:
@@ -352,6 +366,7 @@ class MainWindow(QSystemTrayIcon):
         self.traymenu.addSeparator()
         # help
         helpMenu = self.traymenu.addMenu("Options...")
+        helpMenu.setProperty("emoji_menu", True)
         helpMenu.addAction("About Python 3",
                            lambda: open_new_tab('https://python.org'))
         helpMenu.addAction("About Qt 5", lambda: open_new_tab('http://qt.io'))
@@ -373,16 +388,28 @@ class MainWindow(QSystemTrayIcon):
         self.setContextMenu(self.traymenu)
         self.show()
         self.add_desktop_files()
-        self.traymenu.setStyleSheet(self.set_or_get_stylesheet())
+        custom_style_sheet = self.set_or_get_stylesheet().strip()
+        self.traymenu.setStyleSheet(custom_style_sheet)
+        self.preview.setStyleSheet(custom_style_sheet)
 
     def build_submenu(self, char_list, submenu):
         """Take a list of characters and a submenu and build actions on it."""
         submenu.setProperty("emoji_menu", True)
         for _char in sorted(char_list):
             action = submenu.addAction(_char.strip())
-            action.hovered.connect(lambda char=_char: log.debug(char))
+            action.hovered.connect(lambda char=_char: self.make_preview(char))
             action.triggered.connect(
                 lambda _, char=_char: QApplication.clipboard().setText(char))
+
+    def make_preview(self, emoticon_text):
+        """Make Emoticon Previews for the current Hovered one."""
+        log.debug(emoticon_text)
+        if self.timer.isActive():  # Be Race Condition Safe
+            self.timer.stop()
+        self.preview.setText("  " + emoticon_text + "  ")
+        self.preview.move(QCursor.pos())
+        self.preview.show()
+        self.timer.start(1000)  # how many time display the previews
 
     def click_trap(self, value):
         """Trap the mouse tight click."""
