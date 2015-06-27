@@ -29,11 +29,13 @@
 """Setup.py for Python, as Generic as possible."""
 
 
-import os
-import sys
-import re
-
 import logging as log
+import os
+import re
+import sys
+from copy import copy
+from tempfile import gettempdir
+
 from setuptools import setup
 
 
@@ -45,14 +47,65 @@ DESCRIPTION = ("Like a Color Picker but for Unicode Emoticons. "
                "Trayicon with Unicode Emoticons using Python3 Qt5.")
 MODULE_PATH = os.path.join(os.path.dirname(__file__), "unicodemoticon.py")
 REQUIREMENTS_FILE = os.path.join(os.path.dirname(__file__), "requirements.txt")
-log.basicConfig(level=-1)
-log.debug("Reading source code file {what}.".format(what=MODULE_PATH))
-with open(str(MODULE_PATH), encoding="utf-8-sig") as source_code_file:
-    SOURCE = source_code_file.read()
 
 
 ##############################################################################
 # Dont touch below
+
+
+with open(str(MODULE_PATH), encoding="utf-8-sig") as source_code_file:
+    SOURCE = source_code_file.read()
+
+
+def make_logger(name=str(os.getpid())):
+    """Build and return a Logging Logger."""
+    if not sys.platform.startswith("win") and sys.stderr.isatty():
+        def add_color_emit_ansi(fn):
+            """Add methods we need to the class."""
+            def new(*args):
+                """Method overload."""
+                if len(args) == 2:
+                    new_args = (args[0], copy(args[1]))
+                else:
+                    new_args = (args[0], copy(args[1]), args[2:])
+                if hasattr(args[0], 'baseFilename'):
+                    return fn(*args)
+                levelno = new_args[1].levelno
+                if levelno >= 50:
+                    color = '\x1b[31;5;7m\n '  # blinking red with black
+                elif levelno >= 40:
+                    color = '\x1b[31m'  # red
+                elif levelno >= 30:
+                    color = '\x1b[33m'  # yellow
+                elif levelno >= 20:
+                    color = '\x1b[32m'  # green
+                elif levelno >= 10:
+                    color = '\x1b[35m'  # pink
+                else:
+                    color = '\x1b[0m'  # normal
+                try:
+                    new_args[1].msg = color + str(new_args[1].msg) + ' \x1b[0m'
+                except Exception as reason:
+                    print(reason)  # Do not use log here.
+                return fn(*new_args)
+            return new
+        # all non-Windows platforms support ANSI Colors so we use them
+        log.StreamHandler.emit = add_color_emit_ansi(log.StreamHandler.emit)
+    else:
+        log.debug("Colored Logs not supported on {0}.".format(sys.platform))
+    log_file = os.path.join(gettempdir(), str(name).lower().strip() + ".log")
+    log.basicConfig(level=-1, filemode="w", filename=log_file,
+                    format="%(levelname)s:%(asctime)s %(message)s %(lineno)s")
+    log.getLogger().addHandler(log.StreamHandler(sys.stderr))
+    adrs = "/dev/log" if sys.platform.startswith("lin") else "/var/run/syslog"
+    try:
+        handler = log.handlers.SysLogHandler(address=adrs)
+    except:
+        log.warning("Unix SysLog Server not found,ignored Logging to SysLog.")
+    else:
+        log.addHandler(handler)
+    log.debug("Logger created with Log file at: {0}.".format(log_file))
+    return log
 
 
 # Should be all UTF-8 for best results
@@ -129,6 +182,7 @@ def parse_requirements(path=REQUIREMENTS_FILE):
     return pkgs, links
 
 
+make_logger()
 make_root_check_and_encoding_debug()
 set_process_name_and_cpu_priority("setup_py")
 install_requires_list, dependency_links_list = parse_requirements()
