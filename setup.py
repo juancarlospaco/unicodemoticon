@@ -100,7 +100,7 @@ def make_logger(name=str(os.getpid())):
     adrs = "/dev/log" if sys.platform.startswith("lin") else "/var/run/syslog"
     try:
         handler = log.handlers.SysLogHandler(address=adrs)
-    except:
+    except Exception:
         log.warning("Unix SysLog Server not found,ignored Logging to SysLog.")
     else:
         log.addHandler(handler)
