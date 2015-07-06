@@ -4,7 +4,7 @@
 
 # metadata
 """UnicodEmoticons."""
-__version__ = '1.0.6'
+__version__ = '1.2.0'
 __license__ = ' GPLv3+ LGPLv3+ '
 __author__ = ' Juan Carlos '
 __email__ = ' juancarlospaco@gmail.com '
@@ -30,13 +30,17 @@ from subprocess import call
 from tempfile import gettempdir
 from urllib import request
 from webbrowser import open_new_tab
+from random import randint
 
 from html import entities
 
 from PyQt5.QtCore import QUrl, QTimer, Qt
-from PyQt5.QtGui import QCursor, QFont, QIcon
+
+from PyQt5.QtGui import QCursor, QFont, QIcon, QPalette, QPainter, QPen, QColor
+
 from PyQt5.QtNetwork import (QNetworkAccessManager, QNetworkProxyFactory,
                              QNetworkRequest)
+
 from PyQt5.QtWidgets import (QAction, QApplication, QInputDialog, QMenu,
                              QMessageBox, QProgressDialog, QStyle, QLabel,
                              QSystemTrayIcon)
@@ -47,11 +51,12 @@ except ImportError:
     resource = None
 
 
-QSS_STYLE = """QWidget:disabled { color: gray; font-weight: bold }
+QSS_STYLE = """QWidget:disabled { color: lightgray; font-weight: bold }
 QWidget { background-color: #302F2F; border-radius: 9px; font-family: Oxygen }
-QMenu[emoji_menu] { border: 1px solid gray; color: silver; font-weight: light }
+QMenu[emoji_menu] { border: 0; color: silver; background-color: transparent }
 QMenu[emoji_menu]::item { padding: 1px 1em 1px 1em; margin: 0; border: 0 }
-QMenu[emoji_menu]::item:selected { background-color: skyblue ; color:black }"""
+QMenu[emoji_menu]::item:selected { background-color: skyblue; color: black }
+QMenu[emoji_menu]::item:disabled { background-color: transparent }"""
 
 AUTOSTART_DESKTOP_FILE = """[Desktop Entry]
 Comment=Trayicon with Unicode Emoticons.
@@ -132,11 +137,8 @@ UNICODEMOTICONS = {
     "geometry":
         "■●▲▼▓▒░◑◐〇◈▣▨▧▩◎◊□◕☉",
 
-    "zodiac":
-        "♈♉♊♋♌♍♎♏♐♑♒♓",
-
-    "chess":
-        "♔♕♖♗♘♙♚♛♜♝♞♟",
+    "zodiac and chess":
+        "♈♉♊♋♌♍♎♏♐♑♒♓♔♕♖♗♘♙♚♛♜♝♞♟",
 
     "recycle":
         "♲♻♳♴♵♶♷♸♹♺♼♽♾",
@@ -311,6 +313,34 @@ class Downloader(QProgressDialog):
 ###############################################################################
 
 
+class Menu(QMenu):
+
+    """Custom QMenu widget."""
+
+    def __init__(self, parent=None, *args, **kwargs):
+        """Init class custom tab widget."""
+        super(Menu, self).__init__(parent=None, *args, **kwargs)
+        self.setWindowOpacity(0.8)
+        self.setAttribute(Qt.WA_OpaquePaintEvent, False)  # no opaque paint
+        self.setAttribute(Qt.WA_TranslucentBackground, True)  # translucent
+        self.setStyleSheet("background-color:transparent")  # default style
+
+    def paintEvent(self, event):
+        """Paint transparent background,animated pattern,background text."""
+        painter, font = QPainter(self), self.font()
+        painter.fillRect(event.rect(), Qt.transparent)  # fill transparent rect
+        painter.setPen(Qt.NoPen)  # set the pen to no pen
+        painter.setBrush(QColor("black"))  # Background Color
+        painter.setOpacity(0.85)  # Background Opacity
+        painter.drawRoundedRect(self.rect(), 40, 40)  # Back Rounded Borders
+        for i in range(512):  # animated random dots background pattern
+            x = randint(10, self.size().width() - 10)
+            y = randint(10, self.size().height() - 10)
+            painter.setPen(QPen(QColor(randint(9, 255), randint(9, 255), 255)))
+            painter.drawPoint(x, y)
+        QMenu.paintEvent(self, event)
+
+
 class MainWindow(QSystemTrayIcon):
 
     """Main widget for UnicodEmoticons,not really a window since not needed."""
@@ -321,8 +351,8 @@ class MainWindow(QSystemTrayIcon):
         log.debug("Starting {}.".format(__doc__))
         self.setIcon(icon)
         self.setToolTip(__doc__ + "\nPick 1 Emoticon, use CTRL+V to Paste it!")
-        self.traymenu = QMenu("Emoticons")
-        self.traymenu.addAction("Emoticons").setDisabled(True)
+        self.traymenu = Menu("Emoticons")
+        self.traymenu.addAction("    Emoticons").setDisabled(True)
         self.traymenu.setIcon(icon)
         self.traymenu.addSeparator()
         self.traymenu.setProperty("emoji_menu", True)
@@ -342,6 +372,7 @@ class MainWindow(QSystemTrayIcon):
         self.traymenu.addSeparator()
         menu_html = self.traymenu.addMenu("HTML5 Code")
         menu_html.setProperty("emoji_menu", True)
+        menu_html.setWindowOpacity(0.9)
         log.debug("Building Emoticons SubMenus.")
         for item, label in zip(menus, list_of_labels):
             item.setStyleSheet("padding:0;margin:0;border:0;menu-scrollable:1")
@@ -363,13 +394,15 @@ class MainWindow(QSystemTrayIcon):
                         lambda _, ch=html_char[0]:
                             QApplication.clipboard().setText(
                                 "&{html_entity}".format(html_entity=ch)))
+        self.traymenu.addAction("AlTeRnAtE-CaSe", self.make_alternate_case)
         self.traymenu.addSeparator()
         # help
         helpMenu = self.traymenu.addMenu("Options...")
         helpMenu.setProperty("emoji_menu", True)
+        helpMenu.setWindowOpacity(0.9)
         helpMenu.addAction("About Python 3",
                            lambda: open_new_tab('https://python.org'))
-        helpMenu.addAction("About Qt 5", lambda: open_new_tab('http://qt.io'))
+        helpMenu.addAction("About Qt 5", lambda: QMessageBox.aboutQt(None))
         helpMenu.addAction("About " + __doc__, lambda: open_new_tab(__url__))
         helpMenu.addSeparator()
         helpMenu.addAction("View Source Code", lambda: open_new_tab(__file__))
@@ -383,7 +416,7 @@ class MainWindow(QSystemTrayIcon):
             self.get_or_set_config_folder("unicodemoticon"),
             "unicodemoticon.css")))
         self.traymenu.addSeparator()
-        quit_action = self.traymenu.addAction("Quit", lambda: self.close())
+        quit_action = self.traymenu.addAction("    Quit", self.close)
         quit_action.setMenuRole(QAction.QuitRole)
         self.setContextMenu(self.traymenu)
         self.show()
@@ -391,11 +424,24 @@ class MainWindow(QSystemTrayIcon):
         custom_style_sheet = self.set_or_get_stylesheet().strip()
         self.traymenu.setStyleSheet(custom_style_sheet)
         self.preview.setStyleSheet(custom_style_sheet)
+        helpMenu.setStyleSheet(custom_style_sheet)
+
+    def make_alternate_case(self):
+        """Make alternating camelcase clipboard,if > 3 chars and not digits."""
+        clipboard_text = str(QApplication.clipboard().text()).strip()
+        if len(clipboard_text) > 3 and not clipboard_text.isdigit():
+            funky_camelcase = "".join([_.lower() if i % 2 else _.upper()
+                                       for i, _ in enumerate(clipboard_text)])
+            log.debug(funky_camelcase)
+            return QApplication.clipboard().setText(funky_camelcase)
+        else:
+            log.warning("Need > 3 letters for Alternating CamelCase.")
 
     def build_submenu(self, char_list, submenu):
         """Take a list of characters and a submenu and build actions on it."""
         submenu.setProperty("emoji_menu", True)
         for _char in sorted(char_list):
+            submenu.setWindowOpacity(0.9)
             action = submenu.addAction(_char.strip())
             action.hovered.connect(lambda char=_char: self.make_preview(char))
             action.triggered.connect(
@@ -493,7 +539,10 @@ def make_post_execution_message(app=__doc__.splitlines()[0].strip()):
     """
     ram_use = int(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss *
                   resource.getpagesize() / 1024 / 1024 if resource else 0)
-    log.info("Total Maximum RAM Memory used: ~{0} MegaBytes.".format(ram_use))
+    ram_all = int(os.sysconf('SC_PAGE_SIZE') * os.sysconf('SC_PHYS_PAGES')
+                  / 1024 / 1024)
+    log.info("Total Maximum RAM Memory used: ~{0} of {1} MegaBytes.".format(
+        ram_use, ram_all))
     print("Thanks for using this App,share your experience!{0}".format("""
     Twitter: https://twitter.com/home?status=I%20Like%20{n}!:%20{u}
     Facebook: https://www.facebook.com/share.php?u={u}&t=I%20Like%20{n}
