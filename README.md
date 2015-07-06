@@ -10,10 +10,11 @@ unicodemoticon
 
 - Trayicon with Unicode Emoticons using Python3 Qt5.
 - StandAlone, single-file, easy to use.
-- Set its own Process name and show up on Process lists.
-- Can check for updates for itself.
-- Smooth CPU usage.
+- Set its own Process name and show up on Process lists, GUI Customization via CSS, Icon Customization.
+- Can check for updates for itself, Sets Smooth CPU usage, Colored Logging, Single Instance via Sockets.
+- Menu is Semi-Transparent with particles and Rounded Corners with On Mouse Hover Previews.
 - HTML5 Entities, eg. `&copy;` and Multiple characters Emoticons, eg. `¯\_(ツ)_/¯`.
+- Alternating CamelCase for clipboard text, eg. `AlTeRnAtInG CaMeLcAsE FoR ClIpBoArD TeXt`.
 
 
 # Try it !: 
