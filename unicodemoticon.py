@@ -14,6 +14,7 @@ __source__ = ('https://raw.githubusercontent.com/juancarlospaco/'
 
 
 # imports
+import functools
 import logging as log
 import os
 import signal
@@ -210,6 +211,39 @@ UNICODEMOTICONS = {
 
 
 ###############################################################################
+
+
+def typecheck(f):
+    """Decorator for Python3 annotations to type-check inputs and outputs."""
+    def __check_annotations(tipe):
+        _type, is_ok = None, isinstance(tipe, (type, tuple, type(None)))
+        if is_ok:  # Annotations can be Type or Tuple or None
+            _type = tipe if isinstance(tipe, tuple) else tuple((tipe, ))
+            if None in _type:  # if None on tuple replace with type(None)
+                _type = tuple([_ if _ is not None else type(_) for _ in _type])
+        return _type, is_ok
+
+    @functools.wraps(f)  # wrap a function or method to Type Check it.
+    def decorated(*args, **kwargs):
+        msg = "Type check error: {0} must be {1} but is {2} on function {3}()."
+        notations, f_name = tuple(f.__annotations__.keys()), f.__code__.co_name
+        for i, name in enumerate(f.__code__.co_varnames):
+            if name not in notations:
+                continue  # this arg name has no annotation then skip it.
+            _type, is_ok = __check_annotations(f.__annotations__.get(name))
+            if is_ok:  # Force to tuple
+                if i < len(args) and not isinstance(args[i], _type):
+                    log.critical(msg.format(repr(args[i])[:50], _type,
+                                            type(args[i]), f_name))
+                elif name in kwargs and not isinstance(kwargs[name], _type):
+                    log.critical(msg.format(repr(kwargs[name])[:50], _type,
+                                            type(kwargs[name]), f_name))
+        out = f(*args, **kwargs)
+        _type, is_ok = __check_annotations(f.__annotations__.get("return"))
+        if is_ok and not isinstance(out, _type) and "return" in notations:
+            log.critical(msg.format(repr(out)[:50], _type, type(out), f_name))
+        return out    # The output result of function or method.
+    return decorated  # The decorated function or method.
 
 
 class Downloader(QProgressDialog):
@@ -426,18 +460,22 @@ class MainWindow(QSystemTrayIcon):
         self.preview.setStyleSheet(custom_style_sheet)
         helpMenu.setStyleSheet(custom_style_sheet)
 
-    def make_alternate_case(self):
+    @typecheck
+    def make_alternate_case(self) -> str:
         """Make alternating camelcase clipboard,if > 3 chars and not digits."""
         clipboard_text = str(QApplication.clipboard().text()).strip()
+        funky_camelcase = "Need > 3 letters for Alternating CamelCase."
         if len(clipboard_text) > 3 and not clipboard_text.isdigit():
             funky_camelcase = "".join([_.lower() if i % 2 else _.upper()
                                        for i, _ in enumerate(clipboard_text)])
             log.debug(funky_camelcase)
-            return QApplication.clipboard().setText(funky_camelcase)
+            QApplication.clipboard().setText(funky_camelcase)
         else:
-            log.warning("Need > 3 letters for Alternating CamelCase.")
+            log.warning(funky_camelcase)
+        return funky_camelcase
 
-    def build_submenu(self, char_list, submenu):
+    @typecheck
+    def build_submenu(self, char_list: (str, tuple), submenu: QMenu) -> QMenu:
         """Take a list of characters and a submenu and build actions on it."""
         submenu.setProperty("emoji_menu", True)
         for _char in sorted(char_list):
@@ -446,8 +484,10 @@ class MainWindow(QSystemTrayIcon):
             action.hovered.connect(lambda char=_char: self.make_preview(char))
             action.triggered.connect(
                 lambda _, char=_char: QApplication.clipboard().setText(char))
+        return submenu
 
-    def make_preview(self, emoticon_text):
+    @typecheck
+    def make_preview(self, emoticon_text: str):
         """Make Emoticon Previews for the current Hovered one."""
         log.debug(emoticon_text)
         if self.timer.isActive():  # Be Race Condition Safe
@@ -462,6 +502,7 @@ class MainWindow(QSystemTrayIcon):
         if value == self.Trigger:  # left click
             self.traymenu.exec_(QCursor.pos())
 
+    @typecheck
     def add_desktop_files(self):
         """Add to autostart of the Desktop."""
         autostart_file = path.join(self.get_or_set_config_folder("autostart"),
@@ -482,7 +523,8 @@ class MainWindow(QSystemTrayIcon):
             with open(desktop_file, "w", encoding="utf-8") as desktop_file:
                 desktop_file.write(AUTOSTART_DESKTOP_FILE)
 
-    def set_or_get_stylesheet(self, stylesheet=QSS_STYLE):
+    @typecheck
+    def set_or_get_stylesheet(self, stylesheet: str=QSS_STYLE) -> str:
         """Add a default stylesheet if needed."""
         style_file = path.join(self.get_or_set_config_folder("unicodemoticon"),
                                "unicodemoticon.css")
@@ -496,7 +538,8 @@ class MainWindow(QSystemTrayIcon):
             stylesheet = style_file_object.read().strip()
         return stylesheet
 
-    def get_or_set_config_folder(self, appname=None):
+    @typecheck
+    def get_or_set_config_folder(self, appname: (str, None)=None) -> str:
         """Get config folder cross-platform, try to always return a path."""
         if sys.platform.startswith("darwin"):  # Apples Macos
             config_path = os.path.expanduser("~/Library/Preferences")
@@ -513,14 +556,16 @@ class MainWindow(QSystemTrayIcon):
             os.makedirs(config_path)
         return config_path
 
-    def set_icon(self, icon=None):
+    @typecheck
+    def set_icon(self, icon: (None, str)=None) -> str:
         """Return a string with opendesktop standard icon name for Qt."""
         if not icon:
             icon = QInputDialog.getItem(None, __doc__, "<b>Choose Icon name?:",
                                         STD_ICON_NAMES, 0, False)[0]
         if icon:
             log.debug("Setting Tray Icon name to: {}.".format(icon))
-            return self.setIcon(QIcon.fromTheme("{}".format(icon)))
+            self.setIcon(QIcon.fromTheme("{}".format(icon)))
+        return icon
 
     def close(self):
         """Overload close method."""
@@ -531,7 +576,8 @@ class MainWindow(QSystemTrayIcon):
 ###############################################################################
 
 
-def make_post_execution_message(app=__doc__.splitlines()[0].strip()):
+@typecheck
+def make_post_execution_message(app: str=__doc__.splitlines()[0].strip()):
     """Simple Post-Execution Message with information about RAM and Time.
 
     >>> make_post_execution_message() >= 0
@@ -541,16 +587,18 @@ def make_post_execution_message(app=__doc__.splitlines()[0].strip()):
                   resource.getpagesize() / 1024 / 1024 if resource else 0)
     ram_all = int(os.sysconf('SC_PAGE_SIZE') * os.sysconf('SC_PHYS_PAGES')
                   / 1024 / 1024)
-    log.info("Total Maximum RAM Memory used: ~{0} of {1} MegaBytes.".format(
-        ram_use, ram_all))
+    msg = "Total Maximum RAM Memory used: ~{0} of {1} MegaBytes.".format(
+        ram_use, ram_all)
+    log.info(msg)
     print("Thanks for using this App,share your experience!{0}".format("""
     Twitter: https://twitter.com/home?status=I%20Like%20{n}!:%20{u}
     Facebook: https://www.facebook.com/share.php?u={u}&t=I%20Like%20{n}
     G+: https://plus.google.com/share?url={u}""".format(u=__url__, n=app)))
-    return ram_use
+    return msg
 
 
-def make_root_check_and_encoding_debug():
+@typecheck
+def make_root_check_and_encoding_debug() -> bool:
     """Debug and Log Encodings and Check for root/administrator,return Boolean.
 
     >>> make_root_check_and_encoding_debug()
@@ -577,7 +625,8 @@ def make_root_check_and_encoding_debug():
     return True
 
 
-def set_process_name_and_cpu_priority(name):
+@typecheck
+def set_process_name_and_cpu_priority(name: str) -> bool:
     """Set process name and cpu priority.
 
     >>> set_process_name_and_cpu_priority("test_test")
@@ -596,7 +645,8 @@ def set_process_name_and_cpu_priority(name):
         return True
 
 
-def set_single_instance(name, single_instance=True, port=8888):
+@typecheck
+def set_single_instance(name: str, single_instance: bool=True, port: int=8888):
     """Set process name and cpu priority, return socket.socket object or None.
 
     >>> isinstance(set_single_instance("test"), socket.socket)
@@ -621,7 +671,8 @@ def set_single_instance(name, single_instance=True, port=8888):
     return __lock
 
 
-def make_logger(name=str(os.getpid())):
+@typecheck
+def make_logger(name: str=str(os.getpid())) -> object:
     """Build and return a Logging Logger."""
     if not sys.platform.startswith("win") and sys.stderr.isatty():
         def add_color_emit_ansi(fn):
