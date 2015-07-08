@@ -400,8 +400,7 @@ class MainWindow(QSystemTrayIcon):
         self.preview.setDisabled(True)
         self.preview.setWindowFlags(Qt.FramelessWindowHint | Qt.Tool)
         self.preview.setAttribute(Qt.WA_TranslucentBackground, True)
-        # menus
-        list_of_labels = sorted(UNICODEMOTICONS.keys())
+        list_of_labels = sorted(UNICODEMOTICONS.keys())  # menus
         menus = [self.traymenu.addMenu(lbl.title()) for lbl in list_of_labels]
         self.traymenu.addSeparator()
         menu_html = self.traymenu.addMenu("HTML5 Code")
@@ -674,6 +673,7 @@ def set_single_instance(name: str, single_instance: bool=True, port: int=8888):
 @typecheck
 def make_logger(name: str=str(os.getpid())) -> object:
     """Build and return a Logging Logger."""
+    log.basicConfig(level=-1, format="%(levelname)s:%(asctime)s %(message)s")
     if not sys.platform.startswith("win") and sys.stderr.isatty():
         def add_color_emit_ansi(fn):
             """Add methods we need to the class."""
@@ -708,7 +708,6 @@ def make_logger(name: str=str(os.getpid())) -> object:
         log.StreamHandler.emit = add_color_emit_ansi(log.StreamHandler.emit)
     else:
         log.debug("Colored Logs not supported on {0}.".format(sys.platform))
-    log.basicConfig(level=-1, format="%(levelname)s:%(asctime)s %(message)s")
     return log
 
 

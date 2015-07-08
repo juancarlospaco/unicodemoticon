@@ -53,7 +53,7 @@ REQUIREMENTS_FILE = os.path.join(os.path.dirname(__file__), "requirements.txt")
 # Dont touch below
 
 
-with open(str(MODULE_PATH), encoding="utf-8-sig") as source_code_file:
+with open(str(MODULE_PATH), "r", encoding="utf-8-sig") as source_code_file:
     SOURCE = source_code_file.read()
 
 
