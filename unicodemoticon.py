@@ -21,6 +21,7 @@ import signal
 import sys
 import time
 import socket
+import unicodedata
 from copy import copy
 from ctypes import byref, cdll, create_string_buffer
 from datetime import datetime
@@ -479,7 +480,13 @@ class MainWindow(QSystemTrayIcon):
         submenu.setProperty("emoji_menu", True)
         for _char in sorted(char_list):
             submenu.setWindowOpacity(0.9)
+            submenu.setToolTipsVisible(True)
             action = submenu.addAction(_char.strip())
+            if len(_char) == 1:
+                try:
+                    action.setToolTip(unicodedata.name(_char).title())
+                except ValueError:
+                    pass
             action.hovered.connect(lambda char=_char: self.make_preview(char))
             action.triggered.connect(
                 lambda _, char=_char: QApplication.clipboard().setText(char))
