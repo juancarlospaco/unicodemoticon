@@ -465,7 +465,8 @@ class MainWindow(QSystemTrayIcon):
     def make_explain_unicode(self) -> tuple:
         """Make an explanation from unicode entered,if at least 1 chars."""
         explanation, uni = "", None
-        uni = str(QInputDialog.getText(None, __doc__, "<b>Type Unicodes?:")[0])
+        uni = str(QInputDialog.getText(
+            None, __doc__, "<b>Type Unicode character to explain?")[0]).strip()
         if uni and len(uni):
             explanation = ", ".join([unicodedata.name(_).title() for _ in uni])
             QMessageBox.information(None, __doc__, str((uni, explanation)))
