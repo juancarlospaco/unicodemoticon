@@ -429,6 +429,7 @@ class MainWindow(QSystemTrayIcon):
                             QApplication.clipboard().setText(
                                 "&{html_entity}".format(html_entity=ch)))
         self.traymenu.addAction("AlTeRnAtE-CaSe", self.make_alternate_case)
+        self.traymenu.addAction("Explain Unicode", self.make_explain_unicode)
         self.traymenu.addSeparator()
         # help
         helpMenu = self.traymenu.addMenu("Options...")
@@ -459,6 +460,17 @@ class MainWindow(QSystemTrayIcon):
         self.traymenu.setStyleSheet(custom_style_sheet)
         self.preview.setStyleSheet(custom_style_sheet)
         helpMenu.setStyleSheet(custom_style_sheet)
+
+    @typecheck
+    def make_explain_unicode(self) -> tuple:
+        """Make an explanation from unicode entered,if at least 1 chars."""
+        explanation, uni = "", None
+        uni = str(QInputDialog.getText(None, __doc__, "<b>Type Unicodes?:")[0])
+        if uni and len(uni):
+            explanation = ", ".join([unicodedata.name(_).title() for _ in uni])
+            QMessageBox.information(None, __doc__, str((uni, explanation)))
+        log.debug((uni, explanation))
+        return (uni, explanation)
 
     @typecheck
     def make_alternate_case(self) -> str:
