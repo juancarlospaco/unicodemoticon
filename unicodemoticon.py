@@ -407,6 +407,7 @@ class MainWindow(QSystemTrayIcon):
         menu_html = self.traymenu.addMenu("HTML5 Code")
         menu_html.setProperty("emoji_menu", True)
         menu_html.setWindowOpacity(0.9)
+        menu_html.setToolTipsVisible(True)
         log.debug("Building Emoticons SubMenus.")
         for item, label in zip(menus, list_of_labels):
             item.setStyleSheet("padding:0;margin:0;border:0;menu-scrollable:1")
@@ -428,6 +429,11 @@ class MainWindow(QSystemTrayIcon):
                         lambda _, ch=html_char[0]:
                             QApplication.clipboard().setText(
                                 "&{html_entity}".format(html_entity=ch)))
+                    try:
+                        action.setToolTip(
+                            unicodedata.name(html_char[1]).title())
+                    except ValueError:
+                        pass
         self.traymenu.addAction("AlTeRnAtE-CaSe", self.make_alternate_case)
         self.traymenu.addAction("Explain Unicode", self.make_explain_unicode)
         self.traymenu.addSeparator()
