@@ -18,33 +18,32 @@ import functools
 import logging as log
 import os
 import signal
+import socket
 import sys
 import time
-import socket
 import unicodedata
 from copy import copy
 from ctypes import byref, cdll, create_string_buffer
 from datetime import datetime
 from getopt import getopt
+from html import entities
 from os import path
 from platform import platform, python_version
+from random import randint
 from subprocess import call
 from tempfile import gettempdir
 from urllib import request
 from webbrowser import open_new_tab
-from random import randint
 
-from html import entities
+from PyQt5.QtCore import Qt, QTimer, QUrl
 
-from PyQt5.QtCore import QUrl, QTimer, Qt
-
-from PyQt5.QtGui import QCursor, QFont, QIcon, QPalette, QPainter, QPen, QColor
+from PyQt5.QtGui import QColor, QCursor, QFont, QIcon, QPainter, QPalette, QPen
 
 from PyQt5.QtNetwork import (QNetworkAccessManager, QNetworkProxyFactory,
                              QNetworkRequest)
 
-from PyQt5.QtWidgets import (QAction, QApplication, QInputDialog, QMenu,
-                             QMessageBox, QProgressDialog, QStyle, QLabel,
+from PyQt5.QtWidgets import (QAction, QApplication, QInputDialog, QLabel,
+                             QMenu, QMessageBox, QProgressDialog, QStyle,
                              QSystemTrayIcon)
 
 try:
@@ -367,7 +366,7 @@ class Menu(QMenu):
         painter.setPen(Qt.NoPen)  # set the pen to no pen
         painter.setBrush(QColor("black"))  # Background Color
         painter.setOpacity(0.85)  # Background Opacity
-        painter.drawRoundedRect(self.rect(), 40, 40)  # Back Rounded Borders
+        painter.drawRoundedRect(self.rect(), 30, 30)  # Back Rounded Borders
         for i in range(512):  # animated random dots background pattern
             x = randint(10, self.size().width() - 10)
             y = randint(10, self.size().height() - 10)
