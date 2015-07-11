@@ -61,11 +61,10 @@ unicodemoticon.py
 - **Linux / Os X** *(No MS Window)*
 - [Python 3.x](https://www.python.org "Python Homepage") *(No Python2)*
 - [PyQt 5.x](http://www.riverbankcomputing.co.uk/software/pyqt/download5 "PyQt5 Homepage") *(No Qt4)*
-- ttf-ancient-fonts *(Linux Package)*
 
 **Optionals:**
+- **ttf-ancient-fonts** *(Linux Package with Fonts that support Emoji, A.K.A. ttf-symbola)*
 - [QDarkStyleSheet *(CSS base for Qt5)*](https://github.com/ColinDuquesnoy/QDarkStyleSheet#qdarkstylesheet) `sudo pip3 install qdarkstyle`
-- [Oxygen](https://www.google.com/fonts/specimen/Oxygen) and [Ubuntu](https://www.google.com/fonts/specimen/Ubuntu) Fonts.
 
 
 # Vim:
