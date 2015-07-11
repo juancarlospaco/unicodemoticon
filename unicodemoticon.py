@@ -51,13 +51,14 @@ try:
 except ImportError:
     resource = None
 
+try:
+    import qdarkstyle  # https://github.com/ColinDuquesnoy/QDarkStyleSheet
+except ImportError:    # sudo pip3 install qdarkstyle
+    qdarkstyle = None  # 100% optional
 
-QSS_STYLE = """QWidget:disabled { color: lightgray; font-weight: bold }
-QWidget { background-color: #302F2F; border-radius: 9px; font-family: Oxygen }
-QMenu[emoji_menu] { border: 0; color: silver; background-color: transparent }
-QMenu[emoji_menu]::item { padding: 1px 1em 1px 1em; margin: 0; border: 0 }
-QMenu[emoji_menu]::item:selected { background-color: skyblue; color: black }
-QMenu[emoji_menu]::item:disabled { background-color: transparent }"""
+
+QSS_STYLE = """QMenu[emoji_menu]::item { padding: 0 1em 0 1em }
+QMenu[emoji_menu] { border: 0; background-color: transparent; }"""
 
 AUTOSTART_DESKTOP_FILE = """[Desktop Entry]
 Comment=Trayicon with Unicode Emoticons.
@@ -70,9 +71,7 @@ Terminal=false
 Type=Application
 Categories=Utility
 X-DBUS-ServiceName=unicodemoticon
-X-DBUS-StartupType=none
-X-KDE-StartupNotify=false
-X-KDE-SubstituteUID=false"""
+X-KDE-StartupNotify=false"""
 
 STD_ICON_NAMES = tuple(sorted(set("""emblem-default emblem-documents start-here
 emblem-downloads emblem-favorite emblem-important emblem-mail emblem-photos
@@ -748,6 +747,8 @@ def main():
     app.setOrganizationName("unicodemoticon")
     app.setOrganizationDomain("unicodemoticon")
     app.instance().setQuitOnLastWindowClosed(False)  # no quit on dialog close
+    if qdarkstyle:
+            app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())
     icon = QIcon(app.style().standardPixmap(QStyle.SP_FileIcon))
     app.setWindowIcon(icon)
     win = MainWindow(icon)
