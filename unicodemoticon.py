@@ -637,6 +637,7 @@ def make_root_check_and_encoding_debug() -> bool:
     log.debug("PYTHONIOENCODING Encoding: {0}.".format(
         os.environ.get("PYTHONIOENCODING", None)))
     os.environ["PYTHONIOENCODING"] = "utf-8"
+    sys.dont_write_bytecode = True
     if not sys.platform.startswith("win"):  # root check
         if not os.geteuid():
             log.critical("Runing as root is not Recommended,NOT Run as root!.")
