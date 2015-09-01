@@ -447,6 +447,7 @@ class MainWindow(QSystemTrayIcon):
                         pass
         self.traymenu.addAction("AlTeRnAtE-CaSe", self.make_alternate_case)
         self.traymenu.addAction("Explain Unicode", self.make_explain_unicode)
+        self.traymenu.addAction("Search Unicode", self.make_search_unicode)
         self.traymenu.addSeparator()
         # help
         helpMenu = self.traymenu.addMenu("Options...")
@@ -489,6 +490,33 @@ class MainWindow(QSystemTrayIcon):
             QMessageBox.information(None, __doc__, str((uni, explanation)))
         log.debug((uni, explanation))
         return (uni, explanation)
+
+    def make_search_unicode(self):
+        """Make a Pop-Up Dialog to search Unicode Emoticons."""
+        sorry = "<i>Nothing found! Search can not find similar Unicode, sorry."
+        search = str(QInputDialog.getText(
+            None, __doc__, "<b>Type to search Unicode ?:")[0]).lower()
+        if search and len(search.strip()):
+            log.debug("Searching all Unicode for: '{0}'.".format(search))
+            found_exact = [_ for _ in UNICODEMOTICONS.values() if search in _]
+            found_by_name = []
+            for emoticons_list in UNICODEMOTICONS.values():
+                for emote in emoticons_list:
+                    try:
+                        emoticon_name = unicodedata.name(emote).lower().strip()
+                    except Exception:
+                        emoticon_name = ""
+                    if search in emoticon_name and len(emoticon_name):
+                        found_by_name += emote
+            found_tuple = tuple(sorted(set(found_exact + found_by_name)))
+            result = found_tuple[:75] if len(found_tuple) else sorry
+            msg = """<b>Your Search:</b><h3>{0}</h3><b>{1} Similar Unicode:</b>
+            <h1>{2}</h1><i>All Unicode Copied to Clipboard !.""".format(
+                search[:99], len(found_tuple), result)
+            QApplication.clipboard().setText("".join(found_tuple))
+            log.debug("Found Unicode: '{0}'.".format(found_tuple))
+            QMessageBox.information(None, __doc__, msg)
+            return found_tuple
 
     @typecheck
     def make_alternate_case(self) -> str:
