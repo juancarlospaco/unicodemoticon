@@ -29,7 +29,7 @@ wget -O - https://raw.githubusercontent.com/juancarlospaco/unicodemoticon/master
 ```
 sudo apt-get install python3-pyqt5 ttf-ancient-fonts sni-qt
 #  sudo yum install python3-pyqt5 ttf-ancient-fonts
-#  sudo pacman -Syu python-qt5 ttf-ancient-fonts
+#  sudo pacman -S python-pip python-pyqt5 ttf-symbola
 sudo pip3 install unicodemoticon
 ```
 
