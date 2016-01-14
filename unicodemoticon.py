@@ -4,7 +4,7 @@
 
 # metadata
 """UnicodEmoticons."""
-__version__ = '1.2.2'
+__version__ = '1.4.0'
 __license__ = ' GPLv3+ LGPLv3+ '
 __author__ = ' Juan Carlos '
 __email__ = ' juancarlospaco@gmail.com '
@@ -57,8 +57,7 @@ except ImportError:    # sudo pip3 install qdarkstyle
     qdarkstyle = None  # 100% optional
 
 
-QSS_STYLE = """QMenu[emoji_menu]::item { padding: 0 1em 0 1em; color: silver }
-QMenu[emoji_menu] { border: 0; background-color: transparent; }"""
+QSS_STYLE = "/* Write your Custom Styles here */"
 
 AUTOSTART_DESKTOP_FILE = """[Desktop Entry]
 Comment=Trayicon with Unicode Emoticons.
@@ -258,133 +257,7 @@ def typecheck(f):
     return decorated  # The decorated function or method.
 
 
-class Downloader(QProgressDialog):
-
-    """Downloader Dialog with complete informations and progress bar."""
-
-    def __init__(self, parent=None):
-        """Init class."""
-        super(Downloader, self).__init__(parent)
-        self.setWindowTitle(__doc__)
-        if not os.path.isfile(__file__) or not __source__:
-            return
-        if not os.access(__file__, os.W_OK):
-            error_msg = ("Destination file permission denied (not Writable)! "
-                         "Try again to Update but as root or administrator.")
-            log.critical(error_msg)
-            QMessageBox.warning(self, __doc__.title(), error_msg)
-            return
-        self._time, self._date = time.time(), datetime.now().isoformat()[:-7]
-        self._url, self._dst = __source__, __file__
-        log.debug("Downloading from {} to {}.".format(self._url, self._dst))
-        if not self._url.lower().startswith("https:"):
-            log.warning("Unsecure Download over plain text without SSL.")
-        self.template = """<h3>Downloading</h3><hr><table>
-        <tr><td><b>From:</b></td>      <td>{}</td>
-        <tr><td><b>To:  </b></td>      <td>{}</td> <tr>
-        <tr><td><b>Started:</b></td>   <td>{}</td>
-        <tr><td><b>Actual:</b></td>    <td>{}</td> <tr>
-        <tr><td><b>Elapsed:</b></td>   <td>{}</td>
-        <tr><td><b>Remaining:</b></td> <td>{}</td> <tr>
-        <tr><td><b>Received:</b></td>  <td>{} MegaBytes</td>
-        <tr><td><b>Total:</b></td>     <td>{} MegaBytes</td> <tr>
-        <tr><td><b>Speed:</b></td>     <td>{}</td>
-        <tr><td><b>Percent:</b></td>     <td>{}%</td></table><hr>"""
-        self.manager = QNetworkAccessManager(self)
-        self.manager.finished.connect(self.save_downloaded_data)
-        self.manager.sslErrors.connect(self.download_failed)
-        self.progreso = self.manager.get(QNetworkRequest(QUrl(self._url)))
-        self.progreso.downloadProgress.connect(self.update_download_progress)
-        self.show()
-        self.exec_()
-
-    def save_downloaded_data(self, data):
-        """Save all downloaded data to the disk and quit."""
-        log.debug("Download done. Update Done.")
-        with open(os.path.join(self._dst), "wb") as output_file:
-            output_file.write(data.readAll())
-        data.close()
-        QMessageBox.information(self, __doc__.title(),
-                                "<b>You got the latest version of this App!")
-        del self.manager, data
-        return self.close()
-
-    def download_failed(self, download_error):
-        """Handle a download error, probable SSL errors."""
-        log.error(download_error)
-        QMessageBox.warning(self, __doc__.title(), str(download_error))
-
-    def seconds_time_to_human_string(self, time_on_seconds=0):
-        """Calculate time, with precision from seconds to days."""
-        minutes, seconds = divmod(int(time_on_seconds), 60)
-        hours, minutes = divmod(minutes, 60)
-        days, hours = divmod(hours, 24)
-        human_time_string = ""
-        if days:
-            human_time_string += "%02d Days " % days
-        if hours:
-            human_time_string += "%02d Hours " % hours
-        if minutes:
-            human_time_string += "%02d Minutes " % minutes
-        human_time_string += "%02d Seconds" % seconds
-        return human_time_string
-
-    def update_download_progress(self, bytesReceived, bytesTotal):
-        """Calculate statistics and update the UI with them."""
-        downloaded_MB = round(((bytesReceived / 1024) / 1024), 2)
-        total_data_MB = round(((bytesTotal / 1024) / 1024), 2)
-        downloaded_KB, total_data_KB = bytesReceived / 1024, bytesTotal / 1024
-        # Calculate download speed values, with precision from Kb/s to Gb/s
-        elapsed = time.clock()
-        if elapsed > 0:
-            speed = round((downloaded_KB / elapsed), 2)
-            if speed > 1024000:  # Gigabyte speeds
-                download_speed = "{} GigaByte/Second".format(speed // 1024000)
-            if speed > 1024:  # MegaByte speeds
-                download_speed = "{} MegaBytes/Second".format(speed // 1024)
-            else:  # KiloByte speeds
-                download_speed = "{} KiloBytes/Second".format(int(speed))
-        if speed > 0:
-            missing = abs((total_data_KB - downloaded_KB) // speed)
-        percentage = int(100.0 * bytesReceived // bytesTotal)
-        self.setLabelText(self.template.format(
-            self._url.lower()[:99], self._dst.lower()[:99],
-            self._date, datetime.now().isoformat()[:-7],
-            self.seconds_time_to_human_string(time.time() - self._time),
-            self.seconds_time_to_human_string(missing),
-            downloaded_MB, total_data_MB, download_speed, percentage))
-        self.setValue(percentage)
-
-
 ###############################################################################
-
-
-class Menu(QMenu):
-
-    """Custom QMenu widget."""
-
-    def __init__(self, parent=None, *args, **kwargs):
-        """Init class custom tab widget."""
-        super(Menu, self).__init__(parent=None, *args, **kwargs)
-        self.setWindowOpacity(0.8)
-        self.setAttribute(Qt.WA_OpaquePaintEvent, False)  # no opaque paint
-        self.setAttribute(Qt.WA_TranslucentBackground, True)  # translucent
-        self.setStyleSheet("background-color:transparent")  # default style
-
-    def paintEvent(self, event):
-        """Paint transparent background,animated pattern,background text."""
-        painter, font = QPainter(self), self.font()
-        painter.fillRect(event.rect(), Qt.transparent)  # fill transparent rect
-        painter.setPen(Qt.NoPen)  # set the pen to no pen
-        painter.setBrush(QColor("black"))  # Background Color
-        painter.setOpacity(0.85)  # Background Opacity
-        painter.drawRoundedRect(self.rect(), 30, 30)  # Back Rounded Borders
-        for i in range(512):  # animated random dots background pattern
-            x = randint(10, self.size().width() - 10)
-            y = randint(10, self.size().height() - 10)
-            painter.setPen(QPen(QColor(randint(9, 255), randint(9, 255), 255)))
-            painter.drawPoint(x, y)
-        QMenu.paintEvent(self, event)
 
 
 class MainWindow(QSystemTrayIcon):
@@ -397,7 +270,7 @@ class MainWindow(QSystemTrayIcon):
         log.debug("Starting {}.".format(__doc__))
         self.setIcon(icon)
         self.setToolTip(__doc__ + "\nPick 1 Emoticon, use CTRL+V to Paste it!")
-        self.traymenu = Menu("Emoticons")
+        self.traymenu = QMenu("Emoticons")
         self.traymenu.addAction("    Emoticons").setDisabled(True)
         self.traymenu.setIcon(icon)
         self.traymenu.addSeparator()
@@ -647,6 +520,7 @@ def make_post_execution_message(app: str=__doc__.splitlines()[0].strip()):
     >>> make_post_execution_message() >= 0
     True
     """
+    ram_use, ram_all = 0, 0
     ram_use = int(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss *
                   resource.getpagesize() / 1024 / 1024 if resource else 0)
     ram_all = int(os.sysconf('SC_PAGE_SIZE') * os.sysconf('SC_PHYS_PAGES')
@@ -657,7 +531,9 @@ def make_post_execution_message(app: str=__doc__.splitlines()[0].strip()):
     print("Thanks for using this App,share your experience!{0}".format("""
     Twitter: https://twitter.com/home?status=I%20Like%20{n}!:%20{u}
     Facebook: https://www.facebook.com/share.php?u={u}&t=I%20Like%20{n}
-    G+: https://plus.google.com/share?url={u}""".format(u=__url__, n=app)))
+    G+: https://plus.google.com/share?url={u}\nSend BitCoins !: 
+    https://www.coinbase.com/checkouts/c3538d335faee0c30c81672ea0223877
+    """.format(u=__url__, n=app)))
     return msg
 
 
