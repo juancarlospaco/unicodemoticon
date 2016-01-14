@@ -57,7 +57,7 @@ except ImportError:    # sudo pip3 install qdarkstyle
     qdarkstyle = None  # 100% optional
 
 
-QSS_STYLE = "/* Write your Custom Styles here */"
+QSS_STYLE = "/* Write your Custom Styles here */\n"
 
 AUTOSTART_DESKTOP_FILE = """[Desktop Entry]
 Comment=Trayicon with Unicode Emoticons.
