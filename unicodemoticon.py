@@ -496,14 +496,15 @@ class TabWidget(QTabWidget):
         """Make a Pop-Up Dialog to search Unicode Emoticons."""
         sorry = "<i>Nothing found! Search can not find similar Unicode, sorry."
         search = str(QInputDialog.getText(
-            None, __doc__, "<b>Type to search Unicode ?:")[0]).lower()
-        if search and len(search.strip()):
+            None, __doc__, "<b>Type to search Unicode ?:")[0]).lower().strip()
+        if search and len(search):
             log.debug("Searching all Unicode for: '{0}'.".format(search))
-            found_exact = [_ for _ in UNICODEMOTICONS.values() if search in _]
+            emos = [_ for _ in UNICODEMOTICONS.values() if isinstance(_, str)]
+            found_exact = [_ for _ in emos if search in _]
             found_by_name = []
-            for emoticons_list in UNICODEMOTICONS.values():
+            for emoticons_list in emos:
                 for emote in emoticons_list:
-                    emoticon_name = self.get_description(emote)
+                    emoticon_name = str(self.get_description(emote)).lower()
                     if search in emoticon_name and len(emoticon_name):
                         found_by_name += emote
             found_tuple = tuple(sorted(set(found_exact + found_by_name)))
