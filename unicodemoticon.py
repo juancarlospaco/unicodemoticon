@@ -337,19 +337,6 @@ class TabWidget(QTabWidget):
         layou.addWidget(self.to)
         self.inputx.setPlaceholderText(" Type something cool here . . .")
         self.inputx.setFocus()
-        self.alt.setReadOnly(True)
-        self.b64.setReadOnly(True)
-        self.b64unsafe.setReadOnly(True)
-        self.rot13.setReadOnly(True)
-        self.urlenc.setReadOnly(True)
-        self.urlencp.setReadOnly(True)
-        self.snake.setReadOnly(True)
-        self.spine.setReadOnly(True)
-        self.asci.setReadOnly(True)
-        self.camel.setReadOnly(True)
-        self.swp.setReadOnly(True)
-        self.tran.setReadOnly(True)
-        self.st.setReadOnly(True)
         self.runtools = QPushButton("Go !", self, clicked=self.runtool)
         layout.addWidget(QLabel("<h1>Type or Paste text"))
         layout.addWidget(self.inputx)
@@ -392,6 +379,12 @@ class TabWidget(QTabWidget):
         txt = str(self.inputx.text())
         if not len(txt.strip()):
             return
+        for field in (
+            self.alt, self.b64, self.b64unsafe, self.rot13, self.urlenc,
+            self.urlencp, self.snake, self.spine, self.asci, self.camel,
+            self.swp, self.tran, self.st):
+            field.clear()
+            field.setReadOnly(True)
         self.alt.setText(self.make_alternate_case(txt))
         self.swp.setText(txt.swapcase())
         self.b64.setText(urlsafe_b64encode(
