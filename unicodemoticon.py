@@ -171,7 +171,7 @@ make_root_check_and_encoding_debug()  # AutoMagically Check Encodings/root
 set_process_name_and_cpu_priority("unicodemoticon")  # AutoMagically set Name
 set_single_instance("unicodemoticon")  # AutoMagically set Single Instance
 make_config("unicodemoticon")  # AutoMagically make a JSON-based Config
-add_desktop_files("unicodemoticon", AUTOSTART_DESKTOP_FILE)
+add_desktop_files("unicodemoticon", AUTOSTART_DESKTOP_FILE)  # desktop file
 
 
 def tinyslation(s: str, to: str=getdefaultlocale()[0][:2], fm="en") -> str:
@@ -440,7 +440,7 @@ class TabWidget(QTabWidget):
                     font = button.font()
                     font.setPixelSize(50)
                     button.setFont(font)
-                    index = index + 1 # cant use enumerate()
+                    index = index + 1  # cant use enumerate()
                     row = row + 1 if not index % 8 else row
                     layout2.addWidget(button, row, index % 8)
         group2.setLayout(layout2)
@@ -470,7 +470,7 @@ class TabWidget(QTabWidget):
         for field in (
             self.alt, self.b64, self.b64unsafe, self.rot13, self.urlenc,
             self.urlencp, self.snake, self.spine, self.asci, self.camel,
-            self.swp, self.tran, self.st):
+                self.swp, self.tran, self.st):
             field.clear()
             field.setReadOnly(True)
         self.alt.setText(self.make_alternate_case(txt))
