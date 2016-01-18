@@ -2,19 +2,31 @@ unicodemoticon
 ==============
 
 
-[![GPL License](http://img.shields.io/badge/license-GPL-blue.svg?style=plastic)](http://opensource.org/licenses/GPL-3.0) [![LGPL License](http://img.shields.io/badge/license-LGPL-blue.svg?style=plastic)](http://opensource.org/licenses/LGPL-3.0) [![Python Version](https://img.shields.io/badge/Python-3-brightgreen.svg?style=plastic)](http://python.org) [![Code Issues](http://www.quantifiedcode.com/api/v1/project/378c3f56d270475a8dff5660772fc2f9/badge.svg)](http://www.quantifiedcode.com/app/project/378c3f56d270475a8dff5660772fc2f9) [![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif "Donate with or without Credit Card")](http://goo.gl/cB7PR)
+[![GPL License](http://img.shields.io/badge/license-GPL-blue.svg?style=plastic)](http://opensource.org/licenses/GPL-3.0) [![LGPL License](http://img.shields.io/badge/license-LGPL-blue.svg?style=plastic)](http://opensource.org/licenses/LGPL-3.0) [![Python Version](https://img.shields.io/badge/Python-3-brightgreen.svg?style=plastic)](http://python.org) [![Code Issues](http://www.quantifiedcode.com/api/v1/project/378c3f56d270475a8dff5660772fc2f9/badge.svg)](http://www.quantifiedcode.com/app/project/378c3f56d270475a8dff5660772fc2f9) 
+
+
+[![Donate BitCoins](https://www.coinbase.com/assets/buttons/donation_large-5cf4f17cc2d2ae2f45b6b021ee498297409c94dcf0ba1bbf76fd5668e80b0d02.png)](https://www.coinbase.com/checkouts/c3538d335faee0c30c81672ea0223877 "Donate Bitcoins") [![Subscribe with BitCoins](https://www.coinbase.com/assets/buttons/subscription_large-11d991f628216af05156fae88a48ce25c0cb36447a265421a43a62e572af3853.png)](https://www.coinbase.com/checkouts/c3538d335faee0c30c81672ea0223877 "Subscribe with BitCoins") [![Pay with BitCoins](https://www.coinbase.com/assets/buttons/buy_now_large-6f15fa5979d25404827a7329e8a5ec332a42cf4fd73e27a2c3ccda017034e1b0.png)](https://www.coinbase.com/checkouts/c3538d335faee0c30c81672ea0223877 "Pay with BitCoins") [![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif "Donate with or without Credit Card")](http://goo.gl/cB7PR)
+
+https://pypi.python.org/pypi/unicodemoticon
 
 
 ![screenshot](https://raw.githubusercontent.com/juancarlospaco/unicodemoticon/master/temp.jpg "UnicodEmoticon on Linux")
 
 
-- Trayicon with Unicode Emoticons using Python3 Qt5.
+- Tabbed Window and Trayicon with Unicode Emoticons and text tools using Python3 Qt5.
 - StandAlone, single-file, easy to use.
-- Set its own Process name and show up on Process lists, GUI Customization via CSS, Icon Customization.
-- Can check for updates for itself, Sets Smooth CPU usage, Colored Logging, Single Instance via Sockets.
-- Menu is Semi-Transparent with particles and Rounded Corners with On Mouse Hover Previews.
+- Pretty-Printed colored Logging to Standard Output and Log File on OS Temporary Folder.
+- No Dependencies at all, just needs Python Standard Built-in Libs.
+- Set its own Process name and show up on Process lists.
+- Can check for updates for itself.
+- Full Unicode/UTF-8 support.
+- Smooth CPU usage.
+- GUI Customization via CSS, Icon Customization.
+- Single Instance via Sockets.
+- On Mouse Hover Previews.
 - HTML5 Entities, eg. `&copy;` and Multiple characters Emoticons, eg. `¯\_(ツ)_/¯`.
 - Alternating CamelCase for clipboard text, eg. `AlTeRnAtInG CaMeLcAsE FoR ClIpBoArD TeXt`.
+- Base64, URL Encode, ROT-13, and more.
 
 
 # Try it !: 
@@ -103,5 +115,5 @@ unicodemoticon.py
 Donate, Charityware :
 ---------------------
 
-- [Charityware](https://en.wikipedia.org/wiki/Donationware) is a licensing model that supplies fully operational unrestricted software to the user and requests an optional donation be paid to a third-party beneficiary non-profit. The amount of donation may be left to the discretion of the user. Its GPL-compatible and Enterprise ready.
-- If you want to Donate please [click here](http://www.icrc.org/eng/donations/index.jsp) or [click here](http://www.atheistalliance.org/support-aai/donate) or [click here](http://www.msf.org/donate) or [click here](http://richarddawkins.net/) or [click here](http://www.supportunicef.org/) or [click here](http://www.amnesty.org/en/donate)
+- [Charityware](https://en.wikipedia.org/wiki/Donationware) is a licensing model that supplies fully operational unrestricted software to the user and requests an optional donation be paid to a third-party beneficiary non-profit. The amount may be left to discretion of the user.
+- If you want to Donate please [click here](http://www.icrc.org/eng/donations/index.jsp) or [click here](http://www.atheistalliance.org/support-aai/donate) or [click here](http://www.msf.org/donate) or [click here](http://richarddawkins.net/) or [click here](http://www.supportunicef.org/) or [click here](http://www.amnesty.org/en/donate) or [click here](http://www.rescue.org/irc-fast-facts)
