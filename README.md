@@ -13,6 +13,10 @@ https://pypi.python.org/pypi/unicodemoticon
 ![screenshot](https://raw.githubusercontent.com/juancarlospaco/unicodemoticon/master/temp.jpg "UnicodEmoticon on Linux")
 
 
+- **Standalone**, uses ONLY Standard Libraries, built-in on Python 3.
+- **Single-File**, everything is just 1 file, with PEP-8, Lint and other Python Best Practices, very readable.
+- **Python3 ready**, it will only work with Python >= 3, instead of soon to be deprecated *(year 2020)* python2.
+- **Minimalism**, do 1 thing do it awesome, is tiny and simple, K.I.S.S., its < 1.000 lines.
 - Tabbed Window and Trayicon with Unicode Emoticons and text tools using Python3 Qt5.
 - StandAlone, single-file, easy to use.
 - Pretty-Printed colored Logging to Standard Output and Log File on OS Temporary Folder.
@@ -27,6 +31,7 @@ https://pypi.python.org/pypi/unicodemoticon
 - HTML5 Entities, eg. `&copy;` and Multiple characters Emoticons, eg. `¯\_(ツ)_/¯`.
 - Alternating CamelCase for clipboard text, eg. `AlTeRnAtInG CaMeLcAsE FoR ClIpBoArD TeXt`.
 - Base64, URL Encode, ROT-13, and more.
+- [*Your Feature or idea here...*](https://github.com/juancarlospaco/unicodemoticon/pulls "Send new Features")
 
 
 # Try it !: 
