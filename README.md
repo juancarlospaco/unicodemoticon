@@ -11,6 +11,12 @@
  ![screenshot](https://raw.githubusercontent.com/juancarlospaco/unicodemoticon/master/temp.jpg "UnicodEmoticon on Linux")
 
 
+ ![screenshot](https://raw.githubusercontent.com/juancarlospaco/unicodemoticon/master/temp2.jpg "UnicodEmoticon on Linux")
+
+
+ ![screenshot](https://raw.githubusercontent.com/juancarlospaco/unicodemoticon/master/temp3.jpg "UnicodEmoticon on Linux")
+
+
  - **Standalone**, uses ONLY Standard Libraries, built-in on Python 3.
  - **Single-File**, everything is just 1 file, with PEP-8, Lint and other Python Best Practices, very readable.
  - **Python3 ready**, it will only work with Python >= 3, instead of soon to be deprecated *(year 2020)* python2.
