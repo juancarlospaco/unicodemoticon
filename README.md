@@ -11,13 +11,18 @@
  ![screenshot](https://raw.githubusercontent.com/juancarlospaco/unicodemoticon/master/temp.jpg "UnicodEmoticon on Linux")
 
 
- - Trayicon with Unicode Emoticons using Python3 Qt5.
+ - **Standalone**, uses ONLY Standard Libraries, built-in on Python 3.
+ - **Single-File**, everything is just 1 file, with PEP-8, Lint and other Python Best Practices, very readable.
+ - **Python3 ready**, it will only work with Python >= 3, instead of soon to be deprecated *(year 2020)* python2.
+ - **Unicode ready**, it should handle correctly any kind of character that `UTF-8` can support without escaping.
+ - Tabbed Window and Trayicon with Unicode Emoticons using Python3 Qt5.
  - StandAlone, single-file, easy to use.
  - Set its own Process name and show up on Process lists, GUI Customization via CSS, Icon Customization.
  - Can check for updates for itself, Sets Smooth CPU usage, Colored Logging, Single Instance via Sockets.
  - Menu is Semi-Transparent with particles and Rounded Corners with On Mouse Hover Previews.
  - HTML5 Entities, eg. `&copy;` and Multiple characters Emoticons, eg. `¯\_(ツ)_/¯`.
  - Alternating CamelCase for clipboard text, eg. `AlTeRnAtInG CaMeLcAsE FoR ClIpBoArD TeXt`.
+ - Base64, ROT-13, URL Encode, and more.
 
 
  # Try it !:
