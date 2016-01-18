@@ -68,7 +68,7 @@ kv kw ky la lb lg li ln lo lt lu lv mg mh mi mi mk mk ml mn mr ms ms mt my my
 na nb nd ne ng nl nl nn no nr nv oc oj om or os pa pi pl ps pt qu rm rn ro ro
 ru rw sa sc sd se sg si sk sk sl sm sn so sq sq sr ss st su sv sw ta te tg th
 ti tk tl tn to tr ts tt tw ty ug uk ur uz ve vi vo wa wo xh yi yo za zh zh zu
-""".replace("\n", " ").split())
+""".split())
 
 
 STD_ICON_NAMES = tuple(sorted(set("""emblem-default emblem-documents start-here
@@ -83,7 +83,7 @@ edit-find-replace edit-paste tools-check-spelling accessories-character-map
 accessories-dictionary accessories-text-editor preferences-desktop-font
 preferences-desktop-keyboard applications-other applications-utilities
 preferences-other user-bookmarks application-x-executable image-missing
-""".strip().lower().replace("\n", " ").split(" "))))  # use your themes icons
+""".split())))  # use your themes icons
 
 
 UNICODEMOTICONS = {
