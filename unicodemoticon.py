@@ -34,7 +34,7 @@ from PyQt5.QtWidgets import (QApplication, QComboBox, QDesktopWidget, QDialog,
                              QLabel, QLineEdit, QMainWindow, QMenu,
                              QMessageBox, QPushButton, QScrollArea, QStyle,
                              QTabBar, QTabWidget, QToolButton, QVBoxLayout,
-                             QWidget)
+                             QWidget, QSystemTrayIcon)
 
 import binascii
 import unicodedata
@@ -84,13 +84,10 @@ UNICODEMOTICONS = """{
         "🌋🌌🌁🐶🐱🐭🐹🐰🐻🐼🐨🐯🐮🐷🐽🐸🐙🐵🙈🙉🙊🐒🐔🐧🐦🐤🐣🐥🐺🐗🐴🦄🐝🐛🐌🐞🐜🕷🐍🐢🐠🐟🐡🐬🐳🐋🐊🐆🐅🐃🐂🐄🐪🐫🐘🐐🐏🐑🐎🐖🐀🐁🐓🦃🕊🐕🐩🐈🐇🐿🐾🐉🐲🌵🎄🌲🌳🌴🌱🌿☘🍀🎍🎋🍃🍂🍁🌾🌺🌻🌹🌷🌼🌸💐🍄🌰🎃🐚🕸🌎🌍🌏🌕🌖🌗🌘🌑🌒🌓🌔🌚🌝🌛🌜🌞🌙⭐🌟💫✨☄☀🌤⛅🌥🌦☁🌧⛈🌩⚡🔥💥❄🌨☃⛄🌬💨🌪🌫☂☔💧💦🌊",
 
     "culture":
-        "♫♪♭♩🎶🎵🎼🎨🎬🎤🎧🎹🎻🎺🎷🎸🏁⚽🏀🏈⚾🎾🏐🏉🎱⛳🏌🎿⛷🏂⛸🏹🎣🚣🏊🏄🛀⛹🏋🚴🚵🏇🕴🏆🎽🏅🎖🎗🏵🎫🎟🎭🎨🎪🎤🎧🎼🎹🎷🎺🎸🎻🎬🎮👾🎯🎲🎰🎳",
+        "🏠🏡🏫🏢🏣🏥🏪🏩🏨💒⛪🏬🏤🌇🌆🏯🏰⛺🏭🗼🗻🌄🌅🌃🗽🌉🎠🎡⛲🎢🚢🗽🎍🎎🎒🎓🎏🎃👻🎅🎄🎁🎋🎉🎊🎈🎌🌎💩⚙⚖⚔⚒🔐🔗🔩♫♪♭♩🎶🎵🎼🎨🎬🎤🎧🎹🎻🎺🎷🎸🏁⚽🏀🏈⚾🎾🏐🏉🎱⛳🏌🎿⛷🏂⛸🏹🎣🚣🏊🏄🛀⛹🏋🚴🚵🏇🕴🏆🎽🏅🎖🎗🏵🎫🎟🎭🎨🎪🎤🎧🎼🎹🎷🎺🎸🎻🎬🎮👾🎯🎲🎰🎳",
 
     "food":
         "🍏🍎🍐🍊🍋🍌🍉🍇🍓🍈🍒🍑🍍🍅🍆🌶🌽🍠🍯🍞🧀🍗🍖🍤🍳🍔🍟🌭🍕🍝🌮🌯🍜🍲🍥🍣🍱🍛🍙🍚🍘🍢🍡🍧🍨🍦🍰🎂🍮🍬🍭🍫🍿🍩🍪🍺🍻🍷🍸🍹🍾🍶🍵☕🍼🍴🍽",
-
-    "objects":
-        "🏠🏡🏫🏢🏣🏥🏪🏩🏨💒⛪🏬🏤🌇🌆🏯🏰⛺🏭🗼🗻🌄🌅🌃🗽🌉🎠🎡⛲🎢🚢🗽🎍🎎🎒🎓🎏🎃👻🎅🎄🎁🎋🎉🎊🎈🎌🌎💩⚙⚖⚔⚒🔐🔗🔩",
 
     "tech":
         "⌚📱📲⌨🖥🖨🖱🖲🕹🗜💽💾💿📀📼📷📸📹🎥📽🎞📞☎📟📠📺📻🎙🎚🎛⏱⏲⏰🕰⏳⌛📡🔋🔌💡🔦🕯🗑🛢💸💵💴💶💷💰💳💎⚖🔧🔨⚒🛠⛏🔩⚙⛓🔫💣🔪🗡⚔🛡🚬☠⚰⚱🏺🔮📿💈⚗🔭🔬🕳💊💉🌡🏷🔖🚽🚿🛁🔑🗝🛋🛌🛏🚪🛎🖼🗺⛱🗿🛍🎈🎏🎀🎁🎊🎉🎎🎐🎌🏮✉📩📨📧💌📮📪📫📬📭📦📯📥📤📜📃📑📊📈📉📄📅📆🗓📇🗃🗳🗄📋🗒📁📂🗂🗞📰📓📕📗📘📙📔📒📚📖🔗📎🖇✂📐📏📌📍🚩🏳🏴🔐🔒🔓🔏🖊🖋✒📝✏🖍🖌🔍🔎📛🔊🔉🔇🔔🔕☢☣☤✇✆⛵🚤🚣⚓🚀✈💺🚁🚂🚊🚆🚈🚇🚋🚎🚌🚍🚙🚕🚖🚛🚚🚓🚔🚒🚑🚐🚲🚡🚟🚜"
@@ -312,7 +309,7 @@ class TabWidget(QTabWidget):
         self.setCornerWidget(self.menu_0, 0)
         self.currentChanged.connect(self.make_tabs_previews)
         self.currentChanged.connect(self.make_tabs_fade)
-        layout = QVBoxLayout()
+        self.tray, layout = QSystemTrayIcon(self), QVBoxLayout()
         area, group = QScrollArea(), QGroupBox("Quick and Dirty Text Hacks !")
         area.setWidgetResizable(True)
         area.setHorizontalScrollBarPolicy(1)
@@ -370,9 +367,20 @@ class TabWidget(QTabWidget):
         self.addTab(area, "Tools")
         self.widgets_to_tabs(self.json_to_widgets(UNICODEMOTICONS))
         self.set_or_get_stylesheet()
+        self.make_trayicon()
         self.setMinimumSize(QDesktopWidget().screenGeometry().width() // 1.5,
                             QDesktopWidget().screenGeometry().height() // 1.5)
-        self.showMaximized()
+        # self.showMaximized()
+
+    def make_trayicon(self):
+        """Make a Tray Icon."""
+        if self.windowIcon() and __doc__:
+            self.tray.setIcon(self.windowIcon())
+            self.tray.setToolTip(__doc__)
+            self.tray.activated.connect(
+                lambda: self.hide() if self.isVisible()
+                else self.showMaximized())
+            return self.tray.show()
 
     def runtool(self, *args):
         """Run all text transformation tools."""
@@ -627,7 +635,7 @@ def main():
     icon = QIcon(app.style().standardPixmap(QStyle.SP_FileIcon))
     app.setWindowIcon(icon)
     win = TabWidget()
-    win.show()
+    # win.show()
     make_post_execution_message()
     sys.exit(app.exec())
 
