@@ -2,6 +2,38 @@
 # -*- coding: utf-8 -*-
 
 
+import base64
+import codecs
+import os
+import re
+import sys
+import zlib
+
+from base64 import b64encode, urlsafe_b64encode
+from json import loads
+from locale import getdefaultlocale
+from urllib import parse, request
+
+from PyQt5.QtCore import QEvent, Qt, QTimeLine, QTimer
+
+from PyQt5.QtGui import QCursor, QIcon, QPainter
+
+from PyQt5.QtWidgets import (QApplication, QComboBox, QDesktopWidget, QDialog,
+                             QGridLayout, QGroupBox, QHBoxLayout, QInputDialog,
+                             QLabel, QLineEdit, QMainWindow, QMenu,
+                             QMessageBox, QPushButton, QScrollArea, QStyle,
+                             QTabBar, QTabWidget, QToolButton, QVBoxLayout,
+                             QWidget)
+
+import binascii
+import unicodedata
+
+try:
+    import qdarkstyle  # https://github.com/ColinDuquesnoy/QDarkStyleSheet
+except ImportError:    # sudo pip3 install qdarkstyle
+    qdarkstyle = None  # 100% optional
+
+
 # metadata
 """UnicodEmoticons."""
 __version__ = '2.0.0'
@@ -11,29 +43,6 @@ __email__ = ' juancarlospaco@gmail.com '
 __url__ = 'https://github.com/juancarlospaco/unicodemoticon'
 __source__ = ('https://raw.githubusercontent.com/juancarlospaco/'
               'unicodemoticon/master/unicodemoticon.py')
-
-
-import base64
-import binascii
-import zlib
-import unicodedata
-import atexit
-
-from json import loads
-
-from PyQt5.QtCore import QEvent, QTimeLine, QTimer, Qt
-
-from PyQt5.QtGui import QBrush, QColor, QCursor, QPainter, QRadialGradient, QIcon
-
-from PyQt5.QtWidgets import (QApplication, QColorDialog, QDialog, QGridLayout,
-                             QGroupBox, QInputDialog, QLabel, QMainWindow, QStyle,
-                             QMenu, QMessageBox, QPushButton, QTabBar, QDesktopWidget,
-                             QTabWidget, QToolButton, QVBoxLayout, QScrollArea)
-
-try:
-    import qdarkstyle  # https://github.com/ColinDuquesnoy/QDarkStyleSheet
-except ImportError:    # sudo pip3 install qdarkstyle
-    qdarkstyle = None  # 100% optional
 
 
 AUTOSTART_DESKTOP_FILE = """[Desktop Entry]
@@ -48,6 +57,17 @@ Type=Application
 Categories=Utility
 X-DBUS-ServiceName=unicodemoticon
 X-KDE-StartupNotify=false"""
+
+
+CODES = tuple("""aa ab ae af ak am an ar as av ay az ba be bg bh bi bm bn bo
+bo br bs ca ce ch co cr cs cs cu cv cy cy da de de dv dz ee el el en eo es et
+eu eu fa fa ff fi fj fo fr fr fy ga gd gl gn gu gv ha he hi ho hr ht hu hy hy
+hz ia id ie ig ii ik io is is it iu ja jv ka kg ki kj kk kl km kn ko kr ks ku
+kv kw ky la lb lg li ln lo lt lu lv mg mh mi mi mk mk ml mn mr ms ms mt my my
+na nb nd ne ng nl nl nn no nr nv oc oj om or os pa pi pl ps pt qu rm rn ro ro
+ru rw sa sc sd se sg si sk sk sl sm sn so sq sq sr ss st su sv sw ta te tg th
+ti tk tl tn to tr ts tt tw ty ug uk ur uz ve vi vo wa wo xh yi yo za zh zh zu
+""".replace("\n", " ").split())
 
 
 UNICODEMOTICONS = """{
@@ -77,6 +97,15 @@ UNICODEMOTICONS = """{
 }"""
 
 
+def string_to_stealth(stringy: str, rot13: bool=False) -> str:
+    """String to Stealth,stealth is a hidden string,both str type and utf-8."""
+    stringy = codecs.encode(stringy, "rot-13") if rot13 and codecs else stringy
+    strng = base64.b64encode(zlib.compress(stringy.strip().encode('utf-8'), 9))
+    bits = bin(int(binascii.hexlify(strng), 16))[2:]
+    return str(bits.zfill(8 * ((len(bits) + 7) // 8))).replace(
+        "0", u"\u200B").replace("1", u"\uFEFF")
+
+
 def stealth_to_string(stringy: str, rot13: bool=False) -> str:
     """Stealth to string,stealth is a hidden string,both str type and utf-8."""
     def __i2b(integ):  # int to bytes, do not touch.
@@ -95,7 +124,19 @@ make_root_check_and_encoding_debug()  # AutoMagically Check Encodings/root
 set_process_name_and_cpu_priority("unicodemoticon")  # AutoMagically set Name
 set_single_instance("unicodemoticon")  # AutoMagically set Single Instance
 make_config("unicodemoticon")  # AutoMagically make a JSON-based Config
-#add_desktop_files("unicodemoticon", AUTOSTART_DESKTOP_FILE)
+# add_desktop_files("unicodemoticon", AUTOSTART_DESKTOP_FILE)
+
+
+def tinyslation(s: str, to: str=getdefaultlocale()[0][:2], fm="en") -> str:
+    """Translate from internet via API from mymemory.translated.net,legally."""
+    api = "https://mymemory.translated.net/api/get?q={st}&langpair={fm}|{to}"
+    req = request.Request(url=api.format(st=parse.quote(s), fm=fm, to=to),
+                          headers={'User-Agent': '', 'DNT': 1})  # DoNotTrack
+    try:
+        responze = request.urlopen(req, timeout=3).read().decode("utf-8")
+        return loads(responze)['responseData']['translatedText']
+    except:
+        return str(s).strip()
 
 
 ##############################################################################
@@ -239,14 +280,13 @@ class TabWidget(QTabWidget):
         self.menu_help.addAction(" Help & Info ").setDisabled(True)
         self.menu_0.setMenu(self.menu_help)
         self.menu_1.setMenu(self.menu_tool)
-        self.menu_tool.addAction("AlTeRnAtE-CaSe", self.make_alternate_case)
         self.menu_tool.addAction("Explain Unicode", self.make_explain_unicode)
         self.menu_tool.addAction("Search Unicode", self.make_search_unicode)
         self.menu_tool.addSeparator()
         self.menu_tool.addAction(
             "Set UI Style",
-            lambda: open_new_tab(os.path.join(
-            get_or_set_config_folder("unicodemoticon"), "unicodemoticon.css")))
+            lambda: open_new_tab(os.path.join(get_or_set_config_folder(
+                "unicodemoticon"), "unicodemoticon.css")))
         self.menu_tool.addAction("AutoCenter Window", self.center)
         self.menu_tool.addAction("Move to Mouse position",
                                  self.move_to_mouse_position)
@@ -257,6 +297,9 @@ class TabWidget(QTabWidget):
         self.menu_help.addAction("About Python 3", about_python)
         self.menu_help.addAction("About Qt 5",
                                  lambda: QMessageBox.aboutQt(None))
+        self.menu_help.addAction(
+            "About Stealth Strings", lambda: open_new_tab(
+                "http://gist.github.com/juancarlospaco/cc23a3919df41076252a"))
         self.menu_help.addAction("About " + __doc__, about_self)
         self.menu_help.addSeparator()
         self.menu_help.addAction("View Source Code", view_code)
@@ -269,11 +312,103 @@ class TabWidget(QTabWidget):
         self.setCornerWidget(self.menu_0, 0)
         self.currentChanged.connect(self.make_tabs_previews)
         self.currentChanged.connect(self.make_tabs_fade)
+        layout = QVBoxLayout()
+        area, group = QScrollArea(), QGroupBox("Quick and Dirty Text Hacks !")
+        area.setWidgetResizable(True)
+        area.setHorizontalScrollBarPolicy(1)
+        area.setWidget(group)
+        group.setLayout(layout)
+        self.inputx, self.alt, self.b64 = QLineEdit(), QLineEdit(), QLineEdit()
+        self.b64unsafe, self.rot13 = QLineEdit(), QLineEdit()
+        self.urlenc, self.urlencp = QLineEdit(), QLineEdit()
+        self.snake, self.spine, self.st = QLineEdit(), QLineEdit(), QLineEdit()
+        self.asci, self.camel, self.swp = QLineEdit(), QLineEdit(), QLineEdit()
+        self.tran, self.fr, self.to = QLineEdit(), QComboBox(), QComboBox()
+        self.container, loca = QWidget(), str(getdefaultlocale()[0][:2])
+        self.fr.addItems(CODES)
+        self.to.addItems(CODES)
+        self.fr.setCurrentIndex(self.fr.findText(loca))
+        self.to.setCurrentIndex(self.fr.findText(loca))
+        layou = QHBoxLayout(self.container)
+        layou.addWidget(self.tran)
+        layou.addWidget(QLabel("<b>From"))
+        layou.addWidget(self.fr)
+        layou.addWidget(QLabel("<b>To"))
+        layou.addWidget(self.to)
+        self.inputx.setPlaceholderText(" Type something cool here . . .")
+        self.inputx.setFocus()
+        self.alt.setReadOnly(True)
+        self.b64.setReadOnly(True)
+        self.b64unsafe.setReadOnly(True)
+        self.rot13.setReadOnly(True)
+        self.urlenc.setReadOnly(True)
+        self.urlencp.setReadOnly(True)
+        self.snake.setReadOnly(True)
+        self.spine.setReadOnly(True)
+        self.asci.setReadOnly(True)
+        self.camel.setReadOnly(True)
+        self.swp.setReadOnly(True)
+        self.tran.setReadOnly(True)
+        self.st.setReadOnly(True)
+        self.runtools = QPushButton("Go !", self, clicked=self.runtool)
+        layout.addWidget(QLabel("<h1>Type or Paste text"))
+        layout.addWidget(self.inputx)
+        layout.addWidget(self.runtools)
+        layout.addWidget(QLabel("Translated Text"))
+        layout.addWidget(self.container)
+        layout.addWidget(QLabel("Alternate case"))
+        layout.addWidget(self.alt)
+        layout.addWidget(QLabel("Stealth String"))
+        layout.addWidget(self.st)
+        layout.addWidget(QLabel("Swap case"))
+        layout.addWidget(self.swp)
+        layout.addWidget(QLabel("Base 64 URL Safe, for the Web"))
+        layout.addWidget(self.b64)
+        layout.addWidget(QLabel("Base 64"))
+        layout.addWidget(self.b64unsafe)
+        layout.addWidget(QLabel("ROT-13"))
+        layout.addWidget(self.rot13)
+        layout.addWidget(QLabel("URL Encode Plus+"))
+        layout.addWidget(self.urlencp)
+        layout.addWidget(QLabel("URL Encode"))
+        layout.addWidget(self.urlenc)
+        layout.addWidget(QLabel("Camel Case"))
+        layout.addWidget(self.camel)
+        layout.addWidget(QLabel("Snake Case"))
+        layout.addWidget(self.snake)
+        layout.addWidget(QLabel("Spine Case"))
+        layout.addWidget(self.spine)
+        layout.addWidget(QLabel("Sanitized Clean out ASCII"))
+        layout.addWidget(self.asci)
+        self.addTab(area, "Tools")
         self.widgets_to_tabs(self.json_to_widgets(UNICODEMOTICONS))
         self.set_or_get_stylesheet()
         self.setMinimumSize(QDesktopWidget().screenGeometry().width() // 1.5,
                             QDesktopWidget().screenGeometry().height() // 1.5)
         self.showMaximized()
+
+    def runtool(self, *args):
+        """Run all text transformation tools."""
+        txt = str(self.inputx.text())
+        if not len(txt.strip()):
+            return
+        self.alt.setText(self.make_alternate_case(txt))
+        self.swp.setText(txt.swapcase())
+        self.b64.setText(urlsafe_b64encode(
+            bytes(txt, "utf-8")).decode("utf-8"))
+        self.b64unsafe.setText(b64encode(bytes(txt, "utf-8")).decode("utf-8"))
+        self.rot13.setText(codecs.encode(txt, "rot-13"))
+        self.urlencp.setText(parse.quote_plus(txt, encoding="utf-8"))
+        self.urlenc.setText(parse.quote(txt, encoding="utf-8"))
+        self.camel.setText(txt.title().replace(" ", ""))
+        self.snake.setText(txt.replace(" ", "_"))
+        self.spine.setText(txt.replace(" ", "-"))
+        self.asci.setText(re.sub(r"[^\x00-\x7F]+", "", txt))
+        self.st.setText(string_to_stealth(txt))
+        if self.fr.currentText() != self.to.currentText() and len(txt) < 999:
+            self.tran.setText(tinyslation(txt.strip().replace("\n", " "),
+                              str(self.to.currentText()),
+                              str(self.fr.currentText())))
 
     def make_search_unicode(self):
         """Make a Pop-Up Dialog to search Unicode Emoticons."""
@@ -310,18 +445,10 @@ class TabWidget(QTabWidget):
         log.debug((uni, explanation))
         return (uni, explanation)
 
-    def make_alternate_case(self) -> str:
+    def make_alternate_case(self, stringy: str) -> str:
         """Make alternating camelcase clipboard,if > 3 chars and not digits."""
-        clipboard_text = str(QApplication.clipboard().text()).strip()
-        funky_camelcase = "Need > 3 letters for Alternating CamelCase."
-        if len(clipboard_text) > 3 and not clipboard_text.isdigit():
-            funky_camelcase = "".join([_.lower() if i % 2 else _.upper()
-                                       for i, _ in enumerate(clipboard_text)])
-            log.debug(funky_camelcase)
-            QApplication.clipboard().setText(funky_camelcase)
-        else:
-            log.warning(funky_camelcase)
-        return funky_camelcase
+        return "".join([_.lower() if i % 2 else _.upper()
+                        for i, _ in enumerate(stringy)])
 
     def get_description(self, emote: str):
         description = ""
@@ -348,7 +475,7 @@ class TabWidget(QTabWidget):
 
     def make_preview(self, emoticon_text: str):
         """Make Emoticon Previews for the current Hovered one."""
-        #log.debug(emoticon_text)
+        log.debug(emoticon_text)
         if self.taimer.isActive():  # Be Race Condition Safe
             self.taimer.stop()
         self.preview.setText("  " + emoticon_text + "  ")
@@ -362,7 +489,8 @@ class TabWidget(QTabWidget):
         for titlemotes in tuple(sorted(loads(str(jotason)).items())):
             layout, tit = QGridLayout(), str(titlemotes[0]).strip()[:9].title()
             for index, emote in enumerate(tuple(set(sorted(titlemotes[1])))):
-                button = QPushButton(emote, self,
+                button = QPushButton(
+                    emote, self,
                     clicked=lambda: QApplication.clipboard().setText(emote),
                     released=lambda: self.hide(),
                     pressed=lambda: self.make_preview(emote))
@@ -500,7 +628,7 @@ def main():
     app.setApplicationName("unicodemoticon")
     app.setOrganizationName("unicodemoticon")
     app.setOrganizationDomain("unicodemoticon")
-    # app.instance().setQuitOnLastWindowClosed(False)  # no quit on dialog close
+    # app.instance().setQuitOnLastWindowClosed(False)  # no quit on dialog quit
     if qdarkstyle:
             app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())
     icon = QIcon(app.style().standardPixmap(QStyle.SP_FileIcon))
