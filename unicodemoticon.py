@@ -630,13 +630,6 @@ class TabWidget(QTabWidget):
             self.setWindowIcon(QIcon.fromTheme("{}".format(icon)))
         return icon
 
-    def closeEvent(self, event):
-        """Ask to Quit."""
-        the_conditional_is_true = QMessageBox.question(
-            self, __doc__.title(), 'Quit ?.', QMessageBox.Yes | QMessageBox.No,
-            QMessageBox.No) == QMessageBox.Yes
-        event.accept() if the_conditional_is_true else event.ignore()
-
     def make_tabs_fade(self, index):
         """Make tabs fading transitions."""
         self.fader.fade(
