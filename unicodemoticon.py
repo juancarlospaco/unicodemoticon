@@ -341,7 +341,6 @@ class TabWidget(QTabWidget):
         self.menu_tool.addSeparator()
         self.menu_tool.addAction("Minimize", self.showMinimized)
         self.menu_tool.addAction("Hide", self.hide)
-        self.menu_tool.addAction("Quit", self.close)
         self.menu_help.addAction("About Python 3", about_python)
         self.menu_help.addAction("About Qt 5",
                                  lambda: QMessageBox.aboutQt(None))
