@@ -2,6 +2,17 @@
 # -*- coding: utf-8 -*-
 
 
+# metadata
+"""UnicodEmoticons."""
+__version__ = '2.0.0'
+__license__ = ' GPLv3+ LGPLv3+ '
+__author__ = ' Juan Carlos '
+__email__ = ' juancarlospaco@gmail.com '
+__url__ = 'https://github.com/juancarlospaco/unicodemoticon'
+__source__ = ('https://raw.githubusercontent.com/juancarlospaco/'
+              'unicodemoticon/master/unicodemoticon.py')
+
+
 import base64
 import codecs
 import os
@@ -32,17 +43,6 @@ try:
     import qdarkstyle  # https://github.com/ColinDuquesnoy/QDarkStyleSheet
 except ImportError:    # sudo pip3 install qdarkstyle
     qdarkstyle = None  # 100% optional
-
-
-# metadata
-"""UnicodEmoticons."""
-__version__ = '2.0.0'
-__license__ = ' GPLv3+ LGPLv3+ '
-__author__ = ' Juan Carlos '
-__email__ = ' juancarlospaco@gmail.com '
-__url__ = 'https://github.com/juancarlospaco/unicodemoticon'
-__source__ = ('https://raw.githubusercontent.com/juancarlospaco/'
-              'unicodemoticon/master/unicodemoticon.py')
 
 
 AUTOSTART_DESKTOP_FILE = """[Desktop Entry]
