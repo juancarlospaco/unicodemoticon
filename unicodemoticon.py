@@ -10,7 +10,7 @@ __author__ = ' Juan Carlos '
 __email__ = ' juancarlospaco@gmail.com '
 __url__ = 'https://github.com/juancarlospaco/unicodemoticon'
 __source__ = ('https://raw.githubusercontent.com/juancarlospaco/'
-              'unicodemoticon/master/unicodemoticon.py')
+                  'unicodemoticon/master/unicodemoticon.py')
 
 
 import base64
@@ -24,6 +24,7 @@ from base64 import b64encode, urlsafe_b64encode
 from json import loads
 from locale import getdefaultlocale
 from urllib import parse, request
+from html import entities
 
 from PyQt5.QtCore import QEvent, Qt, QTimeLine, QTimer
 
@@ -70,12 +71,27 @@ ti tk tl tn to tr ts tt tw ty ug uk ur uz ve vi vo wa wo xh yi yo za zh zh zu
 """.replace("\n", " ").split())
 
 
-UNICODEMOTICONS = """{
+STD_ICON_NAMES = tuple(sorted(set("""emblem-default emblem-documents start-here
+emblem-downloads emblem-favorite emblem-important emblem-mail emblem-photos
+emblem-readonly emblem-shared emblem-symbolic-link emblem-synchronized
+emblem-system emblem-unreadable face-angel face-angry face-crying face-devilish
+face-embarrassed face-cool face-kiss face-laugh face-monkey face-plain
+face-raspberry face-sad face-sick face-smile face-smile-big face-smirk
+face-surprise face-tired face-uncertain face-wink face-worried go-home
+insert-image insert-link insert-object insert-text list-add edit-copy
+edit-find-replace edit-paste tools-check-spelling accessories-character-map
+accessories-dictionary accessories-text-editor preferences-desktop-font
+preferences-desktop-keyboard applications-other applications-utilities
+preferences-other user-bookmarks application-x-executable image-missing
+""".strip().lower().replace("\n", " ").split(" "))))  # use your themes icons
+
+
+UNICODEMOTICONS = loads(str("""{
     "faces":
         "😀😬😁😂😃😄😅😆😇😉😊🙂☺😋😌😍😘😗😙😚😜😝😛😎😏😶😐😑😒😳😞😟😠😡😔😕🙁☹😣😖😫😩😤😮😱😨😰😯😦😧😢😥😪😓😭😵😲😷😴💤💩😈👿👹👺💀👻👽😺😸😹😻😼😽🙀😿😾☻👀🙌👏👋👍👎👊✊✌👌✋👐💪🙏☝👆👇👈👉🖕🖐🤘🖖✍💅👄👅👂👃👁👀👤👥🗣👶👦👧👨👩👱👴👵👲👳👮👷💂🕵🎅👼👸👰🚶🏃💃👯👫👬👭🙇💁🙅🙆🙋🙎🙍💇💆💑👩‍❤️‍👩👨‍❤️‍👨💏👩‍❤️‍💋‍👩👨‍❤️‍💋‍👨👪👨‍👩‍👧👨‍👩‍👧‍👦👨‍👩‍👦‍👦👨‍👩‍👧‍👧👩‍👩‍👦👩‍👩‍👧👩‍👩‍👧‍👦👩‍👩‍👦‍👦👩‍👩‍👧‍👧👨‍👨‍👦👨‍👨‍👧👨‍👨‍👧‍👦👨‍👨‍👦‍👦👨‍👨‍👧‍👧👚👕👖👔👗👙👘💄💋👣👠👡👢👞👟👒🎩🎓👑⛑🎒👝👛👜💼👓🕶💍🌂",
 
     "symbols":
-        "☦☧☨☩☪☫☬☭☯࿊࿕☥✟✠✡⛤‼⁉…❓✔✗☑☒➖➗❌™®©Ω℮₤₧❎✅➿♿☠☯☮☘💲💯🚭🚮💤㋡🔞🚼🛀🚬🚭🌀⇉⇇⇈⇊➺⇦⇨⇧⇩↔↕↖↗↘↙↯↰↱↲↳↴↵↶↷↺↻➭🔄⏪⏩⏫⏬①②③④⑤⑥⑦⑧⑨⑩➊➋➌➍➎➏➐➑➒➓½¾∞⒈⒉⒊⒋⒌⒍⒎⒏⒐⒑ⓐⓑⓒⓓⓔⓕⓖⓗⓘⓙⓚⓛⓜⓝⓞⓟⓠⓡⓢⓣⓤⓥⓦⓨⓩ■●▲▼▓▒░◑◐〇◈▣▨▧▩◎◊□◕☉♈♉♊♋♌♍♎♏♐♑♒♓♔♕♖♗♘♙♚♛♜♝♞♟♲♻♳♴♵♶♷♸♹♺♼♽♾",
+        "𝒜𝒞𝒟𝒢𝒥𝒦𝒩𝒪𝒫𝒬𝒮𝒯𝒰𝒱𝒲𝒳𝒴𝒵𝔅𝔇𝔉𝔐ℵαβγδελμψ^@⋙⋘™✔©®€℅№∗√∞≋≡≢⊕⊖⊗⊛☆★⏧⌖☎♀♂✓✗⦿⧉⩸*¢£¥×¤ж—†•π℗Ω≬⊹✠⩐∰§´»«@θ¯⋄∇♥✗☦☧☨☩☪☫☬☭☯࿊࿕☥✟✠✡⛤‼⁉…❓✔✗☑☒➖➗❌™®©Ω℮₤₧❎✅➿♿☠☯☮☘💲💯🚭🚮💤㋡🔞🚼🛀🚬🚭🌀⇉⇇⇈⇊➺⇦⇨⇧⇩↔↕↖↗↘↙↯↰↱↲↳↴↵↶↷↺↻➭🔄⏪⏩⏫⏬①②③④⑤⑥⑦⑧⑨⑩➊➋➌➍➎➏➐➑➒➓½¾∞⒈⒉⒊⒋⒌⒍⒎⒏⒐⒑ⓐⓑⓒⓓⓔⓕⓖⓗⓘⓙⓚⓛⓜⓝⓞⓟⓠⓡⓢⓣⓤⓥⓦⓨⓩ■●▲▼▓▒░◑◐〇◈▣▨▧▩◎◊□◕☉♈♉♊♋♌♍♎♏♐♑♒♓♔♕♖♗♘♙♚♛♜♝♞♟♲♻♳♴♵♶♷♸♹♺♼♽♾",
 
     "feelings":
         "❤💛💚💙💜💔❣💕💞💓💗💖💘💝💟☮🆔⚛📴📳🆚🉑🆑🅾🆘⛔🚫❌⭕💢♨🚷🚯🚳🚱🔞📵❗❕❓❔‼⁉💯🔅🔆⚜⚠🚸🔰💠🌀➿🌐Ⓜ🏧🚹🚺🚼🚮🆗🆙🆒🆕🆓🔚🔙🔛🔝🔜☑🔘⚪⚫🔴🔵🔸🔹🔶🔷🔺▪▫⬛⬜🔻◼◻🃏💭🗯💬♥♡❤❦☙❣💌💘💞💖💓💗💟💝💑🌹💋💔💕✵✪✬✫✻✴☆✨✶✩★✾❄❀✿🃏⚝⚹⚜🌟🌠💫💥♀♂⚢⚣⚤⚥⚧☿👭👬👫",
@@ -91,7 +107,7 @@ UNICODEMOTICONS = """{
 
     "tech":
         "⌚📱📲⌨🖥🖨🖱🖲🕹🗜💽💾💿📀📼📷📸📹🎥📽🎞📞☎📟📠📺📻🎙🎚🎛⏱⏲⏰🕰⏳⌛📡🔋🔌💡🔦🕯🗑🛢💸💵💴💶💷💰💳💎⚖🔧🔨⚒🛠⛏🔩⚙⛓🔫💣🔪🗡⚔🛡🚬☠⚰⚱🏺🔮📿💈⚗🔭🔬🕳💊💉🌡🏷🔖🚽🚿🛁🔑🗝🛋🛌🛏🚪🛎🖼🗺⛱🗿🛍🎈🎏🎀🎁🎊🎉🎎🎐🎌🏮✉📩📨📧💌📮📪📫📬📭📦📯📥📤📜📃📑📊📈📉📄📅📆🗓📇🗃🗳🗄📋🗒📁📂🗂🗞📰📓📕📗📘📙📔📒📚📖🔗📎🖇✂📐📏📌📍🚩🏳🏴🔐🔒🔓🔏🖊🖋✒📝✏🖍🖌🔍🔎📛🔊🔉🔇🔔🔕☢☣☤✇✆⛵🚤🚣⚓🚀✈💺🚁🚂🚊🚆🚈🚇🚋🚎🚌🚍🚙🚕🚖🚛🚚🚓🚔🚒🚑🚐🚲🚡🚟🚜"
-}"""
+}"""))
 
 
 def string_to_stealth(stringy: str, rot13: bool=False) -> str:
@@ -285,6 +301,7 @@ class TabWidget(QTabWidget):
             lambda: open_new_tab(os.path.join(get_or_set_config_folder(
                 "unicodemoticon"), "unicodemoticon.css")))
         self.menu_tool.addAction("AutoCenter Window", self.center)
+        self.menu_tool.addAction("Set Icon", self.set_icon)
         self.menu_tool.addAction("Move to Mouse position",
                                  self.move_to_mouse_position)
         self.menu_tool.addSeparator()
@@ -365,6 +382,35 @@ class TabWidget(QTabWidget):
         layout.addWidget(QLabel("Sanitized Clean out ASCII"))
         layout.addWidget(self.asci)
         self.addTab(area, "Tools")
+        area2, group2 = QScrollArea(), QGroupBox("HTML Entities !")
+        area2.setWidgetResizable(True)
+        area2.setHorizontalScrollBarPolicy(1)
+        area2.setWidget(group2)
+        added_html_entities, row, layout2, index = [], 0, QGridLayout(), 0
+        for html_char in tuple(sorted(entities.html5.items())):
+            if html_char[1] in "".join(UNICODEMOTICONS.values()):
+                added_html_entities.append(
+                    html_char[0].lower().replace(";", ""))
+                if not html_char[0].lower() in added_html_entities:
+                    button = QPushButton(html_char[1], self)
+                    button.released.connect(self.hide)
+                    button.pressed.connect(lambda ch=html_char:
+                                           self.make_preview(str(ch)))
+                    button.clicked.connect(
+                        lambda _, ch=html_char[0]:
+                            QApplication.clipboard().setText(
+                                "&{html_entity}".format(html_entity=ch)))
+                    button.setToolTip("<center><h1>{0}<br>{1}".format(
+                        html_char[1], self.get_description(html_char[1])))
+                    button.setFlat(True)
+                    font = button.font()
+                    font.setPixelSize(50)
+                    button.setFont(font)
+                    index = index + 1 # cant use enumerate()
+                    row = row + 1 if not index % 8 else row
+                    layout2.addWidget(button, row, index % 8)
+        group2.setLayout(layout2)
+        self.addTab(area2, "HTML")
         self.widgets_to_tabs(self.json_to_widgets(UNICODEMOTICONS))
         self.set_or_get_stylesheet()
         self.make_trayicon()
@@ -487,14 +533,14 @@ class TabWidget(QTabWidget):
     def json_to_widgets(self, jotason: str):
         """Take a json string object return QWidgets."""
         dict_of_widgets, row = {}, 0
-        for titlemotes in tuple(sorted(loads(str(jotason)).items())):
+        for titlemotes in tuple(sorted(jotason.items())):
             layout, tit = QGridLayout(), str(titlemotes[0]).strip()[:9].title()
             for index, emote in enumerate(tuple(set(sorted(titlemotes[1])))):
-                button = QPushButton(
-                    emote, self,
-                    clicked=lambda: QApplication.clipboard().setText(emote),
-                    released=lambda: self.hide(),
-                    pressed=lambda: self.make_preview(emote))
+                button = QPushButton(emote, self)
+                button.clicked.connect(lambda _, c=emote:
+                                       QApplication.clipboard().setText(c))
+                button.released.connect(self.hide)
+                button.pressed.connect(lambda c=emote: self.make_preview(c))
                 button.setToolTip("<center><h1>{0}<br>{1}".format(
                     emote, self.get_description(emote)))
                 button.setFlat(True)
@@ -536,6 +582,17 @@ class TabWidget(QTabWidget):
         window_geometry = self.frameGeometry()
         window_geometry.moveCenter(QApplication.desktop().cursor().pos())
         return bool(not self.move(window_geometry.topLeft()))
+
+    def set_icon(self, icon: (None, str)=None) -> str:
+        """Return a string with opendesktop standard icon name for Qt."""
+        if not icon:
+            icon = QInputDialog.getItem(None, __doc__, "<b>Choose Icon name?:",
+                                        STD_ICON_NAMES, 0, False)[0]
+        if icon:
+            log.debug("Setting Tray and Window Icon name to:{}.".format(icon))
+            self.tray.setIcon(QIcon.fromTheme("{}".format(icon)))
+            self.setWindowIcon(QIcon.fromTheme("{}".format(icon)))
+        return icon
 
     def closeEvent(self, event):
         """Ask to Quit."""
@@ -635,7 +692,8 @@ def main():
     icon = QIcon(app.style().standardPixmap(QStyle.SP_FileIcon))
     app.setWindowIcon(icon)
     win = TabWidget()
-    # win.show()
+    win.show()
+    win.hide()
     make_post_execution_message()
     sys.exit(app.exec())
 
