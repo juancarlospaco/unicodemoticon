@@ -10,7 +10,7 @@ __author__ = ' Juan Carlos '
 __email__ = ' juancarlospaco@gmail.com '
 __url__ = 'https://github.com/juancarlospaco/unicodemoticon'
 __source__ = ('https://raw.githubusercontent.com/juancarlospaco/'
-                  'unicodemoticon/master/unicodemoticon.py')
+              'unicodemoticon/master/unicodemoticon.py')
 
 
 import base64
@@ -24,18 +24,17 @@ from base64 import b64encode, urlsafe_b64encode
 from json import loads
 from locale import getdefaultlocale
 from urllib import parse, request
+
 from html import entities
 
 from PyQt5.QtCore import QEvent, Qt, QTimeLine, QTimer
-
 from PyQt5.QtGui import QCursor, QIcon, QPainter
-
 from PyQt5.QtWidgets import (QApplication, QComboBox, QDesktopWidget, QDialog,
                              QGridLayout, QGroupBox, QHBoxLayout, QInputDialog,
                              QLabel, QLineEdit, QMainWindow, QMenu,
                              QMessageBox, QPushButton, QScrollArea, QStyle,
-                             QTabBar, QTabWidget, QToolButton, QVBoxLayout,
-                             QWidget, QSystemTrayIcon)
+                             QSystemTrayIcon, QTabBar, QTabWidget, QToolButton,
+                             QVBoxLayout, QWidget)
 
 import binascii
 import unicodedata
@@ -132,7 +131,7 @@ UNICODEMOTICONS = {
          "(づ ￣ ³￣)づ ⓈⓂⓄⓄⓉⒽ", "❚█══█❚ ▐━━━━━▌",
          "/( ͡° ͜ʖ ͡° )つ──☆*:・ﾟ", "(ง⌐□ل͜□)ง", " ─=≡Σ((( つ◕ل͜◕)つ",
          " ┬──┬◡ﾉ(° -°ﾉ)", "(•̀ᴗ•́)و ̑̑", "（。Y。）ԅ(≖‿≖ԅ)", "(っ˘з(˘⌣˘ )",
-         "(ᗒᗣᗕ)՞", "¯\_( ʘ‿ʘ)人(ʘ‿ʘ )_/¯", "ฅ(⌯͒• ɪ •⌯͒)ฅ❣","ฅ(≚ᄌ≚) ",
+         "(ᗒᗣᗕ)՞", "¯\_( ʘ‿ʘ)人(ʘ‿ʘ )_/¯", "ฅ(⌯͒• ɪ •⌯͒)ฅ❣", "ฅ(≚ᄌ≚) ",
          "o(≧∇≦o)", "ฅ ̳͒•ˑ̫• ̳͒ฅ", "(=｀ェ´=)", "₍˄ุ.͡˳̫.˄ุ₎ฅ˒˒", "༼༭ຶཬ༤ຶ༽", "૮(ㅍ◞◟ㅍ)ა",
          "(〓￣(∵エ∵)￣〓)", "૮(꒦ິཅ꒦ິ)ა", "✲ﾟ｡✧٩(･ิᴗ･ิ๑)۶✲ﾟ｡✧", "٩(๑ơలơ)۶♡",
          "- =͟͟͞͞ ( ꒪౪꒪)ฅ✧", "୧( ॑ധ ॑)୨", "(Ɔ ˘⌣˘)♥(˘⌣˘ C)", "(ʃƪ ˘ ³˘)",
@@ -360,6 +359,27 @@ class TabWidget(QTabWidget):
         self.currentChanged.connect(self.make_tabs_previews)
         self.currentChanged.connect(self.make_tabs_fade)
         self.tray, layout = QSystemTrayIcon(self), QVBoxLayout()
+        self.menu = QMenu(__doc__)
+        self.menu.addAction("    Emoticons").setDisabled(True)
+        self.menu.setIcon(self.windowIcon())
+        self.menu.addSeparator()
+        self.menu.setProperty("emoji_menu", True)
+        list_of_labels = sorted(UNICODEMOTICONS.keys())  # menus
+        menus = [self.menu.addMenu(_.title()) for _ in list_of_labels]
+        self.menu.addSeparator()
+        log.debug("Building Emoticons SubMenus.")
+        for item, label in zip(menus, list_of_labels):
+            item.setStyleSheet("padding:0;margin:0;border:0;menu-scrollable:1")
+            font = item.font()
+            font.setPixelSize(20)
+            item.setFont(font)
+            self.build_submenu(UNICODEMOTICONS[label.lower()], item)
+        self.menu.addSeparator()
+        self.menu.addAction("Show", self.showMaximized)
+        self.menu.addAction("Minimize", self.showMinimized)
+        self.menu.addAction("AutoCenter Window", self.center)
+        self.menu.addAction("To mouse position", self.move_to_mouse_position)
+        self.tray.setContextMenu(self.menu)
         area, group = QScrollArea(), QGroupBox("Quick and Dirty Text Hacks !")
         area.setWidgetResizable(True)
         area.setHorizontalScrollBarPolicy(1)
@@ -420,7 +440,8 @@ class TabWidget(QTabWidget):
         area2.setHorizontalScrollBarPolicy(1)
         area2.setWidget(group2)
         added_html_entities, row, layout2, index = [], 0, QGridLayout(), 0
-        l = "".join([_ for _ in UNICODEMOTICONS.values() if isinstance(_, str)])
+        l = "".join([_ for _ in UNICODEMOTICONS.values()
+                     if isinstance(_, str)])
         for html_char in tuple(sorted(entities.html5.items())):
             if html_char[1] in l:
                 added_html_entities.append(
@@ -451,6 +472,19 @@ class TabWidget(QTabWidget):
         self.setMinimumSize(QDesktopWidget().screenGeometry().width() // 1.5,
                             QDesktopWidget().screenGeometry().height() // 1.5)
         # self.showMaximized()
+
+    def build_submenu(self, char_list: (str, tuple), submenu: QMenu) -> QMenu:
+        """Take a list of characters and a submenu and build actions on it."""
+        submenu.setProperty("emoji_menu", True)
+        submenu.setWindowOpacity(0.9)
+        submenu.setToolTipsVisible(True)
+        for _char in sorted(char_list):
+            action = submenu.addAction(_char.strip())
+            action.setToolTip(self.get_description(_char))
+            action.hovered.connect(lambda char=_char: self.make_preview(char))
+            action.triggered.connect(
+                lambda _, char=_char: QApplication.clipboard().setText(char))
+        return submenu
 
     def make_trayicon(self):
         """Make a Tray Icon."""
