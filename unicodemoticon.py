@@ -139,7 +139,10 @@ UNICODEMOTICONS = {
          "( • Y • )ԅ(‾⌣‾ԅ)", "૮(⋆❛ہ❛⋆)ა", "/(　-̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥᷄◞ω◟-̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥̥᷅ )", "૮(꒦ິཅ꒦ິ)ა",
          "\(¬ω¬)/", "¯\_(҂⌣̀_⌣́)_/¯", "ლ(´﹏`ლ)", "\( ༎ຶŎ༎ຶ )/",
          "ღ╰⋃╯ღ•̥̑ .̮ •̥̑)", "⊂(^(工)^)⊃", "|'''\ (Ⓘ.Ⓘ) /'''|",
-         "ヽ(´ー`)人(´∇｀)人(`Д´)ノ", "ʕʘ̅͜ʘ̅ʔ", "¯\_(❤‿❤)_/¯")
+         "ヽ(´ー`)人(´∇｀)人(`Д´)ノ", "ʕʘ̅͜ʘ̅ʔ", "¯\_(❤‿❤)_/¯", "┣┓웃┏♨❤♨┑유┏┥",
+         "|ʘ‿ʘ)╯", "ƪ(`▿▿´ ƪ)", "\(○’ω’○)/", "◎ヽ(^･ω･^=)~", "\(◦'⌣'◦)/",
+         "(⌣́_⌣̀)\('́⌣'̀ )", "(ఠ_ఠ)", "\(☉_☉)/", "¯\_(⌣̯̀⌣́)_/¯",
+         "ƪ(˘⌣˘)┐ ƪ(˘⌣˘)ʃ ┌(˘⌣˘)ʃ", "〜(￣▽￣〜)(〜￣▽￣)〜")
 }
 
 
@@ -328,6 +331,8 @@ class TabWidget(QTabWidget):
         self.menu_1.setMenu(self.menu_tool)
         self.menu_tool.addAction("Explain Unicode", self.make_explain_unicode)
         self.menu_tool.addAction("Search Unicode", self.make_search_unicode)
+        self.menu_tool.addAction("Alternate Case Clipboard",
+                                 self.alternate_clipboard)
         self.menu_tool.addSeparator()
         self.menu_tool.addAction(
             "Set UI Style",
@@ -374,6 +379,9 @@ class TabWidget(QTabWidget):
             font.setPixelSize(20)
             item.setFont(font)
             self.build_submenu(UNICODEMOTICONS[label.lower()], item)
+        self.menu.addSeparator()
+        self.menu.addAction("Alternate Case Clipboard",
+                            self.alternate_clipboard)
         self.menu.addSeparator()
         self.menu.addAction("Show", self.showMaximized)
         self.menu.addAction("Minimize", self.showMinimized)
@@ -561,8 +569,13 @@ class TabWidget(QTabWidget):
         log.debug((uni, explanation))
         return (uni, explanation)
 
+    def alternate_clipboard(self) -> str:
+        """Make alternating camelcase clipboard."""
+        return QApplication.clipboard().setText(
+            self.make_alternate_case(str(QApplication.clipboard().text())))
+
     def make_alternate_case(self, stringy: str) -> str:
-        """Make alternating camelcase clipboard,if > 3 chars and not digits."""
+        """Make alternating camelcase string."""
         return "".join([_.lower() if i % 2 else _.upper()
                         for i, _ in enumerate(stringy)])
 
