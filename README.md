@@ -18,6 +18,8 @@
 
 
  https://pypi.python.org/pypi/unicodemoticon
+ https://aur.archlinux.org/cgit/aur.git/tree/PKGBUILD?h=unicodemoticon
+ 
  
  - **Standalone**, uses ONLY Standard Libraries, built-in on Python 3.
  - **Single-File**, everything is just 1 file, with PEP-8, Lint and other Python Best Practices, very readable.
