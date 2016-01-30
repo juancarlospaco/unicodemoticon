@@ -37,7 +37,8 @@
  # Try it !:
  *(Without installing anything)*
  ```
- wget -O - https://raw.githubusercontent.com/juancarlospaco/unicodemoticon/master/unicodemoticon.py | python3
+ wget -O https://github.com/juancarlospaco/unicodemoticon/releases/download/2.1.0/unicodemoticon-2.1.0.pyz
+ python3 unicodemoticon-2.1.0.pyz
  ```
 
  # Install permanently on the system:
@@ -52,19 +53,12 @@
 
  **PIP from Git:**
  ```
- sudo pip3 install git+https://raw.githubusercontent.com/juancarlospaco/unicodemoticon/master/unicodemoticon.py
- ```
-
- **WGET:**
- ```
- sudo wget -O /usr/bin/unicodemoticon.py https://raw.githubusercontent.com/juancarlospaco/unicodemoticon/master/unicodemoticon.py
- sudo chmod +x /usr/bin/unicodemoticon.py
- unicodemoticon.py
+ sudo pip3 install git+git://github.com/juancarlospaco/unicodemoticon.git
  ```
 
  **MANUALLY:**
 
- - Save [this file](https://raw.githubusercontent.com/juancarlospaco/unicodemoticon/master/unicodemoticon.py) and run it with Python3.
+ - Save [this file](https://github.com/juancarlospaco/unicodemoticon/releases/download/2.1.0/unicodemoticon-2.1.0.pyz) and run it with Python3. (Your OS probably already uses python3 to open it when you click on it)
 
 
  # Why?:
