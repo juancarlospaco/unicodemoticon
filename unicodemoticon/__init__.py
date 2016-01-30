@@ -5,7 +5,7 @@
 # metadata
 """UnicodEmoticons."""
 
-__version__ = '2.0.0'
+__version__ = '2.1.0'
 __license__ = ' GPLv3+ LGPLv3+ '
 __author__ = ' Juan Carlos '
 __email__ = ' juancarlospaco@gmail.com '
