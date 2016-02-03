@@ -140,6 +140,7 @@ setup(
     dependency_links=dependency_links_list,
 
     packages=["unicodemoticon"],
+    package_data={"unicodemoticon": ['unicodemoticon.desktop']},
 
     entry_points={
         "console_scripts": ['unicodemoticon=unicodemoticon.__main__:main'],
