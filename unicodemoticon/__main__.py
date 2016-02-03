@@ -11,9 +11,8 @@ except ImportError:    # sudo pip3 install qdarkstyle
 # if this script is executed directly: make relative imports work
 if not __package__:
     from pathlib import Path
-    if Path(__file__).parent.suffix != '.pyz':
-        parent_dir = Path(__file__).absolute().parent
-        sys.path.insert(0, str(parent_dir))
+    parent_dir = Path(__file__).absolute().parent
+    sys.path.insert(0, str(parent_dir))
     import unicodemoticon  # noqa
     __package__ = str("unicodemoticon")
 
@@ -45,5 +44,6 @@ def main(args=sys.argv):
     make_post_execution_message()
     sys.exit(app.exec())
 
-if __name__ == "__main__":
+# may be unicodemoticon.__main__
+if __name__.endswith("__main__"):
     main()

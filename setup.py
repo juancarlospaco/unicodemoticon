@@ -16,9 +16,8 @@
 # python3 setup.py bdist_wininst --verbose
 #
 #
-# To generate PKGBUILD ArchLinux from Python Package (from PyPI only):
-# sudo pip3 install git+https://github.com/bluepeppers/pip2arch.git
-# pip2arch.py PackageNameHere
+# To generate a zipapp:
+# python3 setup.py zipapp
 #
 #
 # To Upload to PyPI by executing:
@@ -33,7 +32,7 @@ import logging as log
 import os
 import re
 
-from setuptools import setup
+from setuptools import setup, Command
 
 from unicodemoticon import (__author__, __url__, __email__, __license__,
                             __version__)
@@ -92,6 +91,27 @@ log.info("Starting build of setuptools.setup().")
 ##############################################################################
 # EDIT HERE
 
+class ZipApp(Command):
+    description = "creates a zipapp"
+    user_options = []
+
+    def initialize_options(self): pass
+
+    def finalize_options(self): pass
+
+    def run(self):
+        import shutil
+        import zipapp
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+
+        with TemporaryDirectory() as tmpdir:
+            tmpdir = Path(tmpdir)
+            shutil.copytree('unicodemoticon', str(tmpdir / 'unicodemoticon'))
+            with (tmpdir / '__main__.py').open('w') as entry:
+                entry.write("import runpy\nrunpy.run_module('unicodemoticon')")
+            zipapp.create_archive(tmpdir, 'unicodemoticon.pyz', '/usr/bin/env python3')
+
 
 setup(
 
@@ -118,11 +138,15 @@ setup(
 
     install_requires=install_requires_list,
     dependency_links=dependency_links_list,
-    
+
     packages=["unicodemoticon"],
 
     entry_points={
         "console_scripts": ['unicodemoticon=unicodemoticon.__main__:main'],
+    },
+
+    cmdclass={
+        "zipapp": ZipApp,
     },
 
     keywords=['Unicode', 'Emoticon', 'Smilies', 'Qt', 'HTML5', 'HTML Entity'],
