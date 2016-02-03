@@ -11,17 +11,16 @@ except ImportError:    # sudo pip3 install qdarkstyle
 # if this script is executed directly: make relative imports work
 if not __package__:
     from pathlib import Path
-    parent_dir = Path(__file__).absolute().parent
-    sys.path.insert(0, str(parent_dir))
+    if Path(__file__).parent.suffix != '.pyz':
+        parent_dir = Path(__file__).absolute().parent
+        sys.path.insert(0, str(parent_dir))
     import unicodemoticon  # noqa
     __package__ = str("unicodemoticon")
 
 from . import TabWidget
-from .data import AUTOSTART_DESKTOP_FILE
 from .utils import (make_logger, make_root_check_and_encoding_debug,
                     make_post_execution_message,
-                    set_process_name_and_cpu_priority, make_config,
-                    add_desktop_files)
+                    set_process_name_and_cpu_priority, make_config)
 
 
 def main(args=sys.argv):

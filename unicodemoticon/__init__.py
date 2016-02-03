@@ -38,10 +38,11 @@ from PyQt5.QtWidgets import (QApplication, QComboBox, QDesktopWidget, QDialog,
                              QSystemTrayIcon, QTabBar, QTabWidget, QToolButton,
                              QVBoxLayout, QWidget)
 
-from .data import CODES, STD_ICON_NAMES, UNICODEMOTICONS
+from .data import CODES, STD_ICON_NAMES, UNICODEMOTICONS, AUTOSTART_DESKTOP_FILE
 from .stealth_strings import string_to_stealth
 from .utils import (about_python, about_self, view_code, report_bug,
-                    check_for_updates, get_or_set_config_folder)
+                    check_for_updates, get_or_set_config_folder,
+                    add_desktop_files)
 
 
 def tinyslation(s: str, to: str=getdefaultlocale()[0][:2], fm="en") -> str:
@@ -484,7 +485,7 @@ class TabWidget(QTabWidget):
         self.preview.show()
         self.taimer.start(1000)  # how many time display the previews
 
-    def json_to_widgets(self, jotason: str):
+    def json_to_widgets(self, jotason: dict):
         """Take a json string object return QWidgets."""
         dict_of_widgets, row = {}, 0
         for titlemotes in tuple(sorted(jotason.items())):
