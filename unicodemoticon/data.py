@@ -1,15 +1,6 @@
-AUTOSTART_DESKTOP_FILE = """[Desktop Entry]
-Comment=Trayicon with Unicode Emoticons.
-Exec=chrt --idle 0 unicodemoticon.py
-GenericName=Trayicon with Unicode Emoticons.
-Icon=system-run
-Name=UnicodEmoticon
-StartupNotify=false
-Terminal=false
-Type=Application
-Categories=Utility
-X-DBUS-ServiceName=unicodemoticon
-X-KDE-StartupNotify=false"""
+import pkgutil
+
+AUTOSTART_DESKTOP_FILE = pkgutil.get_data('unicodemoticon', 'unicodemoticon.desktop')
 
 
 CODES = tuple("""aa ab ae af ak am an ar as av ay az ba be bg bh bi bm bn bo

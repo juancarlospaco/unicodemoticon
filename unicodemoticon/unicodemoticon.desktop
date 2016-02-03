@@ -1,0 +1,12 @@
+[Desktop Entry]
+Comment=Trayicon with Unicode Emoticons.
+Exec=chrt --idle 0 unicodemoticon.py
+GenericName=Trayicon with Unicode Emoticons.
+Icon=system-run
+Name=UnicodEmoticon
+StartupNotify=false
+Terminal=false
+Type=Application
+Categories=Utility
+X-DBUS-ServiceName=unicodemoticon
+X-KDE-StartupNotify=false
