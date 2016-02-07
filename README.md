@@ -47,7 +47,7 @@
  ```
  sudo apt-get install python3-pyqt5 ttf-ancient-fonts sni-qt
  #  sudo yum install python3-pyqt5 ttf-ancient-fonts
- #  sudo pacman -S python-pip python-pyqt5 ttf-symbola
+ #  sudo pacman -Syu python-pip python-pyqt5 ttf-ancient-fonts
  sudo pip3 install unicodemoticon
  ```
 
