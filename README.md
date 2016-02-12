@@ -77,8 +77,8 @@
  - **ttf-ancient-fonts** *(Linux Package with Fonts that support Emoji)*
  - noto-fonts-emoji: Another font with emoji *(Linux Package with Fonts that support Emoji)*
  - ttf-symbola: Font with emoji *(Linux Package with Fonts that support Emoji)*
-	- noto-fonts: Fonts designed to cover a wide unicode range *(Linux Package with Fonts that support Emoji)*
-	- ttf-freefont: Another font covering a wide unicode range *(Linux Package with Fonts that support Emoji)*
+ - noto-fonts: Fonts designed to cover a wide unicode range *(Linux Package with Fonts that support Emoji)*
+ - ttf-freefont: Another font covering a wide unicode range *(Linux Package with Fonts that support Emoji)*
  - [QDarkStyleSheet *(CSS base for Qt5)*](https://github.com/ColinDuquesnoy/QDarkStyleSheet#qdarkstylesheet) `sudo pip3 install qdarkstyle`
 
 
