@@ -82,39 +82,6 @@ def make_logger(name=str(os.getpid())):
     return log
 
 
-def typecheck(f):
-    """Decorator for Python3 annotations to type-check inputs and outputs."""
-    def __check_annotations(tipe):
-        _type, is_ok = None, isinstance(tipe, (type, tuple, type(None)))
-        if is_ok:  # Annotations can be Type or Tuple or None
-            _type = tipe if isinstance(tipe, tuple) else tuple((tipe, ))
-            if None in _type:  # if None on tuple replace with type(None)
-                _type = tuple([_ if _ is not None else type(_) for _ in _type])
-        return _type, is_ok
-
-    @functools.wraps(f)  # wrap a function or method to Type Check it.
-    def decorated(*args, **kwargs):
-        msg = "Type check error: {0} must be {1} but is {2} on function {3}()."
-        notations, f_name = tuple(f.__annotations__.keys()), f.__code__.co_name
-        for i, name in enumerate(f.__code__.co_varnames):
-            if name not in notations:
-                continue  # this arg name has no annotation then skip it.
-            _type, is_ok = __check_annotations(f.__annotations__.get(name))
-            if is_ok:  # Force to tuple
-                if i < len(args) and not isinstance(args[i], _type):
-                    log.critical(msg.format(repr(args[i])[:50], _type,
-                                            type(args[i]), f_name))
-                elif name in kwargs and not isinstance(kwargs[name], _type):
-                    log.critical(msg.format(repr(kwargs[name])[:50], _type,
-                                            type(kwargs[name]), f_name))
-        out = f(*args, **kwargs)
-        _type, is_ok = __check_annotations(f.__annotations__.get("return"))
-        if is_ok and not isinstance(out, _type) and "return" in notations:
-            log.critical(msg.format(repr(out)[:50], _type, type(out), f_name))
-        return out    # The output result of function or method.
-    return decorated  # The decorated function or method.
-
-
 def make_root_check_and_encoding_debug():
     """Debug and Log Encodings and Check for root/administrator,return Bool."""
     log.info(__doc__)
@@ -211,14 +178,14 @@ def add_desktop_files(app, desktop_file_content):
     if os.path.isdir(config_dir) and not os.path.isfile(autostart_file):
         log.info("Writing Auto-Start file: " + autostart_file)
         with open(autostart_file, "w", encoding="utf-8") as start_file:
-            start_file.write(desktop_file_content)
+            start_file.write(str(desktop_file_content))
     apps_dir = os.path.join(os.path.expanduser("~"),
                             ".local", "share", "applications")
     desktop_file = os.path.join(apps_dir, app + ".desktop")
     if os.path.isdir(apps_dir) and not os.path.isfile(desktop_file):
         log.info("Writing Desktop Launcher file: " + desktop_file)
         with open(desktop_file, "w", encoding="utf-8") as desktop_file_obj:
-            desktop_file_obj.write(desktop_file_content)
+            desktop_file_obj.write(str(desktop_file_content))
     return desktop_file
 
 

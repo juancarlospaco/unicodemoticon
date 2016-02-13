@@ -11,7 +11,7 @@ __author__ = ' Juan Carlos '
 __email__ = ' juancarlospaco@gmail.com '
 __url__ = 'https://github.com/juancarlospaco/unicodemoticon'
 __source__ = ('https://raw.githubusercontent.com/juancarlospaco/'
-              'unicodemoticon/master/unicodemoticon.py')
+              'unicodemoticon/master/unicodemoticon/__init__.py')
 
 
 import codecs
