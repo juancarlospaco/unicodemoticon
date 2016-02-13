@@ -82,6 +82,15 @@
  - [QDarkStyleSheet *(CSS base for Qt5)*](https://github.com/ColinDuquesnoy/QDarkStyleSheet#qdarkstylesheet) `sudo pip3 install qdarkstyle`
 
 
+# Windows
+
+Support is very limited by Windows itself for Unicode.
+Install all these fonts as admin and reboot the system:
+
+ - ttf-ancient-fonts: https://launchpad.net/ubuntu/+archive/primary/+files/ttf-ancient-fonts_2.59.orig.tar.xz
+ - noto-fonts-emoji: https://github.com/googlei18n/noto-emoji/blob/master/fonts/NotoEmoji-Regular.ttf
+
+
  # Vim:
 
  - Add in your `~/.vimrc` file this lines:
