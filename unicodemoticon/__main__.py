@@ -1,3 +1,7 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+
 import sys
 
 from PyQt5.QtGui import QIcon
@@ -43,6 +47,7 @@ def main(args=sys.argv):
     win.hide()
     make_post_execution_message()
     sys.exit(app.exec())
+
 
 # may be unicodemoticon.__main__
 if __name__.endswith("__main__"):
