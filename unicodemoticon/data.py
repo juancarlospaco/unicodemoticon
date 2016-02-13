@@ -1,6 +1,12 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+
 import pkgutil
 
-AUTOSTART_DESKTOP_FILE = pkgutil.get_data('unicodemoticon', 'unicodemoticon.desktop')
+
+AUTOSTART_DESKTOP_FILE = pkgutil.get_data('unicodemoticon',
+                                          'unicodemoticon.desktop')
 
 
 CODES = tuple("""aa ab ae af ak am an ar as av ay az ba be bg bh bi bm bn bo
