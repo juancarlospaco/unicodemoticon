@@ -18,7 +18,7 @@
 
 
  https://pypi.python.org/pypi/unicodemoticon
- https://aur.archlinux.org/cgit/aur.git/tree/PKGBUILD?h=unicodemoticon
+ https://aur.archlinux.org/packages/unicodemoticon
  
  
  - **Standalone**, uses ONLY Standard Libraries, built-in on Python 3.
@@ -28,7 +28,7 @@
  - easy to use
  - Set its own Process name and show up on Process lists, GUI Customization via CSS, Icon Customization.
  - Can check for updates for itself, Sets Smooth CPU usage, Colored Logging, Single Instance via Sockets.
- - Menu is Semi-Transparent with particles and Rounded Corners with On Mouse Hover Previews.
+ - On Mouse Hover Previews.
  - HTML5 Entities, eg. `&copy;` and Multiple characters Emoticons, eg. `¯\_(ツ)_/¯`.
  - Alternating CamelCase for clipboard text, eg. `AlTeRnAtInG CaMeLcAsE FoR ClIpBoArD TeXt`.
  - Base64, ROT-13, URL Encode, and more.
@@ -56,7 +56,7 @@
  sudo pip3 install git+git://github.com/juancarlospaco/unicodemoticon.git
  ```
 
- **MANUALLY:**
+ **Manually:**
 
  - Save [this file](https://github.com/juancarlospaco/unicodemoticon/releases/download/2.1.0/unicodemoticon-2.1.0.pyz) and run it with Python3. (Your OS probably already uses python3 to open it when you click on it)
 
