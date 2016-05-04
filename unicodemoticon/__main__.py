@@ -37,7 +37,7 @@ def main(args=sys.argv):
     app.setApplicationName("unicodemoticon")
     app.setOrganizationName("unicodemoticon")
     app.setOrganizationDomain("unicodemoticon")
-    # app.instance().setQuitOnLastWindowClosed(False)  # no quit on dialog quit
+    app.instance().setQuitOnLastWindowClosed(False)  # no quit on dialog quit
     if qdarkstyle:
             app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())
     icon = QIcon(app.style().standardPixmap(QStyle.SP_FileIcon))

@@ -2,10 +2,8 @@
 # -*- coding: utf-8 -*-
 
 
-# metadata
 """UnicodEmoticons."""
-
-__version__ = '2.1.1'
+__version__ = '2.2.0'
 __license__ = ' GPLv3+ LGPLv3+ '
 __author__ = ' Juan Carlos '
 __email__ = ' juancarlospaco@gmail.com '
@@ -41,8 +39,7 @@ from PyQt5.QtWidgets import (QApplication, QComboBox, QDesktopWidget, QDialog,
 from .data import CODES, STD_ICON_NAMES, UNICODEMOTICONS, AUTOSTART_DESKTOP_FILE
 from .stealth_strings import string_to_stealth
 from .utils import (about_python, about_self, view_code, report_bug,
-                    check_for_updates, get_or_set_config_folder,
-                    add_desktop_files)
+                    get_or_set_config_folder, add_desktop_files)
 
 
 def tinyslation(s: str, to: str=getdefaultlocale()[0][:2], fm="en") -> str:
@@ -229,9 +226,6 @@ class TabWidget(QTabWidget):
         self.menu_help.addAction("View Source Code", view_code)
         self.menu_help.addSeparator()
         self.menu_help.addAction("Report Bugs", report_bug)
-        self.menu_help.addAction(
-            "Check for Updates", lambda:
-            QMessageBox.information(self, __doc__, check_for_updates()))
         self.setCornerWidget(self.menu_1, 1)
         self.setCornerWidget(self.menu_0, 0)
         self.currentChanged.connect(self.make_tabs_previews)
@@ -362,7 +356,7 @@ class TabWidget(QTabWidget):
         for _char in sorted(char_list):
             action = submenu.addAction(_char.strip())
             action.setToolTip(self.get_description(_char))
-            action.hovered.connect(lambda char=_char: self.make_preview(char))
+            action.hovered.connect(lambda _, ch=_char: self.make_preview(ch))
             action.triggered.connect(
                 lambda _, char=_char: QApplication.clipboard().setText(char))
         return submenu
