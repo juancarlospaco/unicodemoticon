@@ -3,6 +3,7 @@
 
 
 import sys
+from datetime import datetime
 
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QApplication, QStyle
@@ -21,17 +22,19 @@ if not __package__:
     __package__ = str("unicodemoticon")
 
 from . import TabWidget
-from .utils import (make_logger, make_root_check_and_encoding_debug,
-                    make_post_execution_message,
-                    set_process_name_and_cpu_priority, make_config)
+from anglerfish import (make_logger, check_encoding, make_post_exec_msg,
+                        set_process_name, make_config, set_single_instance)
+
+
+start_time = datetime.now()
 
 
 def main(args=sys.argv):
     make_logger("unicodemoticon")
-    make_root_check_and_encoding_debug()
-    set_process_name_and_cpu_priority("unicodemoticon")
+    check_encoding()
+    set_process_name("unicodemoticon")
     make_config("unicodemoticon")
-
+    set_single_instance("unicodemoticon")
     # TODO: single instance
     app = QApplication(args)
     app.setApplicationName("unicodemoticon")
@@ -45,7 +48,7 @@ def main(args=sys.argv):
     win = TabWidget()
     win.show()
     win.hide()
-    make_post_execution_message()
+    make_post_exec_msg(start_time)
     sys.exit(app.exec())
 
 

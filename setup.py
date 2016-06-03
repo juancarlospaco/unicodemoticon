@@ -36,9 +36,7 @@ from setuptools import setup, Command
 
 from unicodemoticon import (__author__, __url__, __email__, __license__,
                             __version__)
-from unicodemoticon.utils import (make_logger,
-                                  make_root_check_and_encoding_debug,
-                                  set_process_name_and_cpu_priority)
+
 
 ##############################################################################
 # EDIT HERE
@@ -59,7 +57,7 @@ def parse_requirements(path=REQUIREMENTS_FILE):
     We just want to separate regular packages from links to pass them to the
     'install_requires' and 'dependency_links' params of the 'setup()'.
     """
-    log.debug("Parsing Requirements from file {what}.".format(what=path))
+    print("Parsing Requirements from file {what}.".format(what=path))
     pkgs, links = ["pip"], []
     if not os.path.isfile(path):
         return pkgs, links
@@ -77,19 +75,17 @@ def parse_requirements(path=REQUIREMENTS_FILE):
             pkgs.append('{package}=={ver}'.format(package=name, ver=version))
         else:
             pkgs.append(req)
-    log.debug("Requirements found: {what}.".format(what=(pkgs, links)))
+    print("Requirements found: {what}.".format(what=(pkgs, links)))
     return pkgs, links
 
 
-make_logger()
-make_root_check_and_encoding_debug()
-set_process_name_and_cpu_priority("setup_py")
 install_requires_list, dependency_links_list = parse_requirements()
-log.info("Starting build of setuptools.setup().")
+print("Starting build of setuptools.setup().")
 
 
 ##############################################################################
 # EDIT HERE
+
 
 class ZipApp(Command):
     description = "creates a zipapp"
@@ -132,9 +128,7 @@ setup(
     include_package_data=True,
     zip_safe=True,
 
-    extras_require={"pip": ["pip"]},
-    tests_require=['pip'],
-    requires=['pip'],
+    requires=['anglerfish'],
 
     install_requires=install_requires_list,
     dependency_links=dependency_links_list,
@@ -173,7 +167,7 @@ setup(
 
         'Programming Language :: Python',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3.5',
 
         'Programming Language :: Python :: Implementation :: CPython',
         'Programming Language :: Python :: Implementation :: PyPy',
@@ -184,4 +178,4 @@ setup(
 )
 
 
-log.info("Finished build of setuptools.setup().")
+print("Finished build of setuptools.setup().")

@@ -3,7 +3,7 @@
 
 
 """UnicodEmoticons."""
-__version__ = '2.2.0'
+__version__ = '2.2.2'
 __license__ = ' GPLv3+ LGPLv3+ '
 __author__ = ' Juan Carlos '
 __email__ = ' juancarlospaco@gmail.com '
@@ -37,9 +37,9 @@ from PyQt5.QtWidgets import (QApplication, QComboBox, QDesktopWidget, QDialog,
                              QVBoxLayout, QWidget)
 
 from .data import CODES, STD_ICON_NAMES, UNICODEMOTICONS, AUTOSTART_DESKTOP_FILE
-from .stealth_strings import string_to_stealth
-from .utils import (about_python, about_self, view_code, report_bug,
-                    get_or_set_config_folder, add_desktop_files)
+
+from anglerfish import (about_python, about_self, view_code, report_bug,
+                        get_config_folder, set_desktop_launcher)
 
 
 def tinyslation(s: str, to: str=getdefaultlocale()[0][:2], fm="en") -> str:
@@ -202,13 +202,13 @@ class TabWidget(QTabWidget):
         self.menu_tool.addSeparator()
         self.menu_tool.addAction(
             "Set UI Style",
-            lambda: open_new_tab(os.path.join(get_or_set_config_folder(
+            lambda: open_new_tab(os.path.join(get_config_folder(
                 "unicodemoticon"), "unicodemoticon.css")))
         self.menu_tool.addAction("AutoCenter Window", self.center)
         self.menu_tool.addAction("Set Icon", self.set_icon)
-        self.menu_tool.addAction(
-            "Add Launcher to Desktop", lambda:  # force recreate desktop file
-            add_desktop_files("unicodemoticon", AUTOSTART_DESKTOP_FILE))
+        self.menu_tool.addAction(  # force recreate desktop file
+            "Add Launcher to Desktop", lambda: set_desktop_launcher(
+                "unicodemoticon", AUTOSTART_DESKTOP_FILE, True))
         self.menu_tool.addAction("Move to Mouse position",
                                  self.move_to_mouse_position)
         self.menu_tool.addSeparator()
@@ -263,7 +263,7 @@ class TabWidget(QTabWidget):
         self.inputx, self.alt, self.b64 = QLineEdit(), QLineEdit(), QLineEdit()
         self.b64unsafe, self.rot13 = QLineEdit(), QLineEdit()
         self.urlenc, self.urlencp = QLineEdit(), QLineEdit()
-        self.snake, self.spine, self.st = QLineEdit(), QLineEdit(), QLineEdit()
+        self.snake, self.spine = QLineEdit(), QLineEdit()
         self.asci, self.camel, self.swp = QLineEdit(), QLineEdit(), QLineEdit()
         self.tran, self.fr, self.to = QLineEdit(), QComboBox(), QComboBox()
         self.container, loca = QWidget(), str(getdefaultlocale()[0][:2])
@@ -287,8 +287,6 @@ class TabWidget(QTabWidget):
         layout.addWidget(self.container)
         layout.addWidget(QLabel("Alternate case"))
         layout.addWidget(self.alt)
-        layout.addWidget(QLabel("Stealth String"))
-        layout.addWidget(self.st)
         layout.addWidget(QLabel("Swap case"))
         layout.addWidget(self.swp)
         layout.addWidget(QLabel("Base 64 URL Safe, for the Web"))
@@ -379,7 +377,7 @@ class TabWidget(QTabWidget):
         for field in (
             self.alt, self.b64, self.b64unsafe, self.rot13, self.urlenc,
             self.urlencp, self.snake, self.spine, self.asci, self.camel,
-                self.swp, self.tran, self.st):
+                self.swp, self.tran):
             field.clear()
             field.setReadOnly(True)
         self.alt.setText(self.make_alternate_case(txt))
@@ -394,7 +392,6 @@ class TabWidget(QTabWidget):
         self.snake.setText(txt.replace(" ", "_"))
         self.spine.setText(txt.replace(" ", "-"))
         self.asci.setText(re.sub(r"[^\x00-\x7F]+", "", txt))
-        self.st.setText(string_to_stealth(txt))
         if self.fr.currentText() != self.to.currentText() and len(txt) < 999:
             self.tran.setText(tinyslation(txt.strip().replace("\n", " "),
                               str(self.to.currentText()),
@@ -458,7 +455,7 @@ class TabWidget(QTabWidget):
     def set_or_get_stylesheet(self, stylesheet: str="") -> str:
         """Add a default stylesheet if needed."""
         style_file = os.path.join(
-            get_or_set_config_folder("unicodemoticon"), "unicodemoticon.css")
+            get_config_folder("unicodemoticon"), "unicodemoticon.css")
         log.info("To Customize the Look'n'Feel Edit the file: " + style_file)
         if not os.path.isfile(style_file):
             log.info("Writing Default CSS StyleSheet file: " + style_file)
