@@ -28,7 +28,9 @@ from webbrowser import open_new_tab
 import unicodedata
 
 from PyQt5.QtCore import QEvent, Qt, QTimeLine, QTimer
+
 from PyQt5.QtGui import QCursor, QIcon, QPainter
+
 from PyQt5.QtWidgets import (QApplication, QComboBox, QDesktopWidget, QDialog,
                              QGridLayout, QGroupBox, QHBoxLayout, QInputDialog,
                              QLabel, QLineEdit, QMainWindow, QMenu,

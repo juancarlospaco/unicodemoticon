@@ -35,7 +35,6 @@ def main(args=sys.argv):
     set_process_name("unicodemoticon")
     make_config("unicodemoticon")
     set_single_instance("unicodemoticon")
-    # TODO: single instance
     app = QApplication(args)
     app.setApplicationName("unicodemoticon")
     app.setOrganizationName("unicodemoticon")

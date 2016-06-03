@@ -20,6 +20,10 @@
 # python3 setup.py zipapp
 #
 #
+# To try it locally:
+# python3 setup.py install .
+#
+#
 # To Upload to PyPI by executing:
 # python3 setup.py register
 # python3 setup.py bdist_egg sdist --formats=bztar,gztar,zip upload --sign
@@ -28,7 +32,6 @@
 """Setup.py for Python, as Generic as possible."""
 
 
-import logging as log
 import os
 import re
 
@@ -64,7 +67,7 @@ def parse_requirements(path=REQUIREMENTS_FILE):
     try:
         requirements = map(str.strip, path.splitlines())
     except Exception as reason:
-        log.warning(reason)
+        print(reason)
         return pkgs, links
     for req in requirements:
         if not req:
