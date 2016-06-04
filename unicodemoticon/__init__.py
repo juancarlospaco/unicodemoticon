@@ -341,6 +341,26 @@ class TabWidget(QTabWidget):
                     layout2.addWidget(button, row, index % 8)
         group2.setLayout(layout2)
         self.addTab(area2, "HTML")
+        area3, group3 = QScrollArea(), QGroupBox("Recent Emoji !")
+        area3.setWidgetResizable(True)
+        area3.setHorizontalScrollBarPolicy(1)
+        area3.setWidget(group3)
+        row, layout3, index = 0, QGridLayout(), 0
+        self.recent_emoji, self.recent_buttons = str("? " * 25).split(), []
+        for i in range(25):
+            button = QPushButton("?", self)
+            button.released.connect(self.hide)
+            button.setFlat(True)
+            button.setDisabled(True)
+            font = button.font()
+            font.setPixelSize(50)
+            button.setFont(font)
+            index = index + 1  # cant use enumerate()
+            row = row + 1 if not index % 8 else row
+            self.recent_buttons.append(button)
+            layout3.addWidget(button, row, index % 8)
+        group3.setLayout(layout3)
+        self.addTab(area3, "Recent")
         self.widgets_to_tabs(self.json_to_widgets(UNICODEMOTICONS))
         self.set_or_get_stylesheet()
         self.make_trayicon()
@@ -478,6 +498,23 @@ class TabWidget(QTabWidget):
         self.preview.show()
         self.taimer.start(1000)  # how many time display the previews
 
+    def recentify(self, emote):
+        """Update the recent emojis tab."""
+        self.recent_emoji.append(emote)  # append last emoji to last item
+        self.recent_emoji.pop(0)  # remove first item
+        for index, button in enumerate(self.recent_buttons):
+            button.setText(self.recent_emoji[index])
+            if str(button.text()) != "?":
+                button.pressed.connect(lambda ch=self.recent_emoji[index]:
+                                       self.make_preview(str(ch)))
+                button.clicked.connect(
+                    lambda _, ch=self.recent_emoji[index]:
+                        QApplication.clipboard().setText(ch))
+                button.setToolTip("<center><h1>{0}<br>{1}".format(
+                    self.recent_emoji[index], self.get_description(self.recent_emoji[index])))
+                button.setDisabled(False)
+        return self.recent_emoji
+
     def json_to_widgets(self, jotason: dict):
         """Take a json string object return QWidgets."""
         dict_of_widgets, row = {}, 0
@@ -489,6 +526,7 @@ class TabWidget(QTabWidget):
                 button.clicked.connect(lambda _, c=emote:
                                        QApplication.clipboard().setText(c))
                 button.released.connect(self.hide)
+                button.released.connect(lambda c=emote: self.recentify(c))
                 button.pressed.connect(lambda c=emote: self.make_preview(c))
                 button.setToolTip("<center><h1>{0}<br>{1}".format(
                     emote, self.get_description(emote)))
