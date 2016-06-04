@@ -21,7 +21,6 @@
  https://aur.archlinux.org/packages/unicodemoticon
  
  
- - **Standalone**, uses ONLY Standard Libraries, built-in on Python 3.
  - **Python3 ready**, it will only work with Python >= 3, instead of soon to be deprecated *(year 2020)* python2.
  - **Unicode ready**, it should handle correctly any kind of character that `UTF-8` can support without escaping.
  - Tabbed Window and Trayicon with Unicode Emoticons using Python3 Qt5.
@@ -144,7 +143,6 @@ https://pypi.python.org/pypi/unicodemoticon
 
 |screenshot|
 
--  **Standalone**, uses ONLY Standard Libraries, built-in on Python 3.
 -  **Single-File**, everything is just 1 file, with PEP-8, Lint and
    other Python Best Practices, very readable.
 -  **Python3 ready**, it will only work with Python >= 3, instead of
