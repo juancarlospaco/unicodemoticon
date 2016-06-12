@@ -8,6 +8,9 @@ from datetime import datetime
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QApplication, QStyle
 
+from anglerfish import (make_logger, check_encoding, make_post_exec_msg,
+                        set_process_name, make_config, set_single_instance)
+
 try:
     import qdarkstyle  # https://github.com/ColinDuquesnoy/QDarkStyleSheet
 except ImportError:    # sudo pip3 install qdarkstyle
@@ -21,9 +24,7 @@ if not __package__:
     import unicodemoticon  # noqa
     __package__ = str("unicodemoticon")
 
-from . import TabWidget
-from anglerfish import (make_logger, check_encoding, make_post_exec_msg,
-                        set_process_name, make_config, set_single_instance)
+from . import TabWidget  # lint:ok noqa pragma:nocover
 
 
 start_time = datetime.now()
