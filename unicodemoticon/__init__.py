@@ -3,13 +3,6 @@
 
 
 """UnicodEmoticons."""
-__version__ = '2.2.2'
-__license__ = ' GPLv3+ LGPLv3+ '
-__author__ = ' Juan Carlos '
-__email__ = ' juancarlospaco@gmail.com '
-__url__ = 'https://github.com/juancarlospaco/unicodemoticon'
-__source__ = ('https://raw.githubusercontent.com/juancarlospaco/'
-              'unicodemoticon/master/unicodemoticon/__init__.py')
 
 
 import codecs
@@ -38,10 +31,20 @@ from PyQt5.QtWidgets import (QApplication, QComboBox, QDesktopWidget, QDialog,
                              QSystemTrayIcon, QTabBar, QTabWidget, QToolButton,
                              QVBoxLayout, QWidget)
 
-from .data import CODES, STD_ICON_NAMES, UNICODEMOTICONS, AUTOSTART_DESKTOP_FILE
+from .data import (CODES, STD_ICON_NAMES,
+                   UNICODEMOTICONS, AUTOSTART_DESKTOP_FILE)
 
 from anglerfish import (about_python, about_self, view_code, report_bug,
                         get_config_folder, set_desktop_launcher)
+
+
+__version__ = '2.2.2'
+__license__ = ' GPLv3+ LGPLv3+ '
+__author__ = ' Juan Carlos '
+__email__ = ' juancarlospaco@gmail.com '
+__url__ = 'https://github.com/juancarlospaco/unicodemoticon'
+__source__ = ('https://raw.githubusercontent.com/juancarlospaco/'
+              'unicodemoticon/master/unicodemoticon/__init__.py')
 
 
 def tinyslation(s: str, to: str=getdefaultlocale()[0][:2], fm="en") -> str:
@@ -346,14 +349,14 @@ class TabWidget(QTabWidget):
         area3.setHorizontalScrollBarPolicy(1)
         area3.setWidget(group3)
         row, layout3, index = 0, QGridLayout(), 0
-        self.recent_emoji, self.recent_buttons = str("? " * 25).split(), []
-        for i in range(25):
+        self.recent_emoji, self.recent_buttons = str("? " * 50).split(), []
+        for i in range(50):
             button = QPushButton("?", self)
             button.released.connect(self.hide)
             button.setFlat(True)
             button.setDisabled(True)
             font = button.font()
-            font.setPixelSize(50)
+            font.setPixelSize(font.pixelSize() * 2)
             button.setFont(font)
             index = index + 1  # cant use enumerate()
             row = row + 1 if not index % 8 else row
@@ -511,7 +514,8 @@ class TabWidget(QTabWidget):
                     lambda _, ch=self.recent_emoji[index]:
                         QApplication.clipboard().setText(ch))
                 button.setToolTip("<center><h1>{0}<br>{1}".format(
-                    self.recent_emoji[index], self.get_description(self.recent_emoji[index])))
+                    self.recent_emoji[index],
+                    self.get_description(self.recent_emoji[index])))
                 button.setDisabled(False)
         return self.recent_emoji
 
