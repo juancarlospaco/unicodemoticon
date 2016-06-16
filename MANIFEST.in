@@ -1,0 +1,3 @@
+recursive-include unicodemoticon *.py
+recursive-include unicodemoticon *.desktop
+include LICENSE
