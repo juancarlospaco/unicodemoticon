@@ -35,7 +35,7 @@ from .data import (CODES, STD_ICON_NAMES,
                    UNICODEMOTICONS, AUTOSTART_DESKTOP_FILE)
 
 from anglerfish import (about_python, about_self, view_code, report_bug,
-                        get_config_folder, set_desktop_launcher)
+                        get_config_folder, set_desktop_launcher)  # fades.pypi
 
 
 __version__ = '2.3.4'
