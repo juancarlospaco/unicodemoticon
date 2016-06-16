@@ -38,7 +38,7 @@ from anglerfish import (about_python, about_self, view_code, report_bug,
                         get_config_folder, set_desktop_launcher)
 
 
-__version__ = '2.2.2'
+__version__ = '2.3.4'
 __license__ = ' GPLv3+ LGPLv3+ '
 __author__ = ' Juan Carlos '
 __email__ = ' juancarlospaco@gmail.com '
