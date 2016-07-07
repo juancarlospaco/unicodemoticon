@@ -32,14 +32,6 @@
  - Alternating CamelCase for clipboard text, eg. `AlTeRnAtInG CaMeLcAsE FoR ClIpBoArD TeXt`.
  - Base64, ROT-13, URL Encode, and more.
 
-
- # Try it !:
- *(Without installing anything)*
- ```
- wget -O https://github.com/juancarlospaco/unicodemoticon/releases/download/2.1.0/unicodemoticon-2.1.0.pyz
- python3 unicodemoticon-2.1.0.pyz
- ```
-
  # Install permanently on the system:
 
  **PIP:** *(Recommended!)*
@@ -49,16 +41,6 @@
  #  sudo pacman -Syu python-pip python-pyqt5 ttf-ancient-fonts
  sudo pip3 install unicodemoticon
  ```
-
- **PIP from Git:**
- ```
- sudo pip3 install git+git://github.com/juancarlospaco/unicodemoticon.git
- ```
-
- **Manually:**
-
- - Save [this file](https://github.com/juancarlospaco/unicodemoticon/releases/download/2.1.0/unicodemoticon-2.1.0.pyz) and run it with Python3. (Your OS probably already uses python3 to open it when you click on it)
-
 
  # Why?:
 
