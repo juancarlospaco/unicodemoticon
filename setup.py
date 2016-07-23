@@ -36,6 +36,9 @@ import os
 import re
 
 from setuptools import setup, Command
+from tempfile import TemporaryDirectory
+from shutil import copytree
+from zipapp import create_archive
 
 from unicodemoticon import (__author__, __url__, __email__, __license__,
                             __version__)
@@ -53,25 +56,19 @@ print("Starting build of setuptools.setup().")
 
 
 class ZipApp(Command):
-    description = "creates a zipapp"
-    user_options = []
+    description, user_options = "Creates a zipapp.", []
 
-    def initialize_options(self): pass
+    def initialize_options(self): pass  # Dont needed, but required.
 
-    def finalize_options(self): pass
+    def finalize_options(self): pass  # Dont needed, but required.
 
     def run(self):
-        import shutil
-        import zipapp
-        from pathlib import Path
-        from tempfile import TemporaryDirectory
-
         with TemporaryDirectory() as tmpdir:
-            tmpdir = Path(tmpdir)
-            shutil.copytree('unicodemoticon', str(tmpdir / 'unicodemoticon'))
-            with (tmpdir / '__main__.py').open('w') as entry:
+            copytree('unicodemoticon', os.path.join(tmpdir, 'unicodemoticon'))
+            fyle = os.path.join(tmpdir, '__main__.py')
+            with open(fyle, 'w', encoding='utf-8') as entry:
                 entry.write("import runpy\nrunpy.run_module('unicodemoticon')")
-            zipapp.create_archive(tmpdir, 'unicodemoticon.pyz', '/usr/bin/env python3')
+            create_archive(tmpdir, 'unicodemoticon.pyz', '/usr/bin/env python3')
 
 
 ##############################################################################
