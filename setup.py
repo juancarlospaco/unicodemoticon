@@ -47,47 +47,9 @@ from unicodemoticon import (__author__, __url__, __email__, __license__,
 
 DESCRIPTION = ("Like a Color Picker but for Unicode Emoticons. "
                "Trayicon with Unicode Emoticons using Python3 Qt5.")
-REQUIREMENTS_FILE = os.path.join(os.path.dirname(__file__), "requirements.txt")
 
 
-##############################################################################
-# Dont touch below
-
-
-def parse_requirements(path=REQUIREMENTS_FILE):
-    """Rudimentary parser for the requirements.txt file.
-
-    We just want to separate regular packages from links to pass them to the
-    'install_requires' and 'dependency_links' params of the 'setup()'.
-    """
-    print("Parsing Requirements from file {what}.".format(what=path))
-    pkgs, links = ["pip"], []
-    if not os.path.isfile(path):
-        return pkgs, links
-    try:
-        requirements = map(str.strip, path.splitlines())
-    except Exception as reason:
-        print(reason)
-        return pkgs, links
-    for req in requirements:
-        if not req:
-            continue
-        if 'http://' in req.lower() or 'https://' in req.lower():
-            links.append(req)
-            name, version = re.findall("\#egg=([^\-]+)-(.+$)", req)[0]
-            pkgs.append('{package}=={ver}'.format(package=name, ver=version))
-        else:
-            pkgs.append(req)
-    print("Requirements found: {what}.".format(what=(pkgs, links)))
-    return pkgs, links
-
-
-install_requires_list, dependency_links_list = parse_requirements()
 print("Starting build of setuptools.setup().")
-
-
-##############################################################################
-# EDIT HERE
 
 
 class ZipApp(Command):
@@ -112,6 +74,10 @@ class ZipApp(Command):
             zipapp.create_archive(tmpdir, 'unicodemoticon.pyz', '/usr/bin/env python3')
 
 
+##############################################################################
+# EDIT HERE
+
+
 setup(
 
     name="unicodemoticon",
@@ -131,10 +97,10 @@ setup(
     include_package_data=True,
     zip_safe=True,
 
+    install_requires=['anglerfish'],
+    setup_requires=['anglerfish'],
+    tests_require=['anglerfish'],
     requires=['anglerfish'],
-
-    install_requires=install_requires_list,
-    dependency_links=dependency_links_list,
 
     packages=["unicodemoticon"],
     package_data={"unicodemoticon": ['unicodemoticon.desktop']},
