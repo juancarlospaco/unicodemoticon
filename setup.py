@@ -25,8 +25,9 @@
 #
 #
 # To Upload to PyPI by executing:
+# sudo pip install --upgrade pip setuptools wheel virtualenv
 # python3 setup.py register
-# python3 setup.py bdist_egg sdist --formats=bztar,gztar,zip upload --sign
+# python3 setup.py bdist_egg bdist_wheel --universal sdist --formats=bztar,gztar,zip upload --sign
 
 
 """Setup.py for Python, as Generic as possible."""
