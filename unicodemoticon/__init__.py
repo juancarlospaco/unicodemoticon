@@ -205,10 +205,6 @@ class TabWidget(QTabWidget):
         self.menu_tool.addAction("Alternate Case Clipboard",
                                  self.alternate_clipboard)
         self.menu_tool.addSeparator()
-        self.menu_tool.addAction(
-            "Set UI Style",
-            lambda: open_new_tab(os.path.join(os.path.expanduser("~"),
-                                              "unicodemoticon.css")))
         self.menu_tool.addAction("AutoCenter Window", self.center)
         self.menu_tool.addAction("Set Icon", self.set_icon)
         self.menu_tool.addAction(  # force recreate desktop file
@@ -365,7 +361,6 @@ class TabWidget(QTabWidget):
         group3.setLayout(layout3)
         self.addTab(area3, "Recent")
         self.widgets_to_tabs(self.json_to_widgets(UNICODEMOTICONS))
-        self.set_or_get_stylesheet()
         self.make_trayicon()
         self.setMinimumSize(QDesktopWidget().screenGeometry().width() // 1.5,
                             QDesktopWidget().screenGeometry().height() // 1.5)
@@ -476,16 +471,6 @@ class TabWidget(QTabWidget):
             log.debug("Description not found for Unicode: " + emote)
         finally:
             return description
-
-    def set_or_get_stylesheet(self, stylesheet: str="") -> str:
-        """Add a default stylesheet if needed."""
-        style_file = os.path.join(
-            os.path.expanduser("~"), "unicodemoticon.css")
-        log.info("To Customize the Look'n'Feel Edit the file: " + style_file)
-        log.debug("Reading CSS StyleSheet file: " + style_file)
-        with open(style_file, "r", encoding="utf-8") as style_file_object:
-            stylesheet = style_file_object.read().strip()
-        return stylesheet
 
     def make_preview(self, emoticon_text: str):
         """Make Emoticon Previews for the current Hovered one."""

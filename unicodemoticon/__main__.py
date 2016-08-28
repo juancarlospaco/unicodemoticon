@@ -10,7 +10,7 @@ from PyQt5.QtWidgets import QApplication, QStyle
 
 from anglerfish import (make_logger, check_encoding,
                         make_post_exec_msg, set_process_name,
-                        make_config, set_single_instance)  # fades.pypi
+                        set_single_instance)  # fades.pypi
 
 try:
     import qdarkstyle  # https://github.com/ColinDuquesnoy/QDarkStyleSheet
@@ -35,7 +35,6 @@ def main(args=sys.argv):
     make_logger("unicodemoticon")
     check_encoding()
     set_process_name("unicodemoticon")
-    make_config("unicodemoticon")
     set_single_instance("unicodemoticon")
     app = QApplication(args)
     app.setApplicationName("unicodemoticon")
