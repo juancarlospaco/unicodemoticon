@@ -39,6 +39,7 @@
  sudo apt-get install python3-pyqt5 ttf-ancient-fonts sni-qt
  #  sudo yum install python3-pyqt5 ttf-ancient-fonts
  #  sudo pacman -Syu python-pip python-pyqt5 ttf-ancient-fonts
+ #  sudo yaourt -Sy emojione-color-font ttf-freefont noto-fonts-emoji
  sudo pip3 install unicodemoticon
  ```
 
@@ -94,6 +95,7 @@ Install all these fonts as admin and reboot the system:
  - **Please Star this Repo on Github !**, it helps to show up faster on searchs.
  - **Ad-Hocracy Meritocracy**: 3 Pull Requests Merged on Master you become Repo Admin. *Join us!*
  - [Help](https://help.github.com/articles/using-pull-requests) and more [Help](https://help.github.com/articles/fork-a-repo) and Interactive Quick [Git Tutorial](https://try.github.io).
+- Please take special care of NOT breaking any existing emoji before sending a Pull Request.
 
 
  # Licence:
