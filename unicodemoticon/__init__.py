@@ -35,7 +35,7 @@ from .data import (CODES, STD_ICON_NAMES,
                    UNICODEMOTICONS, AUTOSTART_DESKTOP_FILE)
 
 from anglerfish import (about_python, about_self, view_code, report_bug,
-                        get_config_folder, set_desktop_launcher)  # fades.pypi
+                        set_desktop_launcher)  # fades.pypi
 
 
 __version__ = '2.3.4'
@@ -207,8 +207,8 @@ class TabWidget(QTabWidget):
         self.menu_tool.addSeparator()
         self.menu_tool.addAction(
             "Set UI Style",
-            lambda: open_new_tab(os.path.join(get_config_folder(
-                "unicodemoticon"), "unicodemoticon.css")))
+            lambda: open_new_tab(os.path.join(os.path.expanduser("~"),
+                                              "unicodemoticon.css")))
         self.menu_tool.addAction("AutoCenter Window", self.center)
         self.menu_tool.addAction("Set Icon", self.set_icon)
         self.menu_tool.addAction(  # force recreate desktop file
@@ -480,12 +480,8 @@ class TabWidget(QTabWidget):
     def set_or_get_stylesheet(self, stylesheet: str="") -> str:
         """Add a default stylesheet if needed."""
         style_file = os.path.join(
-            get_config_folder("unicodemoticon"), "unicodemoticon.css")
+            os.path.expanduser("~"), "unicodemoticon.css")
         log.info("To Customize the Look'n'Feel Edit the file: " + style_file)
-        if not os.path.isfile(style_file):
-            log.info("Writing Default CSS StyleSheet file: " + style_file)
-            with open(style_file, "w", encoding="utf-8") as style_file_object:
-                style_file_object.write("/* Write your Custom Style here */\n")
         log.debug("Reading CSS StyleSheet file: " + style_file)
         with open(style_file, "r", encoding="utf-8") as style_file_object:
             stylesheet = style_file_object.read().strip()
