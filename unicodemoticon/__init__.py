@@ -34,8 +34,7 @@ from PyQt5.QtWidgets import (QApplication, QComboBox, QDesktopWidget, QDialog,
 from .data import (CODES, STD_ICON_NAMES,
                    UNICODEMOTICONS, AUTOSTART_DESKTOP_FILE)
 
-from anglerfish import (about_python, about_self, view_code, report_bug,
-                        set_desktop_launcher)  # fades.pypi
+from anglerfish import about_self, view_code, set_desktop_launcher  # fades.pypi
 
 
 __version__ = '2.5.0'
