@@ -37,7 +37,7 @@ from .data import (CODES, STD_ICON_NAMES,
 from anglerfish import about_self, view_code, set_desktop_launcher  # fades.pypi
 
 
-__version__ = '2.5.0'
+__version__ = '2.5.5'
 __license__ = ' GPLv3+ LGPLv3+ '
 __author__ = ' Juan Carlos '
 __email__ = ' juancarlospaco@gmail.com '
