@@ -33,9 +33,9 @@ start_time = datetime.now()
 
 def main(args=sys.argv):
     make_logger("unicodemoticon")
+    lock = set_single_instance("unicodemoticon")
     check_encoding()
     set_process_name("unicodemoticon")
-    set_single_instance("unicodemoticon")
     app = QApplication(args)
     app.setApplicationName("unicodemoticon")
     app.setOrganizationName("unicodemoticon")

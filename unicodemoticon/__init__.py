@@ -34,10 +34,10 @@ from PyQt5.QtWidgets import (QApplication, QComboBox, QDesktopWidget, QDialog,
 from .data import (CODES, STD_ICON_NAMES,
                    UNICODEMOTICONS, AUTOSTART_DESKTOP_FILE)
 
-from anglerfish import about_self, view_code, set_desktop_launcher
+from anglerfish import set_desktop_launcher
 
 
-__version__ = '2.5.6'
+__version__ = '2.7.5'
 __license__ = ' GPLv3+ LGPLv3+ '
 __author__ = ' Juan Carlos '
 __email__ = ' juancarlospaco@gmail.com '
@@ -217,12 +217,6 @@ class TabWidget(QTabWidget):
         self.menu_tool.addAction("Quit", exit)
         self.menu_help.addAction("About Qt 5",
                                  lambda: QMessageBox.aboutQt(None))
-        self.menu_help.addAction(
-            "About Stealth Strings", lambda: open_new_tab(
-                "http://gist.github.com/juancarlospaco/cc23a3919df41076252a"))
-        self.menu_help.addAction("About " + __doc__, about_self)
-        self.menu_help.addSeparator()
-        self.menu_help.addAction("View Source Code", view_code)
         self.setCornerWidget(self.menu_1, 1)
         self.setCornerWidget(self.menu_0, 0)
         self.currentChanged.connect(self.make_tabs_previews)
