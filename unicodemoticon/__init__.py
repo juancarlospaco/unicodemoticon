@@ -548,8 +548,12 @@ class TabWidget(QTabWidget):
     def set_icon(self, icon: (None, str)=None) -> str:
         """Return a string with opendesktop standard icon name for Qt."""
         if not icon:
+            try:
+                cur_idx = STD_ICON_NAMES.index(self.windowIcon().name())
+            except ValueError:
+                cur_idx = 0
             icon = QInputDialog.getItem(None, __doc__, "<b>Choose Icon name?:",
-                                        STD_ICON_NAMES, 0, False)[0]
+                                        STD_ICON_NAMES, cur_idx, False)[0]
         if icon:
             log.debug("Setting Tray and Window Icon name to:{}.".format(icon))
             self.tray.setIcon(QIcon.fromTheme("{}".format(icon)))
