@@ -161,6 +161,24 @@ class TabBar(QTabBar):
                 lambda _, index=index: self.setCurrentIndex(index))
 
 
+class ScrollGroup(QScrollArea):
+    def __init__(self, title):
+        super(ScrollGroup, self).__init__()
+        self.group = QGroupBox(title)
+        self.setWidgetResizable(True)
+        self.setHorizontalScrollBarPolicy(1)
+        self.setWidget(self.group)
+        self.group.setLayout(QGridLayout())
+        self.group.setFlat(True)
+    
+    def layout(self):
+        return self.group.layout()
+    
+    def setLayout(self, layout):
+        self.group.setLayout(layout)
+        
+
+
 class TabWidget(QTabWidget):
 
     """Custom tab widget."""
@@ -168,7 +186,28 @@ class TabWidget(QTabWidget):
     def __init__(self, parent=None, *args, **kwargs):
         """Init class custom tab widget."""
         super(TabWidget, self).__init__(parent=None, *args, **kwargs)
-        self.parent, self.previews, self.timer = parent, [], QTimer(self)
+        self.parent = parent
+        self.setTabBar(TabBar(self))
+        self.setMovable(False)
+        self.setTabsClosable(False)
+        self.setTabShape(QTabWidget.Triangular)
+
+        self.init_preview()
+        self.init_corner_menus()
+        self.init_tray()
+
+        self.init_tool_tab()
+        self.init_html_tab()
+        self.init_recent_tab()
+        self.widgets_to_tabs(self.json_to_widgets(UNICODEMOTICONS))
+        
+        self.make_trayicon()
+        self.setMinimumSize(QDesktopWidget().screenGeometry().width() // 1.5,
+                            QDesktopWidget().screenGeometry().height() // 1.5)
+        # self.showMaximized()
+
+    def init_preview(self):
+        self.previews, self.timer = [], QTimer(self)
         self.fader, self.previous_pic = FaderWidget(self), None
         self.timer.setSingleShot(True)
         self.timer.timeout.connect(lambda: [_.close() for _ in self.previews])
@@ -181,10 +220,8 @@ class TabWidget(QTabWidget):
         self.preview.setDisabled(True)
         self.preview.setWindowFlags(Qt.FramelessWindowHint | Qt.Tool)
         self.preview.setAttribute(Qt.WA_TranslucentBackground, True)
-        self.setTabBar(TabBar(self))
-        self.setMovable(False)
-        self.setTabsClosable(False)
-        self.setTabShape(QTabWidget.Triangular)
+
+    def init_corner_menus(self):
         self.menu_1, self.menu_0 = QToolButton(self), QToolButton(self)
         self.menu_1.setText(" ⚙ ")
         self.menu_1.setToolTip("<b>Options, Extras")
@@ -221,7 +258,9 @@ class TabWidget(QTabWidget):
         self.setCornerWidget(self.menu_0, 0)
         self.currentChanged.connect(self.make_tabs_previews)
         self.currentChanged.connect(self.make_tabs_fade)
-        self.tray, layout = QSystemTrayIcon(self), QVBoxLayout()
+
+    def init_tray(self):
+        self.tray = QSystemTrayIcon(self)
         self.menu = QMenu(__doc__)
         self.menu.addAction("    Emoticons").setDisabled(True)
         self.menu.setIcon(self.windowIcon())
@@ -246,11 +285,8 @@ class TabWidget(QTabWidget):
         self.menu.addAction("AutoCenter Window", self.center)
         self.menu.addAction("To mouse position", self.move_to_mouse_position)
         self.tray.setContextMenu(self.menu)
-        area, group = QScrollArea(), QGroupBox("Quick and Dirty Text Hacks !")
-        area.setWidgetResizable(True)
-        area.setHorizontalScrollBarPolicy(1)
-        area.setWidget(group)
-        group.setLayout(layout)
+
+    def init_tool_tab(self):
         self.inputx, self.alt, self.b64 = QLineEdit(), QLineEdit(), QLineEdit()
         self.b64unsafe, self.rot13 = QLineEdit(), QLineEdit()
         self.urlenc, self.urlencp = QLineEdit(), QLineEdit()
@@ -271,6 +307,11 @@ class TabWidget(QTabWidget):
         self.inputx.setPlaceholderText(" Type something cool here . . .")
         self.inputx.setFocus()
         self.runtools = QPushButton("Go !", self, clicked=self.runtool)
+        
+        tool_area = ScrollGroup("Quick and Dirty Text Hacks !")
+        tool_area.setLayout(QVBoxLayout())
+        layout = tool_area.layout()
+        
         layout.addWidget(QLabel("<h1>Type or Paste text"))
         layout.addWidget(self.inputx)
         layout.addWidget(self.runtools)
@@ -298,12 +339,14 @@ class TabWidget(QTabWidget):
         layout.addWidget(self.spine)
         layout.addWidget(QLabel("Sanitized,Clean out weird characters,ASCII"))
         layout.addWidget(self.asci)
-        self.addTab(area, "Tools")
-        area2, group2 = QScrollArea(), QGroupBox("HTML Entities !")
-        area2.setWidgetResizable(True)
-        area2.setHorizontalScrollBarPolicy(1)
-        area2.setWidget(group2)
-        added_html_entities, row, layout2, index = [], 0, QGridLayout(), 0
+        
+        self.addTab(tool_area, "Tools")
+
+    def init_html_tab(self):
+        html_area = ScrollGroup("HTML Entities !")
+        layout = html_area.layout()
+        
+        added_html_entities, row, index = [], 0, 0
         l = "".join([_ for _ in UNICODEMOTICONS.values()
                      if isinstance(_, str)])
         for html_char in tuple(sorted(entities.html5.items())):
@@ -317,8 +360,8 @@ class TabWidget(QTabWidget):
                                            self.make_preview(str(ch)))
                     button.clicked.connect(
                         lambda _, ch=html_char[0]:
-                            QApplication.clipboard().setText(
-                                "&{html_entity}".format(html_entity=ch)))
+                        QApplication.clipboard().setText(
+                            "&{html_entity}".format(html_entity=ch)))
                     button.setToolTip("<center><h1>{0}<br>{1}".format(
                         html_char[1], self.get_description(html_char[1])))
                     button.setFlat(True)
@@ -327,14 +370,14 @@ class TabWidget(QTabWidget):
                     button.setFont(font)
                     index = index + 1  # cant use enumerate()
                     row = row + 1 if not index % 8 else row
-                    layout2.addWidget(button, row, index % 8)
-        group2.setLayout(layout2)
-        self.addTab(area2, "HTML")
-        area3, group3 = QScrollArea(), QGroupBox("Recent Emoji !")
-        area3.setWidgetResizable(True)
-        area3.setHorizontalScrollBarPolicy(1)
-        area3.setWidget(group3)
-        row, layout3, index = 0, QGridLayout(), 0
+                    layout.addWidget(button, row, index % 8)
+        
+        self.addTab(html_area, "HTML")
+
+    def init_recent_tab(self):
+        emoji_area = ScrollGroup("Recent Emoji !")
+        layout = emoji_area.layout()
+        row, index = 0, 0
         self.recent_emoji, self.recent_buttons = str("? " * 50).split(), []
         for i in range(50):
             button = QPushButton("?", self)
@@ -347,14 +390,8 @@ class TabWidget(QTabWidget):
             index = index + 1  # cant use enumerate()
             row = row + 1 if not index % 8 else row
             self.recent_buttons.append(button)
-            layout3.addWidget(button, row, index % 8)
-        group3.setLayout(layout3)
-        self.addTab(area3, "Recent")
-        self.widgets_to_tabs(self.json_to_widgets(UNICODEMOTICONS))
-        self.make_trayicon()
-        self.setMinimumSize(QDesktopWidget().screenGeometry().width() // 1.5,
-                            QDesktopWidget().screenGeometry().height() // 1.5)
-        # self.showMaximized()
+            layout.addWidget(button, row, index % 8)
+        self.addTab(emoji_area, "Recent")
 
     def build_submenu(self, char_list: (str, tuple), submenu: QMenu) -> QMenu:
         """Take a list of characters and a submenu and build actions on it."""
@@ -494,7 +531,10 @@ class TabWidget(QTabWidget):
         """Take a json string object return QWidgets."""
         dict_of_widgets, row = {}, 0
         for titlemotes in tuple(sorted(jotason.items())):
-            layout, tit = QGridLayout(), str(titlemotes[0]).strip()[:9].title()
+            tit = str(titlemotes[0]).strip()[:9].title()
+            area = ScrollGroup(tit + " !")
+            layout = area.layout()
+            
             grid_cols = 2 if tit.lower() == "multichar" else 8
             for index, emote in enumerate(tuple(set(sorted(titlemotes[1])))):
                 button = QPushButton(emote, self)
@@ -511,12 +551,8 @@ class TabWidget(QTabWidget):
                 button.setFont(font)
                 row = row + 1 if not index % grid_cols else row
                 layout.addWidget(button, row, index % grid_cols)
-            area, group = QScrollArea(), QGroupBox(tit + " !")
-            area.setWidgetResizable(True)
-            area.setHorizontalScrollBarPolicy(1)
-            area.setWidget(group)
-            group.setLayout(layout)
-            dict_of_widgets.update({tit: area})
+            
+            dict_of_widgets[tit] = area
         return dict_of_widgets
 
     def widgets_to_tabs(self, dict_of_widgets: dict):
