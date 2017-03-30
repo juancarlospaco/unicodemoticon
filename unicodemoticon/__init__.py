@@ -6,33 +6,36 @@
 
 
 import codecs
-import os
 import re
 import logging as log
 
 from base64 import b64encode, urlsafe_b64encode
-from json import loads
 from locale import getdefaultlocale
-from urllib import parse, request
+from urllib import parse
 
 from html import entities
-from webbrowser import open_new_tab
 
 import unicodedata
 
-from PyQt5.QtCore import QEvent, Qt, QTimeLine, QTimer
+from PyQt5.QtCore import Qt, QTimer
 
-from PyQt5.QtGui import QCursor, QIcon, QPainter
+from PyQt5.QtGui import QCursor, QIcon
 
 from PyQt5.QtWidgets import (QApplication, QComboBox, QDesktopWidget, QDialog,
-                             QGridLayout, QGroupBox, QHBoxLayout, QInputDialog,
-                             QLabel, QLineEdit, QMainWindow, QMenu,
-                             QMessageBox, QPushButton, QScrollArea,
-                             QSystemTrayIcon, QTabBar, QTabWidget, QToolButton,
+                             QHBoxLayout, QInputDialog,
+                             QLabel, QLineEdit, QMenu,
+                             QMessageBox, QPushButton,
+                             QSystemTrayIcon, QTabWidget, QToolButton,
                              QVBoxLayout, QWidget)
+
 
 from .data import (CODES, STD_ICON_NAMES,
                    UNICODEMOTICONS, AUTOSTART_DESKTOP_FILE)
+from .tinyslation import tinyslation
+from .faderwidget import FaderWidget
+from .tabbar import TabBar
+from .scrollgroup import ScrollGroup
+
 
 from anglerfish import set_desktop_launcher
 
@@ -42,141 +45,9 @@ __license__ = ' GPLv3+ LGPLv3+ '
 __author__ = ' Juan Carlos '
 __email__ = ' juancarlospaco@gmail.com '
 __url__ = 'https://github.com/juancarlospaco/unicodemoticon'
-__source__ = ('https://raw.githubusercontent.com/juancarlospaco/'
-              'unicodemoticon/master/unicodemoticon/__init__.py')
-
-
-def tinyslation(s: str, to: str=getdefaultlocale()[0][:2], fm="en") -> str:
-    """Translate from internet via API from mymemory.translated.net,legally."""
-    api = "https://mymemory.translated.net/api/get?q={st}&langpair={fm}|{to}"
-    req = request.Request(url=api.format(st=parse.quote(s), fm=fm, to=to),
-                          headers={'User-Agent': '', 'DNT': 1})  # DoNotTrack
-    try:
-        responze = request.urlopen(req, timeout=3).read().decode("utf-8")
-        return loads(responze)['responseData']['translatedText']
-    except:
-        return str(s).strip()
 
 
 ##############################################################################
-
-
-class FaderWidget(QLabel):
-
-    """Custom Placeholder Fading Widget for tabs on TabWidget."""
-
-    def __init__(self, parent):
-        """Init class."""
-        super(FaderWidget, self).__init__(parent)
-        self.timeline, self.opacity, self.old_pic = QTimeLine(), 1.0, None
-        self.timeline.valueChanged.connect(self.animate)
-        self.timeline.finished.connect(self.close)
-        self.timeline.setDuration(750)  # 500 ~ 750 Ms is Ok, Not more.
-
-    def paintEvent(self, event):
-        """Overloaded paintEvent to set opacity and pic."""
-        painter = QPainter(self)
-        painter.setOpacity(self.opacity)
-        if self.old_pic:
-            painter.drawPixmap(0, 0, self.old_pic)
-
-    def animate(self, value):
-        """Animation of Opacity."""
-        self.opacity = 1.0 - value
-        return self.hide() if self.opacity < 0.1 else self.repaint()
-
-    def fade(self, old_pic, old_geometry, move_to):
-        """Fade from previous tab to new tab."""
-        if self.isVisible():
-            self.close()
-        if self.timeline.state():
-            self.timeline.stop()
-        self.setGeometry(old_geometry)
-        self.move(1, move_to)
-        self.old_pic = old_pic
-        self.timeline.start()
-        self.show()
-
-
-class TabBar(QTabBar):
-
-    """Custom tab bar."""
-
-    def __init__(self, parent=None, *args, **kwargs):
-        """Init class custom tab bar."""
-        super(TabBar, self).__init__(parent=None, *args, **kwargs)
-        self.parent, self.limit = parent, self.count() * 2
-        self.menu, self.submenu = QMenu("Tab Options"), QMenu("Tabs")
-        self.tab_previews = True
-        self.menu.addAction("Tab Menu").setDisabled(True)
-        self.menu.addSeparator()
-        self.menu.addAction("Top or Bottom Position", self.set_position)
-        self.menu.addAction("Undock Tab", self.make_undock)
-        self.menu.addAction("Toggle Tabs Previews", self.set_tab_previews)
-        self.menu.addMenu(self.submenu)
-        self.menu.aboutToShow.connect(self.build_submenu)
-        self.tabCloseRequested.connect(
-            lambda: self.removeTab(self.currentIndex()))
-        self.setMouseTracking(True)
-        self.installEventFilter(self)
-
-    def eventFilter(self, obj, event):
-        """Custom Events Filder for detecting clicks on Tabs."""
-        if obj == self:
-            if event.type() == QEvent.MouseMove:
-                index = self.tabAt(event.pos())
-                self.setCurrentIndex(index)
-                return True
-            else:
-                return QTabBar.eventFilter(self, obj, event)  # False
-        else:
-            return QMainWindow.eventFilter(self, obj, event)
-
-    def mouseDoubleClickEvent(self, event):
-        """Handle double click."""
-        self.menu.exec_(QCursor.pos())
-
-    def set_tab_previews(self):
-        """Toggle On/Off the Tabs Previews."""
-        self.tab_previews = not self.tab_previews
-        return self.tab_previews
-
-    def make_undock(self):
-        """Undock Tab from TabWidget to a Dialog,if theres more than 2 Tabs."""
-        msg = "<b>Needs more than 2 Tabs to allow Un-Dock Tabs !."
-        return self.parent.make_undock() if self.count(
-            ) > 2 else QMessageBox.warning(self, "Error", msg)
-
-    def set_position(self):
-        """Handle set Position on Tabs."""
-        self.parent.setTabPosition(0 if self.parent.tabPosition() else 1)
-
-    def build_submenu(self):
-        """Handle build a sub-menu on the fly with the list of tabs."""
-        self.submenu.clear()
-        self.submenu.addAction("Tab list").setDisabled(True)
-        for index in tuple(range(self.count())):
-            action = self.submenu.addAction("Tab {0}".format(index + 1))
-            action.triggered.connect(
-                lambda _, index=index: self.setCurrentIndex(index))
-
-
-class ScrollGroup(QScrollArea):
-    def __init__(self, title):
-        super(ScrollGroup, self).__init__()
-        self.group = QGroupBox(title)
-        self.setWidgetResizable(True)
-        self.setHorizontalScrollBarPolicy(1)
-        self.setWidget(self.group)
-        self.group.setLayout(QGridLayout())
-        self.group.setFlat(True)
-    
-    def layout(self):
-        return self.group.layout()
-    
-    def setLayout(self, layout):
-        self.group.setLayout(layout)
-        
 
 
 class TabWidget(QTabWidget):
@@ -200,7 +71,7 @@ class TabWidget(QTabWidget):
         self.init_html_tab()
         self.init_recent_tab()
         self.widgets_to_tabs(self.json_to_widgets(UNICODEMOTICONS))
-        
+
         self.make_trayicon()
         self.setMinimumSize(QDesktopWidget().screenGeometry().width() // 1.5,
                             QDesktopWidget().screenGeometry().height() // 1.5)
@@ -307,11 +178,11 @@ class TabWidget(QTabWidget):
         self.inputx.setPlaceholderText(" Type something cool here . . .")
         self.inputx.setFocus()
         self.runtools = QPushButton("Go !", self, clicked=self.runtool)
-        
+
         tool_area = ScrollGroup("Quick and Dirty Text Hacks !")
         tool_area.setLayout(QVBoxLayout())
         layout = tool_area.layout()
-        
+
         layout.addWidget(QLabel("<h1>Type or Paste text"))
         layout.addWidget(self.inputx)
         layout.addWidget(self.runtools)
@@ -339,18 +210,18 @@ class TabWidget(QTabWidget):
         layout.addWidget(self.spine)
         layout.addWidget(QLabel("Sanitized,Clean out weird characters,ASCII"))
         layout.addWidget(self.asci)
-        
+
         self.addTab(tool_area, "Tools")
 
     def init_html_tab(self):
         html_area = ScrollGroup("HTML Entities !")
         layout = html_area.layout()
-        
+
         added_html_entities, row, index = [], 0, 0
-        l = "".join([_ for _ in UNICODEMOTICONS.values()
+        _l = "".join([_ for _ in UNICODEMOTICONS.values()
                      if isinstance(_, str)])
         for html_char in tuple(sorted(entities.html5.items())):
-            if html_char[1] in l:
+            if html_char[1] in _l:
                 added_html_entities.append(
                     html_char[0].lower().replace(";", ""))
                 if not html_char[0].lower() in added_html_entities:
@@ -371,7 +242,7 @@ class TabWidget(QTabWidget):
                     index = index + 1  # cant use enumerate()
                     row = row + 1 if not index % 8 else row
                     layout.addWidget(button, row, index % 8)
-        
+
         self.addTab(html_area, "HTML")
 
     def init_recent_tab(self):
@@ -510,7 +381,7 @@ class TabWidget(QTabWidget):
         self.taimer.start(1000)  # how many time display the previews
 
     def recentify(self, emote):
-        """Update the recent emojis tab."""
+        """Update the recent emojis."""
         self.recent_emoji.append(emote)  # append last emoji to last item
         self.recent_emoji.pop(0)  # remove first item
         for index, button in enumerate(self.recent_buttons):
@@ -534,7 +405,7 @@ class TabWidget(QTabWidget):
             tit = str(titlemotes[0]).strip()[:9].title()
             area = ScrollGroup(tit + " !")
             layout = area.layout()
-            
+
             grid_cols = 2 if tit.lower() == "multichar" else 8
             for index, emote in enumerate(tuple(set(sorted(titlemotes[1])))):
                 button = QPushButton(emote, self)
@@ -551,7 +422,7 @@ class TabWidget(QTabWidget):
                 button.setFont(font)
                 row = row + 1 if not index % grid_cols else row
                 layout.addWidget(button, row, index % grid_cols)
-            
+
             dict_of_widgets[tit] = area
         return dict_of_widgets
 
