@@ -49,7 +49,7 @@ from unicodemoticon import (__author__, __url__, __email__, __license__,
 # EDIT HERE
 
 
-DESCRIPTION = ("Like a Color Picker but for Unicode Emoticons. "
+DESCRIPTION = ("Emoji App. Like a Color Picker but for Unicode Emoticons. "
                "Trayicon with Unicode Emoticons using Python3 Qt5.")
 
 
