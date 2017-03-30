@@ -25,6 +25,7 @@ if not __package__:
     import unicodemoticon  # noqa
     __package__ = str("unicodemoticon")
 
+
 from . import TabWidget  # lint:ok noqa pragma:nocover
 
 
