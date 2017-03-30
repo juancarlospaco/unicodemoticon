@@ -32,7 +32,7 @@ start_time = datetime.now()
 
 
 def main(args=sys.argv):
-    make_logger("unicodemoticon")
+    make_logger("unicodemoticon", emoji=True)
     lock = set_single_instance("unicodemoticon")
     check_encoding()
     set_process_name("unicodemoticon")
