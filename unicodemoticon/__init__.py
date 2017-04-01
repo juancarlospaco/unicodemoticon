@@ -22,20 +22,22 @@ from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QCursor, QIcon
 
 from PyQt5.QtWidgets import (QApplication, QComboBox, QDesktopWidget, QDialog,
-                             QHBoxLayout, QInputDialog,
+                             QHBoxLayout, QInputDialog, QCompleter,
                              QLabel, QLineEdit, QMenu,
                              QMessageBox, QPushButton,
                              QSystemTrayIcon, QTabWidget, QToolButton,
                              QVBoxLayout, QWidget)
 
 
-from .data import (CODES, STD_ICON_NAMES,
+from .data import (STD_ICON_NAMES,
                    UNICODEMOTICONS, AUTOSTART_DESKTOP_FILE)
-from .tinyslation import tinyslation
+
 from .faderwidget import FaderWidget
 from .tabbar import TabBar
 from .scrollgroup import ScrollGroup
-
+from .tab_html import TabHtml
+from .tab_tool import TabTool
+from .tab_recent import TabRecent
 
 from anglerfish import set_desktop_launcher
 
@@ -62,20 +64,42 @@ class TabWidget(QTabWidget):
         self.setMovable(False)
         self.setTabsClosable(False)
         self.setTabShape(QTabWidget.Triangular)
-
         self.init_preview()
         self.init_corner_menus()
         self.init_tray()
-
-        self.init_tool_tab()
-        self.init_html_tab()
-        self.init_recent_tab()
+        self.addTab(TabTool(self), "Tools")
+        self.addTab(TabHtml(self), "HTML")
+        self._recent_tab = TabRecent(self)
+        self.recentify = self._recent_tab.recentify  # shortcut
+        self.addTab(self._recent_tab, "Recent")
         self.widgets_to_tabs(self.json_to_widgets(UNICODEMOTICONS))
-
         self.make_trayicon()
         self.setMinimumSize(QDesktopWidget().screenGeometry().width() // 1.5,
                             QDesktopWidget().screenGeometry().height() // 1.5)
         # self.showMaximized()
+        emoji_area = ScrollGroup("Search as you type !")
+        search, layout = QLineEdit(emoji_area), emoji_area.layout()
+        search.setPlaceholderText("Search Unicode...")
+        font = search.font()
+        font.setPixelSize(25)
+        search.setFont(font)
+        search.resize(search.size().width() * 3, search.size().height())
+        search.move(99, 9)
+        search.setFocus()
+        search.setCompleter(QCompleter(("cat", "dog")))
+        row, index = 0, 0
+        for i in range(50):
+            button = QPushButton("?", self)
+            button.released.connect(self.hide)
+            button.setFlat(True)
+            button.setDisabled(True)
+            font = button.font()
+            font.setPixelSize(25)
+            button.setFont(font)
+            index = index + 1  # cant use enumerate()
+            row = row + 1 if not index % 8 else row
+            layout.addWidget(button, row, index % 8)
+        self.addTab(emoji_area, "Search")
 
     def init_preview(self):
         self.previews, self.timer = [], QTimer(self)
@@ -131,8 +155,7 @@ class TabWidget(QTabWidget):
         self.currentChanged.connect(self.make_tabs_fade)
 
     def init_tray(self):
-        self.tray = QSystemTrayIcon(self)
-        self.menu = QMenu(__doc__)
+        self.tray, self.menu = QSystemTrayIcon(self), QMenu(__doc__)
         self.menu.addAction("    Emoticons").setDisabled(True)
         self.menu.setIcon(self.windowIcon())
         self.menu.addSeparator()
@@ -151,118 +174,10 @@ class TabWidget(QTabWidget):
         self.menu.addAction("Alternate Case Clipboard",
                             self.alternate_clipboard)
         self.menu.addSeparator()
+        self.menu.addAction("Quit", exit)
         self.menu.addAction("Show", self.showMaximized)
         self.menu.addAction("Minimize", self.showMinimized)
-        self.menu.addAction("AutoCenter Window", self.center)
-        self.menu.addAction("To mouse position", self.move_to_mouse_position)
         self.tray.setContextMenu(self.menu)
-
-    def init_tool_tab(self):
-        self.inputx, self.alt, self.b64 = QLineEdit(), QLineEdit(), QLineEdit()
-        self.b64unsafe, self.rot13 = QLineEdit(), QLineEdit()
-        self.urlenc, self.urlencp = QLineEdit(), QLineEdit()
-        self.snake, self.spine = QLineEdit(), QLineEdit()
-        self.asci, self.camel, self.swp = QLineEdit(), QLineEdit(), QLineEdit()
-        self.tran, self.fr, self.to = QLineEdit(), QComboBox(), QComboBox()
-        self.container, loca = QWidget(), str(getdefaultlocale()[0][:2])
-        self.fr.addItems(CODES)
-        self.to.addItems(CODES)
-        self.fr.setCurrentIndex(self.fr.findText(loca))
-        self.to.setCurrentIndex(self.fr.findText(loca))
-        layou = QHBoxLayout(self.container)
-        layou.addWidget(self.tran)
-        layou.addWidget(QLabel("<b>From"))
-        layou.addWidget(self.fr)
-        layou.addWidget(QLabel("<b>To"))
-        layou.addWidget(self.to)
-        self.inputx.setPlaceholderText(" Type something cool here . . .")
-        self.inputx.setFocus()
-        self.runtools = QPushButton("Go !", self, clicked=self.runtool)
-
-        tool_area = ScrollGroup("Quick and Dirty Text Hacks !")
-        tool_area.setLayout(QVBoxLayout())
-        layout = tool_area.layout()
-
-        layout.addWidget(QLabel("<h1>Type or Paste text"))
-        layout.addWidget(self.inputx)
-        layout.addWidget(self.runtools)
-        layout.addWidget(QLabel("Translated Text"))
-        layout.addWidget(self.container)
-        layout.addWidget(QLabel("Alternate case"))
-        layout.addWidget(self.alt)
-        layout.addWidget(QLabel("Swap case"))
-        layout.addWidget(self.swp)
-        layout.addWidget(QLabel("Base 64 URL Safe, for the Web"))
-        layout.addWidget(self.b64)
-        layout.addWidget(QLabel("Base 64"))
-        layout.addWidget(self.b64unsafe)
-        layout.addWidget(QLabel("ROT-13"))
-        layout.addWidget(self.rot13)
-        layout.addWidget(QLabel("URL Encode Plus+"))
-        layout.addWidget(self.urlencp)
-        layout.addWidget(QLabel("URL Encode"))
-        layout.addWidget(self.urlenc)
-        layout.addWidget(QLabel("Camel Case"))
-        layout.addWidget(self.camel)
-        layout.addWidget(QLabel("Snake Case"))
-        layout.addWidget(self.snake)
-        layout.addWidget(QLabel("Spine Case"))
-        layout.addWidget(self.spine)
-        layout.addWidget(QLabel("Sanitized,Clean out weird characters,ASCII"))
-        layout.addWidget(self.asci)
-
-        self.addTab(tool_area, "Tools")
-
-    def init_html_tab(self):
-        html_area = ScrollGroup("HTML Entities !")
-        layout = html_area.layout()
-
-        added_html_entities, row, index = [], 0, 0
-        _l = "".join([_ for _ in UNICODEMOTICONS.values()
-                     if isinstance(_, str)])
-        for html_char in tuple(sorted(entities.html5.items())):
-            if html_char[1] in _l:
-                added_html_entities.append(
-                    html_char[0].lower().replace(";", ""))
-                if not html_char[0].lower() in added_html_entities:
-                    button = QPushButton(html_char[1], self)
-                    button.released.connect(self.hide)
-                    button.pressed.connect(lambda ch=html_char:
-                                           self.make_preview(str(ch)))
-                    button.clicked.connect(
-                        lambda _, ch=html_char[0]:
-                        QApplication.clipboard().setText(
-                            "&{html_entity}".format(html_entity=ch)))
-                    button.setToolTip("<center><h1>{0}<br>{1}".format(
-                        html_char[1], self.get_description(html_char[1])))
-                    button.setFlat(True)
-                    font = button.font()
-                    font.setPixelSize(50)
-                    button.setFont(font)
-                    index = index + 1  # cant use enumerate()
-                    row = row + 1 if not index % 8 else row
-                    layout.addWidget(button, row, index % 8)
-
-        self.addTab(html_area, "HTML")
-
-    def init_recent_tab(self):
-        emoji_area = ScrollGroup("Recent Emoji !")
-        layout = emoji_area.layout()
-        row, index = 0, 0
-        self.recent_emoji, self.recent_buttons = str("? " * 50).split(), []
-        for i in range(50):
-            button = QPushButton("?", self)
-            button.released.connect(self.hide)
-            button.setFlat(True)
-            button.setDisabled(True)
-            font = button.font()
-            font.setPixelSize(font.pixelSize() * 2)
-            button.setFont(font)
-            index = index + 1  # cant use enumerate()
-            row = row + 1 if not index % 8 else row
-            self.recent_buttons.append(button)
-            layout.addWidget(button, row, index % 8)
-        self.addTab(emoji_area, "Recent")
 
     def build_submenu(self, char_list: (str, tuple), submenu: QMenu) -> QMenu:
         """Take a list of characters and a submenu and build actions on it."""
@@ -286,34 +201,6 @@ class TabWidget(QTabWidget):
                 lambda: self.hide() if self.isVisible()
                 else self.showMaximized())
             return self.tray.show()
-
-    def runtool(self, *args):
-        """Run all text transformation tools."""
-        txt = str(self.inputx.text())
-        if not len(txt.strip()):
-            return
-        for field in (
-            self.alt, self.b64, self.b64unsafe, self.rot13, self.urlenc,
-            self.urlencp, self.snake, self.spine, self.asci, self.camel,
-                self.swp, self.tran):
-            field.clear()
-            field.setReadOnly(True)
-        self.alt.setText(self.make_alternate_case(txt))
-        self.swp.setText(txt.swapcase())
-        self.b64.setText(urlsafe_b64encode(
-            bytes(txt, "utf-8")).decode("utf-8"))
-        self.b64unsafe.setText(b64encode(bytes(txt, "utf-8")).decode("utf-8"))
-        self.rot13.setText(codecs.encode(txt, "rot-13"))
-        self.urlencp.setText(parse.quote_plus(txt, encoding="utf-8"))
-        self.urlenc.setText(parse.quote(txt, encoding="utf-8"))
-        self.camel.setText(txt.title().replace(" ", ""))
-        self.snake.setText(txt.replace(" ", "_"))
-        self.spine.setText(txt.replace(" ", "-"))
-        self.asci.setText(re.sub(r"[^\x00-\x7F]+", "", txt))
-        if self.fr.currentText() != self.to.currentText() and len(txt) < 999:
-            self.tran.setText(tinyslation(txt.strip().replace("\n", " "),
-                              str(self.to.currentText()),
-                              str(self.fr.currentText())))
 
     def make_search_unicode(self):
         """Make a Pop-Up Dialog to search Unicode Emoticons."""
@@ -375,39 +262,21 @@ class TabWidget(QTabWidget):
         log.debug(emoticon_text)
         if self.taimer.isActive():  # Be Race Condition Safe
             self.taimer.stop()
-        self.preview.setText("  " + emoticon_text + "  ")
+        self.preview.setText(" " + emoticon_text + " ")
         self.preview.move(QCursor.pos())
         self.preview.show()
         self.taimer.start(1000)  # how many time display the previews
-
-    def recentify(self, emote):
-        """Update the recent emojis."""
-        self.recent_emoji.append(emote)  # append last emoji to last item
-        self.recent_emoji.pop(0)  # remove first item
-        for index, button in enumerate(self.recent_buttons):
-            button.setText(self.recent_emoji[index])
-            if str(button.text()) != "?":
-                button.pressed.connect(lambda ch=self.recent_emoji[index]:
-                                       self.make_preview(str(ch)))
-                button.clicked.connect(
-                    lambda _, ch=self.recent_emoji[index]:
-                        QApplication.clipboard().setText(ch))
-                button.setToolTip("<center><h1>{0}<br>{1}".format(
-                    self.recent_emoji[index],
-                    self.get_description(self.recent_emoji[index])))
-                button.setDisabled(False)
-        return self.recent_emoji
 
     def json_to_widgets(self, jotason: dict):
         """Take a json string object return QWidgets."""
         dict_of_widgets, row = {}, 0
         for titlemotes in tuple(sorted(jotason.items())):
             tit = str(titlemotes[0]).strip()[:9].title()
-            area = ScrollGroup(tit + " !")
+            area = ScrollGroup(tit)
             layout = area.layout()
 
             grid_cols = 2 if tit.lower() == "multichar" else 8
-            for index, emote in enumerate(tuple(set(sorted(titlemotes[1])))):
+            for index, emote in enumerate(tuple(set(list(titlemotes[1])))):
                 button = QPushButton(emote, self)
                 button.clicked.connect(lambda _, c=emote:
                                        QApplication.clipboard().setText(c))
