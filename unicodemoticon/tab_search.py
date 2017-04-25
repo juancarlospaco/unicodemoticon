@@ -5,8 +5,8 @@
 """Custom tab widget."""
 
 
-from PyQt5.QtWidgets import (QApplication, QPushButton, QLineEdit, QCompleter,
-                             QVBoxLayout, QGridLayout, QGroupBox, QScrollArea, QWidget)
+from PyQt5.QtWidgets import (QApplication, QPushButton, QLineEdit, QVBoxLayout,
+                             QGridLayout, QGroupBox, QScrollArea, QWidget)
 
 
 class _ScrollGroup(QScrollArea):
@@ -14,7 +14,7 @@ class _ScrollGroup(QScrollArea):
     """Group with Scroll and QVBoxLayout."""
 
     def __init__(self, title):
-        super(ScrollGroup, self).__init__()
+        super(_ScrollGroup, self).__init__()
         self.group = QGroupBox(title)
         self.setWidgetResizable(True)
         self.setHorizontalScrollBarPolicy(1)
@@ -47,11 +47,8 @@ class TabSearch(_ScrollGroup):
         search.setFocus()
         layout.addWidget(search)
 
-        search.setCompleter(QCompleter(("cat", "dog")))
-
-        self.container = Qwidget(self)
+        self.container = QWidget(self)
         self.container.setLayout(QGridLayout())
-        self.container.setFlat(True)
         layout.addWidget(self.container)
         row, index = 0, 0
         for i in range(50):
@@ -64,4 +61,4 @@ class TabSearch(_ScrollGroup):
             button.setFont(font)
             index = index + 1  # cant use enumerate()
             row = row + 1 if not index % 8 else row
-            self.container.addWidget(button, row, index % 8)
+            self.container.layout().addWidget(button, row, index % 8)
