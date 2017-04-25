@@ -43,6 +43,7 @@ class TabSearch(_ScrollGroup):
         search.setPlaceholderText("Search Unicode...")
         font = search.font()
         font.setPixelSize(25)
+        font.setBold(True)
         search.setFont(font)
         search.setFocus()
         layout.addWidget(search)
