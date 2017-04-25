@@ -51,9 +51,10 @@ class TabSearch(_ScrollGroup):
         self.container = QWidget(self)
         self.container.setLayout(QGridLayout())
         layout.addWidget(self.container)
-        row, index = 0, 0
+        self.buttons, row, index = 0, 0, []
         for i in range(50):
             button = QPushButton("?", self)
+            self.buttons.append(button)
             button.released.connect(self.hide)
             button.setFlat(True)
             button.setDisabled(True)
