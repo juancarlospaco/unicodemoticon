@@ -12,6 +12,9 @@
 ![screenshot](https://raw.githubusercontent.com/juancarlospaco/unicodemoticon/master/temp3.jpg "UnicodEmoticon on Linux")
 
 
+![screenshot](https://raw.githubusercontent.com/juancarlospaco/unicodemoticon/master/temp4.jpg "As-you-type Emoji Search")
+
+
 https://pypi.python.org/pypi/unicodemoticon
 https://aur.archlinux.org/packages/unicodemoticon
 
