@@ -26,7 +26,7 @@ if not __package__:
     __package__ = str("unicodemoticon")
 
 
-from . import TabWidget  # lint:ok noqa pragma:nocover
+from . import MainWidget  # lint:ok noqa pragma:nocover
 
 
 start_time = datetime.now()
@@ -47,9 +47,9 @@ def main(args=sys.argv):
             app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())
     icon = QIcon(app.style().standardPixmap(QStyle.SP_FileIcon))
     app.setWindowIcon(icon)
-    win = TabWidget()
-    win.show()
-    win.hide()
+    mainwindow = MainWidget()
+    mainwindow.show()
+    mainwindow.hide()
     make_post_exec_msg(start_time)
     sys.exit(app.exec())
 
