@@ -30,7 +30,7 @@ class _ScrollGroup(QScrollArea):
         return self.group.layout()
 
     def setLayout(self, layout):
-        self.group.setLayout(layout)
+        return self.group.setLayout(layout)
 
 
 class TabSearch(_ScrollGroup):
@@ -49,7 +49,7 @@ class TabSearch(_ScrollGroup):
         self.timer.timeout.connect(self._make_search_unicode)
 
         self.search, layout = QLineEdit(self), self.layout()
-        self.search.setPlaceholderText(" Search Unicode...")
+        self.search.setPlaceholderText(" Search Unicode . . .")
         font = self.search.font()
         font.setPixelSize(25)
         font.setBold(True)
@@ -74,11 +74,11 @@ class TabSearch(_ScrollGroup):
             self.searchbutons.append(button)
             self.container.layout().addWidget(button, row, index % 8)
 
-      def _go(self):
+    def _go(self):
         """Run/Stop the QTimer."""
         if self.timer.isActive():
             self.timer.stop()
-        return self.timer.start(3000)
+        return self.timer.start(1000)
 
     def _make_search_unicode(self):
         """Make a search for Unicode Emoticons."""
@@ -94,6 +94,7 @@ class TabSearch(_ScrollGroup):
                         found_by_name += emote
             results = tuple(sorted(set(found_exact + found_by_name)))[:50]
             for emoji, button in zip(results, self.searchbutons):
+                button.setText(emoji)
                 button.pressed.connect(lambda ch=emoji:
                                        self.parent.make_preview(ch))
                 button.clicked.connect(
