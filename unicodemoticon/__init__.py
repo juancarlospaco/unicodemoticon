@@ -5,41 +5,32 @@
 """UnicodEmoticons."""
 
 
-import codecs
-import re
 import logging as log
 
-from base64 import b64encode, urlsafe_b64encode
-from locale import getdefaultlocale
-from urllib import parse
-
-from html import entities
-
 import unicodedata
+
+from webbrowser import open_new_tab
 
 from PyQt5.QtCore import Qt, QTimer
 
 from PyQt5.QtGui import QCursor, QIcon
 
-from PyQt5.QtWidgets import (QApplication, QComboBox, QDesktopWidget, QDialog,
-                             QHBoxLayout, QInputDialog, QCompleter,
-                             QLabel, QLineEdit, QMenu,
-                             QMessageBox, QPushButton,
-                             QSystemTrayIcon, QTabWidget, QToolButton,
-                             QVBoxLayout, QWidget)
+from PyQt5.QtWidgets import (QApplication, QDesktopWidget, QDialog,
+                             QInputDialog, QLabel, QMenu, QMessageBox,
+                             QPushButton, QSystemTrayIcon, QTabWidget,
+                             QToolButton, QVBoxLayout)
 
+from unicodemoticon.core.faderwidget import FaderWidget
+from unicodemoticon.core.tabbar import TabBar
+from unicodemoticon.core.scrollgroup import ScrollGroup
+from unicodemoticon.core.data import (STD_ICON_NAMES, UNICODEMOTICONS,
+                                      AUTOSTART_DESKTOP_FILE)
 
-from .data import (STD_ICON_NAMES,
-                   UNICODEMOTICONS, AUTOSTART_DESKTOP_FILE)
-
-from .faderwidget import FaderWidget
-from .tabbar import TabBar
-from .scrollgroup import ScrollGroup
-from .tab_html import TabHtml
-from .tab_symbols import TabSymbols
-from .tab_tool import TabTool
-from .tab_recent import TabRecent
-from .tab_search import TabSearch
+from unicodemoticon.tabs.tab_html import TabHtml
+from unicodemoticon.tabs.tab_symbols import TabSymbols
+from unicodemoticon.tabs.tab_tool import TabTool
+from unicodemoticon.tabs.tab_recent import TabRecent
+from unicodemoticon.tabs.tab_search import TabSearch
 
 from anglerfish import set_desktop_launcher
 
@@ -48,19 +39,20 @@ __version__ = '2.7.5'
 __license__ = ' GPLv3+ LGPLv3+ '
 __author__ = ' Juan Carlos '
 __email__ = ' juancarlospaco@gmail.com '
-__url__ = 'https://github.com/juancarlospaco/unicodemoticon'
+__url__ = 'https://github.com/juancarlospaco/unicodemoticon#unicodemoticon'
+__all__ = ("MainWidget", )
 
 
 ##############################################################################
 
 
-class TabWidget(QTabWidget):
+class MainWidget(QTabWidget):
 
-    """Custom tab widget."""
+    """Custom main widget."""
 
     def __init__(self, parent=None, *args, **kwargs):
         """Init class custom tab widget."""
-        super(TabWidget, self).__init__(parent=None, *args, **kwargs)
+        super(MainWidget, self).__init__(parent=None, *args, **kwargs)
         self.parent = parent
         self.setTabBar(TabBar(self))
         self.setMovable(False)
@@ -78,8 +70,8 @@ class TabWidget(QTabWidget):
         self.addTab(self._recent_tab, "Recent")
         self.widgets_to_tabs(self.json_to_widgets(UNICODEMOTICONS))
         self.make_trayicon()
-        self.setMinimumSize(QDesktopWidget().screenGeometry().width() // 1.25,
-                            QDesktopWidget().screenGeometry().height() // 1.25)
+        self.setMinimumSize(QDesktopWidget().screenGeometry().width() // 1.5,
+                            QDesktopWidget().screenGeometry().height() // 1.5)
         # self.showMaximized()
 
     def init_preview(self):
@@ -129,6 +121,8 @@ class TabWidget(QTabWidget):
         self.menu_tool.addAction("Quit", exit)
         self.menu_help.addAction("About Qt 5",
                                  lambda: QMessageBox.aboutQt(None))
+        self.menu_help.addAction("About Unicodemoticon",
+                                 lambda: open_new_tab(__url__))
         self.setCornerWidget(self.menu_1, 1)
         self.setCornerWidget(self.menu_0, 0)
         self.currentChanged.connect(self.make_tabs_previews)
