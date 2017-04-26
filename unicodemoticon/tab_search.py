@@ -8,6 +8,8 @@
 from PyQt5.QtWidgets import (QApplication, QPushButton, QLineEdit, QVBoxLayout,
                              QGridLayout, QGroupBox, QScrollArea, QWidget)
 
+from .data import UNICODEMOTICONS
+
 
 class _ScrollGroup(QScrollArea):
 
@@ -39,14 +41,14 @@ class TabSearch(_ScrollGroup):
         self.parent = parent
         self.setParent(parent)
 
-        search, layout = QLineEdit(self), self.layout()
-        search.setPlaceholderText(" Search Unicode...")
-        font = search.font()
+        self.search, layout = QLineEdit(self), self.layout()
+        self.search.setPlaceholderText(" Search Unicode...")
+        font = self.search.font()
         font.setPixelSize(25)
         font.setBold(True)
-        search.setFont(font)
-        search.setFocus()
-        layout.addWidget(search)
+        self.search.setFont(font)
+        self.search.setFocus()
+        layout.addWidget(self.search)
 
         self.container, self.searchbutons, row, index = QWidget(self), [], 0, 0
         self.container.setLayout(QGridLayout())
@@ -66,25 +68,23 @@ class TabSearch(_ScrollGroup):
 
     def make_search_unicode(self):
         """Make a search for Unicode Emoticons."""
-        sorry = "<i>Nothing found! Search can not find similar Unicode, sorry."
-        search = str(QInputDialog.getText(
-            None, __doc__, "<b>Type to search Unicode ?:")[0]).lower().strip()
+        search = str(self.search.text()).lower().strip()
         if search and len(search):
-            log.debug("Searching all Unicode for: '{0}'.".format(search))
             emos = [_ for _ in UNICODEMOTICONS.values() if isinstance(_, str)]
             found_exact = [_ for _ in emos if search in _]
             found_by_name = []
             for emoticons_list in emos:
                 for emote in emoticons_list:
-                    emoticon_name = str(self.get_description(emote)).lower()
-                    if search in emoticon_name and len(emoticon_name):
+                    emojiname = str(self.parent.get_description(emote)).lower()
+                    if search in emojiname and len(emojiname):
                         found_by_name += emote
-            found_tuple = tuple(sorted(set(found_exact + found_by_name)))
-            result = found_tuple[:75] if len(found_tuple) else sorry
-            msg = """<b>Your Search:</b><h3>{0}</h3><b>{1} Similar Unicode:</b>
-            <h1>{2}</h1><i>All Unicode Copied to Clipboard !.""".format(
-                search[:99], len(found_tuple), result)
-            QApplication.clipboard().setText("".join(found_tuple))
-            log.debug("Found Unicode: '{0}'.".format(found_tuple))
-            QMessageBox.information(None, __doc__, msg)
-            return found_tuple
+            results = tuple(sorted(set(found_exact + found_by_name)))[:50]
+            for emoji, button in zip(results, self.searchbutons):
+                button.pressed.connect(lambda ch=emoji:
+                                       self.parent.make_preview(ch))
+                button.clicked.connect(
+                    lambda _, ch=emoji: QApplication.clipboard().setText(ch))
+                button.setToolTip("<center><h1>{0}<br>{1}".format(
+                    emoji, self.parent.get_description(emoji)))
+                button.setDisabled(False)
+            return results
