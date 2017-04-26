@@ -38,7 +38,7 @@ from anglerfish import set_desktop_launcher
 __version__ = '3.0.0'
 __license__ = ' GPLv3+ LGPLv3+ '
 __author__ = ' Juan Carlos '
-__email__ = ' juancarlospaco@gmail.com '
+__email__ = 'juancarlospaco@gmail.com'
 __url__ = 'https://github.com/juancarlospaco/unicodemoticon#unicodemoticon'
 __all__ = ("MainWidget", )
 
