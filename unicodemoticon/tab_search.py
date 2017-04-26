@@ -48,12 +48,11 @@ class TabSearch(_ScrollGroup):
         search.setFocus()
         layout.addWidget(search)
 
-        self.container, self.buttons, row, index = QWidget(self), [], 0, 0
+        self.container, self.searchbutons, row, index = QWidget(self), [], 0, 0
         self.container.setLayout(QGridLayout())
         layout.addWidget(self.container)
         for i in range(50):
             button = QPushButton("?", self)
-            self.buttons.append(button)
             button.released.connect(self.hide)
             button.setFlat(True)
             button.setDisabled(True)
@@ -62,4 +61,5 @@ class TabSearch(_ScrollGroup):
             button.setFont(font)
             index = index + 1  # cant use enumerate()
             row = row + 1 if not index % 8 else row
+            self.searchbutons.append(button)
             self.container.layout().addWidget(button, row, index % 8)
