@@ -5,6 +5,8 @@
 """Custom tab widget."""
 
 
+from PyQt5.QtCore import QTimer
+
 from PyQt5.QtWidgets import (QApplication, QPushButton, QLineEdit, QVBoxLayout,
                              QGridLayout, QGroupBox, QScrollArea, QWidget)
 
@@ -41,6 +43,11 @@ class TabSearch(_ScrollGroup):
         self.parent = parent
         self.setParent(parent)
 
+        # Timer to start
+        self.timer = QTimer(self)
+        self.timer.setSingleShot(True)
+        self.timer.timeout.connect(self._make_search_unicode)
+
         self.search, layout = QLineEdit(self), self.layout()
         self.search.setPlaceholderText(" Search Unicode...")
         font = self.search.font()
@@ -48,6 +55,7 @@ class TabSearch(_ScrollGroup):
         font.setBold(True)
         self.search.setFont(font)
         self.search.setFocus()
+        self.search.textChanged.connect(self._go)
         layout.addWidget(self.search)
 
         self.container, self.searchbutons, row, index = QWidget(self), [], 0, 0
@@ -66,7 +74,13 @@ class TabSearch(_ScrollGroup):
             self.searchbutons.append(button)
             self.container.layout().addWidget(button, row, index % 8)
 
-    def make_search_unicode(self):
+      def _go(self):
+        """Run/Stop the QTimer."""
+        if self.timer.isActive():
+            self.timer.stop()
+        return self.timer.start(3000)
+
+    def _make_search_unicode(self):
         """Make a search for Unicode Emoticons."""
         search = str(self.search.text()).lower().strip()
         if search and len(search):
