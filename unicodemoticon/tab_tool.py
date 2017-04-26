@@ -11,10 +11,9 @@ import re
 from base64 import b64encode, urlsafe_b64encode
 from locale import getdefaultlocale
 from urllib import parse
-from locale import getdefaultlocale
 
 from PyQt5.QtWidgets import (QComboBox, QHBoxLayout, QLabel, QLineEdit,
-                             QPushButton, QVBoxLayout, QWidget)
+                             QPushButton, QWidget)
 
 from .scrollgroup import ScrollGroup
 from .tinyslation import tinyslation

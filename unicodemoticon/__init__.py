@@ -69,17 +69,17 @@ class TabWidget(QTabWidget):
         self.init_preview()
         self.init_corner_menus()
         self.init_tray()
+        self.addTab(TabSearch(self), "Search")
         self.addTab(TabTool(self), "Tools")
         self.addTab(TabHtml(self), "HTML")
         self.addTab(TabSymbols(self), "Symbols")
         self._recent_tab = TabRecent(self)
         self.recentify = self._recent_tab.recentify  # shortcut
         self.addTab(self._recent_tab, "Recent")
-        self.addTab(TabSearch(self), "Search")
         self.widgets_to_tabs(self.json_to_widgets(UNICODEMOTICONS))
         self.make_trayicon()
-        self.setMinimumSize(QDesktopWidget().screenGeometry().width() // 1.5,
-                            QDesktopWidget().screenGeometry().height() // 1.5)
+        self.setMinimumSize(QDesktopWidget().screenGeometry().width() // 1.25,
+                            QDesktopWidget().screenGeometry().height() // 1.25)
         # self.showMaximized()
 
     def init_preview(self):

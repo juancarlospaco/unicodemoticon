@@ -9,8 +9,8 @@ from html import entities
 
 from PyQt5.QtCore import QTimer
 
-from PyQt5.QtWidgets import (QApplication, QPushButton, QLineEdit, QVBoxLayout,
-                             QGridLayout, QGroupBox, QScrollArea, QWidget)
+from PyQt5.QtWidgets import (QApplication, QGridLayout, QGroupBox, QLineEdit,
+                             QPushButton, QScrollArea, QVBoxLayout, QWidget)
 
 from .data import UNICODEMOTICONS
 

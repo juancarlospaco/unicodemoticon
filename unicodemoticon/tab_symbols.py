@@ -25,7 +25,7 @@ class TabSymbols(ScrollGroup):
         added_symbols, row, index = [], 0, 0
         for html_char in tuple(sorted(entities.html5.items())):
             html_char = str(html_char[1]).lower().strip()
-            if not html_char in added_symbols and len(html_char):
+            if html_char not in added_symbols and len(html_char):
                 button = QPushButton(html_char, self)
                 button.released.connect(self.parent.hide)
                 button.pressed.connect(lambda ch=html_char:
