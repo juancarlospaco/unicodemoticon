@@ -36,8 +36,10 @@ from .faderwidget import FaderWidget
 from .tabbar import TabBar
 from .scrollgroup import ScrollGroup
 from .tab_html import TabHtml
+from .tab_symbols import TabSymbols
 from .tab_tool import TabTool
 from .tab_recent import TabRecent
+from .tab_search import TabSearch
 
 from anglerfish import set_desktop_launcher
 
@@ -69,37 +71,16 @@ class TabWidget(QTabWidget):
         self.init_tray()
         self.addTab(TabTool(self), "Tools")
         self.addTab(TabHtml(self), "HTML")
+        self.addTab(TabSymbols(self), "Symbols")
         self._recent_tab = TabRecent(self)
         self.recentify = self._recent_tab.recentify  # shortcut
         self.addTab(self._recent_tab, "Recent")
+        self.addTab(TabSearch(self), "Search")
         self.widgets_to_tabs(self.json_to_widgets(UNICODEMOTICONS))
         self.make_trayicon()
         self.setMinimumSize(QDesktopWidget().screenGeometry().width() // 1.5,
                             QDesktopWidget().screenGeometry().height() // 1.5)
         # self.showMaximized()
-        emoji_area = ScrollGroup("Search as you type !")
-        search, layout = QLineEdit(emoji_area), emoji_area.layout()
-        search.setPlaceholderText("Search Unicode...")
-        font = search.font()
-        font.setPixelSize(25)
-        search.setFont(font)
-        search.resize(search.size().width() * 3, search.size().height())
-        search.move(99, 9)
-        search.setFocus()
-        search.setCompleter(QCompleter(("cat", "dog")))
-        row, index = 0, 0
-        for i in range(50):
-            button = QPushButton("?", self)
-            button.released.connect(self.hide)
-            button.setFlat(True)
-            button.setDisabled(True)
-            font = button.font()
-            font.setPixelSize(25)
-            button.setFont(font)
-            index = index + 1  # cant use enumerate()
-            row = row + 1 if not index % 8 else row
-            layout.addWidget(button, row, index % 8)
-        self.addTab(emoji_area, "Search")
 
     def init_preview(self):
         self.previews, self.timer = [], QTimer(self)
@@ -132,7 +113,6 @@ class TabWidget(QTabWidget):
         self.menu_0.setMenu(self.menu_help)
         self.menu_1.setMenu(self.menu_tool)
         self.menu_tool.addAction("Explain Unicode", self.make_explain_unicode)
-        self.menu_tool.addAction("Search Unicode", self.make_search_unicode)
         self.menu_tool.addAction("Alternate Case Clipboard",
                                  self.alternate_clipboard)
         self.menu_tool.addSeparator()
@@ -201,31 +181,6 @@ class TabWidget(QTabWidget):
                 lambda: self.hide() if self.isVisible()
                 else self.showMaximized())
             return self.tray.show()
-
-    def make_search_unicode(self):
-        """Make a Pop-Up Dialog to search Unicode Emoticons."""
-        sorry = "<i>Nothing found! Search can not find similar Unicode, sorry."
-        search = str(QInputDialog.getText(
-            None, __doc__, "<b>Type to search Unicode ?:")[0]).lower().strip()
-        if search and len(search):
-            log.debug("Searching all Unicode for: '{0}'.".format(search))
-            emos = [_ for _ in UNICODEMOTICONS.values() if isinstance(_, str)]
-            found_exact = [_ for _ in emos if search in _]
-            found_by_name = []
-            for emoticons_list in emos:
-                for emote in emoticons_list:
-                    emoticon_name = str(self.get_description(emote)).lower()
-                    if search in emoticon_name and len(emoticon_name):
-                        found_by_name += emote
-            found_tuple = tuple(sorted(set(found_exact + found_by_name)))
-            result = found_tuple[:75] if len(found_tuple) else sorry
-            msg = """<b>Your Search:</b><h3>{0}</h3><b>{1} Similar Unicode:</b>
-            <h1>{2}</h1><i>All Unicode Copied to Clipboard !.""".format(
-                search[:99], len(found_tuple), result)
-            QApplication.clipboard().setText("".join(found_tuple))
-            log.debug("Found Unicode: '{0}'.".format(found_tuple))
-            QMessageBox.information(None, __doc__, msg)
-            return found_tuple
 
     def make_explain_unicode(self) -> tuple:
         """Make an explanation from unicode entered,if at least 1 chars."""
