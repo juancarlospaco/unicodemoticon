@@ -40,7 +40,7 @@ class TabSearch(_ScrollGroup):
         self.setParent(parent)
 
         search, layout = QLineEdit(self), self.layout()
-        search.setPlaceholderText("Search Unicode...")
+        search.setPlaceholderText(" Search Unicode...")
         font = search.font()
         font.setPixelSize(25)
         font.setBold(True)
@@ -48,10 +48,9 @@ class TabSearch(_ScrollGroup):
         search.setFocus()
         layout.addWidget(search)
 
-        self.container = QWidget(self)
+        self.container, self.buttons, row, index = QWidget(self), [], 0, 0
         self.container.setLayout(QGridLayout())
         layout.addWidget(self.container)
-        self.buttons, row, index = 0, 0, []
         for i in range(50):
             button = QPushButton("?", self)
             self.buttons.append(button)
