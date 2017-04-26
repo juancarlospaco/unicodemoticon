@@ -5,6 +5,8 @@
 """Custom tab widget."""
 
 
+from html import entities
+
 from PyQt5.QtCore import QTimer
 
 from PyQt5.QtWidgets import (QApplication, QPushButton, QLineEdit, QVBoxLayout,
@@ -42,6 +44,9 @@ class TabSearch(_ScrollGroup):
         super(TabSearch, self).__init__(self, *args, **kwargs)
         self.parent = parent
         self.setParent(parent)
+        list1 = [_ for _ in UNICODEMOTICONS.values() if isinstance(_, str)]
+        list2 = [_[1] for _ in entities.html5.items()]
+        self.emos = tuple(sorted(set(list1 + list2)))
 
         # Timer to start
         self.timer = QTimer(self)
@@ -84,10 +89,9 @@ class TabSearch(_ScrollGroup):
         """Make a search for Unicode Emoticons."""
         search = str(self.search.text()).lower().strip()
         if search and len(search):
-            emos = [_ for _ in UNICODEMOTICONS.values() if isinstance(_, str)]
-            found_exact = [_ for _ in emos if search in _]
+            found_exact = [_ for _ in self.emos if search in _]
             found_by_name = []
-            for emoticons_list in emos:
+            for emoticons_list in self.emos:
                 for emote in emoticons_list:
                     emojiname = str(self.parent.get_description(emote)).lower()
                     if search in emojiname and len(emojiname):
